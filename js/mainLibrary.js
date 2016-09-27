@@ -12,7 +12,7 @@
             this.brokeAdventurerList = [];
             this.expPool = createExpPool(this.expData);
             this.monsterPool = createMonsterPool(this.monsterData);
-            this.moneyPool = 0;
+            this.moneyPool = 50;
             //adjustable - how much it costs to heal damage
             this.costPerHP = 1;
             //adjustable - what percentage of damage monsters do in a fight
@@ -24,10 +24,19 @@
             //adjustable - die roll to add extra gold when an adventurer kills a monster
             this.goldGainRoll = 4;
         }
-        CartelGameModel.addAdventurers = function(num) {
+        CartelGameModel.addAdventurers = function(num, cost) {
+            this.moneyPool -= cost;
             for (var i = 0; i < num; i++)
                 this.adventurerList.push(new Adventurer(1, this.expPool.get(1)));
         }
+        //Price=BaseCost×Multiplier^(#Owned)
+        CartelGameModel.adventurerCost = function() {
+            return Math.floor(50 * Math.pow(1.07, this.adventurerList.length));
+        }
+        CartelGameModel.hasAmount = function(amount) {
+            return amount <= this.moneyPool;
+        }
+        
         CartelGameModel.updateHealingCost = function(newCost) {
             this.costPerHP = newCost;
         }
