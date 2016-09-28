@@ -50,29 +50,19 @@ Game.prototype = {
         button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + button.details.cost, {font: '16px TheMinion'}));
         button.multiplier = multiplier;
         button.events.onInputDown.add(this.addAdventurers, this);
-        //below works but have to also dim the button somehow
         if (!CartelGameModel.hasAmount(button.details.cost)) {
             button.inputEnabled = false;
             button.alpha = 0.1;
         }
         
     }
-    
-    /*
-     function create() {        
-        buttonA = game.add.sprite(100, 100, 'buttonA');
-        buttonA.variable = "Hi there!"        
-        buttonA.inputEnabled = true;        
-        buttonA.events.onInputDown.add(doSomething, this);    
-        
-        }    
-        function doSomething (item) {        console.log(item.variable);    }
-    */
 
     , addAdventurers: function(button) {
         CartelGameModel.addAdventurers(button.details.multiplier, button.details.cost);
         this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
         this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
+        //update cost and availability for all
+        this.updateButtons();
     }
     
     , create: function () {
@@ -82,23 +72,26 @@ Game.prototype = {
         //this.addMenuOption('Quit ->', function (e) {
         //    this.game.state.start("GameOver");
         //});
-        CartelGameModel.addAdventurers(100);
         //scorekeepers
         this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + CartelGameModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.playerAdvText = this.add.text(200, 50, 'Adventurers: ' + CartelGameModel.adventurerList.length, {
+        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + CartelGameModel.adventurerList.length, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
         
         //adventurer control buttons
-        var addAdvA = this.addAdventurerButton(200, 100, "Add 1 Adventurer", "swordA", 1);
-        var addAdvB = this.addAdventurerButton(200, 150, "Add 10 Adventurers", "swordB", 10);
-        var addAdvC = this.addAdventurerButton(200, 200, "Add 100 Adventurers", "swordC", 100);
+        this.buttonGroup = game.add.group();
+        this.buttonGroup.add(this.addAdventurerButton(200, 100, "Add 1 Adventurer", "swordA", 1));
+        this.addAdvB = this.addAdventurerButton(200, 150, "Add 10 Adventurers", "swordB", 10));
+        this.addAdvC = this.addAdventurerButton(200, 200, "Add 100 Adventurers", "swordC", 100));
+        
+        //timer
+        this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         
         //navigation buttons
         this.addMovementButton(25, 325, "Visit Tavern", "Tavern", '#f79764');
@@ -110,8 +103,21 @@ Game.prototype = {
         game.add.sprite(450, 100, 'mizakDeform')
     }
     
-    , update: function() {
+    , timerTrigger: function() {
+        CartelGameModel.goAdventuring();
+        CartelGameModel.visitTown();        
         this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
         this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
     }
+    
+    , updateButtons: function() {
+        //update the prices each button, even if you only click one
+        this.addAdvA.details.cost = CartelGameModel.adventurerCost() * this.addAdvA.details.multiplier;
+        this.addAdvA.costText.text = 'Cost: ' + this.addAdvA.details.cost;
+        if (!CartelGameModel.hasAmount(this.addAdvA.details.cost)) {
+            this.addAdvA.inputEnabled = false;
+            this.addAdvA.alpha = 0.1;
+        }
+    }
+    
 };

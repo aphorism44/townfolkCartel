@@ -101,7 +101,7 @@ Splash.prototype = {
         musicPlayer.loop = true;
         musicPlayer.play();
     }
-
+    
     , create: function() {
         this.status.setText('Ready!');
         this.addGameStates();
