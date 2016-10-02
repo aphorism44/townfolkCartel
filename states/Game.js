@@ -81,7 +81,7 @@ Game.prototype = {
             , {icon: 'swordC', name: "Add 100 Adventurers", cost: 5000, multiplier: 100 }
         ];
         
-        advButtons = this.game.add.group(); //this.upgradePanel.addChild(this.game.add.group());
+        advButtons = this.game.add.group();
         
         var button;
         this.advImage = this.getButtonImage();
@@ -90,8 +90,7 @@ Game.prototype = {
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
             button.details = buttonData;
-            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: '
-                            + buttonData.cost, {font: '16px TheMinion'}));
+            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + buttonData.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.addAdventurers, state);
             if (!CartelGameModel.hasAmount(button.details.cost)) {
                 button.inputEnabled = false;
@@ -119,20 +118,23 @@ Game.prototype = {
         CartelGameModel.visitTown();        
         this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
         this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
+        this.updateButtons();
     }
     
     , updateButtons: function() {
         //update the prices each button, even if you only click one
+        var state = this;
         advButtons.forEach(function(button) {
-            
+            button.details.cost = CartelGameModel.adventurerCost() * button.details.multiplier;
+            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.details.cost, {font: '16px TheMinion'}));
+            if (!CartelGameModel.hasAmount(button.details.cost)) {
+                button.inputEnabled = false;
+                button.alpha = 0.1;
+            } else {
+                button.inputEnabled = true;
+                button.alpha = 1;
+            }
         });
-        
-        /*this.addAdvA.details.cost = CartelGameModel.adventurerCost() * this.addAdvA.details.multiplier;
-        this.addAdvA.costText.text = 'Cost: ' + this.addAdvA.details.cost;
-        if (!CartelGameModel.hasAmount(this.addAdvA.details.cost)) {
-            this.addAdvA.inputEnabled = false;
-            this.addAdvA.alpha = 0.1;
-        } */
     }
     
 };
