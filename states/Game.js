@@ -34,27 +34,16 @@ Game.prototype = {
         });
     }
     
-    , addAdventurerButton: function(x, y, text, iconName, multiplier) {
-        var buttonImage = this.game.add.bitmapData(476, 48);
+    , getButtonImage: function() {
+        //BUG - the button image below is not rendering; all other parts of button are
+        var buttonImage = this.game.add.bitmapData(250, 48);
         buttonImage.ctx.fillStyle = "White";
         buttonImage.ctx.strokeStyle = '#35371c';
         buttonImage.ctx.lineWidth = 4;
         buttonImage.ctx.fillRect(0, 0, 250, 48);
         buttonImage.ctx.strokeRect(0, 0, 250, 48);
-        var button;
-        button = this.game.add.button(x, y, buttonImage);
-        button.icon = button.addChild(this.game.add.image(6, 6, iconName));
-        button.text = button.addChild(this.game.add.text(45, 6, text, {font: '18px TheMinion', fill: 'Black'}));
-        button.details = {cost: CartelGameModel.adventurerCost() * multiplier
-                         , multiplier: multiplier};
-        button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + button.details.cost, {font: '16px TheMinion'}));
-        button.multiplier = multiplier;
-        button.events.onInputDown.add(this.addAdventurers, this);
-        if (!CartelGameModel.hasAmount(button.details.cost)) {
-            button.inputEnabled = false;
-            button.alpha = 0.1;
-        }
         
+        return buttonImage;  
     }
 
     , addAdventurers: function(button) {
@@ -66,6 +55,7 @@ Game.prototype = {
     }
     
     , create: function () {
+        var state = this;
         //console.log(CartelGameModel.getOverview());
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'townmenu-bg');
@@ -85,10 +75,31 @@ Game.prototype = {
         });
         
         //adventurer control buttons
-        this.buttonGroup = game.add.group();
-        this.buttonGroup.add(this.addAdventurerButton(200, 100, "Add 1 Adventurer", "swordA", 1));
-        this.addAdvB = this.addAdventurerButton(200, 150, "Add 10 Adventurers", "swordB", 10));
-        this.addAdvC = this.addAdventurerButton(200, 200, "Add 100 Adventurers", "swordC", 100));
+        var advButtonsData = [
+            {icon: 'swordA', name: "Add 1 Adventurer", cost: 50, multiplier: 1 }
+            , {icon: 'swordB', name: "Add 10 Adventurers", cost: 500, multiplier: 10 }
+            , {icon: 'swordC', name: "Add 100 Adventurers", cost: 5000, multiplier: 100 }
+        ];
+        
+        advButtons = this.game.add.group(); //this.upgradePanel.addChild(this.game.add.group());
+        
+        var button;
+        this.advImage = this.getButtonImage();
+        advButtonsData.forEach(function(buttonData, index) {
+            button = state.game.add.button(200, 100 + 50 * index, state.game.advImage);
+            button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
+            button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
+            button.details = buttonData;
+            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: '
+                            + buttonData.cost, {font: '16px TheMinion'}));
+            button.events.onInputDown.add(state.addAdventurers, state);
+            if (!CartelGameModel.hasAmount(button.details.cost)) {
+                button.inputEnabled = false;
+                button.alpha = 0.1;
+            }
+            advButtons.addChild(button);
+            
+        });
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
@@ -112,12 +123,16 @@ Game.prototype = {
     
     , updateButtons: function() {
         //update the prices each button, even if you only click one
-        this.addAdvA.details.cost = CartelGameModel.adventurerCost() * this.addAdvA.details.multiplier;
+        advButtons.forEach(function(button) {
+            
+        });
+        
+        /*this.addAdvA.details.cost = CartelGameModel.adventurerCost() * this.addAdvA.details.multiplier;
         this.addAdvA.costText.text = 'Cost: ' + this.addAdvA.details.cost;
         if (!CartelGameModel.hasAmount(this.addAdvA.details.cost)) {
             this.addAdvA.inputEnabled = false;
             this.addAdvA.alpha = 0.1;
-        }
+        } */
     }
     
 };

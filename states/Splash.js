@@ -99,6 +99,7 @@ Splash.prototype = {
     , addGameMusic: function () {
         musicPlayer = game.add.audio('menumusic');
         musicPlayer.loop = true;
+        musicPlayer.volume = 0.5;
         musicPlayer.play();
     }
     
