@@ -16,24 +16,6 @@ Game.prototype = {
         
     }
     
-    , addMovementButton: function(x, y, text, nextState, color) {
-        var buttonImage = this.game.add.bitmapData(476, 48);
-        buttonImage.ctx.fillStyle = color;
-        buttonImage.ctx.strokeStyle = '#35371c';
-        buttonImage.ctx.lineWidth = 4;
-        buttonImage.ctx.fillRect(0, 0, 225, 48);
-        buttonImage.ctx.strokeRect(0, 0, 225, 48);
-        var button;
-        button = this.game.add.button(x, y, buttonImage);
-        //button.icon = button.addChild(this.game.add.image(6, 6, 'dagger'));
-        button.text = button.addChild(this.game.add.text(12, 6, text, {font: '18px TheMinion', fill: 'Black'}));
-        //button.details = {cost: 5};
-        //button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + //button.details.cost, {font: '16px Arial Black'}));
-        button.events.onInputDown.add(function() {
-            this.state.start(nextState);
-        });
-    }
-    
     , getButtonImage: function() {
         //BUG - the button image below is not rendering; all other parts of button are
         var buttonImage = this.game.add.bitmapData(250, 48);
@@ -44,14 +26,6 @@ Game.prototype = {
         buttonImage.ctx.strokeRect(0, 0, 250, 48);
         
         return buttonImage;  
-    }
-
-    , addAdventurers: function(button) {
-        CartelGameModel.addAdventurers(button.details.multiplier, button.details.cost);
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
-        //update cost and availability for all
-        this.updateButtons();
     }
     
     , create: function () {
@@ -76,9 +50,9 @@ Game.prototype = {
         
         //adventurer control buttons
         var advButtonsData = [
-            {icon: 'swordA', name: "Add 1 Adventurer", cost: 50, multiplier: 1 }
-            , {icon: 'swordB', name: "Add 10 Adventurers", cost: 500, multiplier: 10 }
-            , {icon: 'swordC', name: "Add 100 Adventurers", cost: 5000, multiplier: 100 }
+            {icon: 'swordA', name: "Add 1 Adventurer", multiplier: 1 }
+            , {icon: 'swordB', name: "Add 10 Adventurers", multiplier: 10 }
+            , {icon: 'swordC', name: "Add 100 Adventurers", multiplier: 100 }
         ];
         
         advButtons = this.game.add.group();
@@ -89,12 +63,16 @@ Game.prototype = {
             button = state.game.add.button(200, 100 + 50 * index, state.game.advImage);
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
-            button.details = buttonData;
-            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + buttonData.cost, {font: '16px TheMinion'}));
+            button.multiplier = buttonData.multiplier;
+            button.cost = CartelGameModel.adventurerCost() * buttonData.multiplier;
+            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.addAdventurers, state);
-            if (!CartelGameModel.hasAmount(button.details.cost)) {
+            if (!CartelGameModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
+            } else {
+                button.inputEnabled = true;
+                button.alpha = 1;
             }
             advButtons.addChild(button);
             
@@ -102,15 +80,36 @@ Game.prototype = {
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
-        
         //navigation buttons
-        this.addMovementButton(25, 325, "Visit Tavern", "Tavern", '#f79764');
-        this.addMovementButton(275, 325, "Visit Inn", "Inn", '#64f7db');
-        this.addMovementButton(25, 425, "Visit Temple", "Temple", '#fdf8f6');
-        this.addMovementButton(275, 425, "Visit Blacksmith", "Blacksmith", '#c1b3b3');
-        this.addMovementButton(25, 525, "Visit Item Shop", "ItemShop", '#6cf26c');
-        this.addMovementButton(275, 525, "Dossiers", "Dossiers", '#f7e664');
-        game.add.sprite(450, 100, 'mizakDeform')
+        var navButtonsData = [
+            { name: "Tavern", color: "#f79764", nav: "Tavern" }
+            , { name: "Inn", color: "#64f7db", nav: "Inn" }
+            , { name: "Temple", color: "#fdf8f6", nav: "Temple" }
+            , { name: "Blacksmith", color: "#c1b3b3", nav: "Blacksmith" }
+            , { name: "Item Shop", color: "#6cf26c", nav: "ItemShop" }
+            , { name: "Dossiers", color: "#f7e664", nav: "Dossier" }
+        ];
+        
+        navButtonsData.forEach(function(buttonData, index) {
+            var buttonImage = this.game.add.bitmapData(476, 48);
+            buttonImage.ctx.fillStyle = buttonData.color;
+            buttonImage.ctx.strokeStyle = '#35371c';
+            buttonImage.ctx.lineWidth = 4;
+            buttonImage.ctx.fillRect(0, 0, 225, 48);
+            buttonImage.ctx.strokeRect(0, 0, 225, 48);
+            var button;
+            var x = 25 + 250 * (index % 2);
+            var y = 325 + 100 * Math.floor(index / 2);
+            button = this.game.add.button(x, y, buttonImage);
+            //button.icon = button.addChild(this.game.add.image(6, 6, 'dagger'));
+            button.text = button.addChild(this.game.add.text(12, 6, buttonData.name, {font: '18px TheMinion', fill: 'Black'}));
+            button.events.onInputDown.add(function() {
+                game.state.start(buttonData.nav);
+            });
+        });
+        
+        game.add.sprite(450, 100, 'mizakDeform');
+        
     }
     
     , timerTrigger: function() {
@@ -121,13 +120,24 @@ Game.prototype = {
         this.updateButtons();
     }
     
-    , updateButtons: function() {
+    , addAdventurers: function(button, statePointer) {
+        CartelGameModel.addAdventurers(button.multiplier, button.cost);
+        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
+        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
+        //update cost and availability for all
+        this.updateButtons(statePointer);
+    }
+    
+    , updateButtons: function(statePointer) {
         //update the prices each button, even if you only click one
-        var state = this;
         advButtons.forEach(function(button) {
-            button.details.cost = CartelGameModel.adventurerCost() * button.details.multiplier;
-            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.details.cost, {font: '16px TheMinion'}));
-            if (!CartelGameModel.hasAmount(button.details.cost)) {
+            // make this a function so that it updates after we buy
+            function getAdjustedCost() {
+                return button.cost;
+            }
+            button.cost = CartelGameModel.adventurerCost() * button.multiplier;
+            button.costText.text = 'Cost: ' + getAdjustedCost();
+            if (!CartelGameModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
