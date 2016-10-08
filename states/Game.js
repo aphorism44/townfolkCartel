@@ -3,9 +3,7 @@ var Game = function(game) {};
 Game.prototype = {
 
     preload: function () {
-        this.optionCount = 1;
         this.stage.disableVisibilityChange = true;
-
         if (gameOptions.playMusic) {
             musicPlayer.stop();
             //pick music later
@@ -42,7 +40,13 @@ Game.prototype = {
             fill: '#fff',
             strokeThickness: 4
         });
-        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + CartelGameModel.adventurerList.length, {
+        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + CartelGameModel.adventurerList.length + " / " + CartelGameModel.maxAdventurers, {
+            font: '24px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
+        });
+        
+        this.maintCostText = this.add.text(50, 100, 'Maintenance\nCost:\n' + CartelGameModel.getMaintenanceCost(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -67,7 +71,7 @@ Game.prototype = {
             button.cost = CartelGameModel.adventurerCost() * buttonData.multiplier;
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.addAdventurers, state);
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!CartelGameModel.hasAmount(button.cost) || CartelGameModel.adventurerList.length + button.multiplier >= CartelGameModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -87,7 +91,7 @@ Game.prototype = {
             , { name: "Temple", color: "#fdf8f6", nav: "Temple" }
             , { name: "Blacksmith", color: "#c1b3b3", nav: "Blacksmith" }
             , { name: "Item Shop", color: "#6cf26c", nav: "ItemShop" }
-            , { name: "Dossiers", color: "#f7e664", nav: "Dossier" }
+            , { name: "Dossiers", color: "#f7e664", nav: "Dossiers" }
         ];
         
         navButtonsData.forEach(function(buttonData, index) {
@@ -116,14 +120,14 @@ Game.prototype = {
         CartelGameModel.goAdventuring();
         CartelGameModel.visitTown();        
         this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
+        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length+ " / " + CartelGameModel.maxAdventurers;
         this.updateButtons();
     }
     
     , addAdventurers: function(button, statePointer) {
         CartelGameModel.addAdventurers(button.multiplier, button.cost);
         this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length;
+        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length+ " / " + CartelGameModel.maxAdventurers;
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -137,7 +141,7 @@ Game.prototype = {
             }
             button.cost = CartelGameModel.adventurerCost() * button.multiplier;
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!CartelGameModel.hasAmount(button.cost) || CartelGameModel.adventurerList.length + button.multiplier > CartelGameModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {

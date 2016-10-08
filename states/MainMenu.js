@@ -2,12 +2,7 @@ var MainMenu = function() {};
 
 
 MainMenu.prototype = {
-
-    menuConfig: {
-        startY: 260,
-        startX: 30
-    },
-
+    
     init: function () {
         this.titleText = game.make.text(game.world.centerX, 100, "The Townsfolk\nCartel", {
             font: 'bold 60pt TheMinion',
@@ -16,7 +11,6 @@ MainMenu.prototype = {
         });
         this.titleText.setShadow(3, 3, '#000000', 5);
         this.titleText.anchor.set(0.5);
-        this.optionCount = 1;
     }
 
     , create: function () {
@@ -33,15 +27,15 @@ MainMenu.prototype = {
 
         this.addMenuOption('Start', function () {
             game.state.start("Game");
-        });
+        }, "MainMenu", 200, 260);
         
         this.addMenuOption('Options', function () {
             game.state.start("Options");
-        });
+        }, "MainMenu", 200, 320);
         
         this.addMenuOption('Credits', function () {
             game.state.start("Credits");
-        });
+        }, "MainMenu", 200, 380);
     }
 };
 

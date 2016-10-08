@@ -68,7 +68,7 @@ Credits.prototype = {
         this.addCredit('for playing', 'Thank you');
         this.addMenuOption('<- Back', function (e) {
             game.state.start("MainMenu");
-        });
+        }, "Credits", 100, 500);
     game.add.tween(bg).to({alpha: 0}, 20000, Phaser.Easing.Cubic.Out, true, 40000);
     }
 

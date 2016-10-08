@@ -44,6 +44,14 @@ Splash.prototype = {
         game.load.image('jera', 'assets/images/jera.png');
         game.load.image('widow', 'assets/images/widow.png');
         
+        game.load.image('mizakFull', 'assets/images/mizakFull.png');
+        game.load.image('lemelFull', 'assets/images/lemelFull.png');
+        game.load.image('lissetteFull', 'assets/images/lissetteFull.png');
+        game.load.image('clavoFull', 'assets/images/clavoFull.png');
+        
+        
+        
+        
         //button info
         game.load.image('swordA', 'assets/images/greenSword.png');
         game.load.image('swordB', 'assets/images/yellowSword.png');

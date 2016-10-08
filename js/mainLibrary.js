@@ -12,40 +12,103 @@
             this.brokeAdventurerList = [];
             this.expPool = createExpPool(this.expData);
             this.monsterPool = createMonsterPool(this.monsterData);
-            this.moneyPool = 50;
-            //adjustable - how much it costs to heal damage
-            this.costPerHP = 1;
-            //adjustable - what percentage of damage monsters do in a fight
-            this.hpLossPercentage = 0.1;
-            //adjustable - die roll to add to damage adventurers lose in a fight
-            this.hpLossRoll = 4;
-            //adjustable - die roll to add extra experience when an adventurer kills a monster
-            this.expGainRoll = 4;
-            //adjustable - die roll to add extra gold when an adventurer kills a monster
-            this.goldGainRoll = 4;
+            this.moneyPool = 50000;
+            //blacksmith stats
+            this.swordLevel = 0;
+            this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
+            this.armorLevel = 0;
+            this.hpLossPercentage = 0.4; //adjustable - what percentage of damage monsters do in a fight
+            //inn stats
+            this.innLevel = 0;
+            this.maxAdventurers = 20; //adjustable at inn
+            //temple stats
+            this.templeLevel = 0;
+            this.costPerHP = 1; //adjustable - cost to heal each lost HP
+            //tavern stats
+            this.tavernLevel = 0;
+            this.expGainRoll = 4; //adjustable - die roll to add extra experience when an adventurer kills a monster
+            //item shop stats
+            this.shopLevel = 0;
+            this.goldGainRoll = 4; //adjustable - die roll to add extra gold when an adventurer kills a monster
         }
         CartelGameModel.addAdventurers = function(num, cost) {
             this.moneyPool -= cost;
             for (var i = 0; i < num; i++)
                 this.adventurerList.push(new Adventurer(1, this.expPool.get(1)));
         }
+        
+        CartelGameModel.hasAmount = function(amount) {
+            return amount <= this.moneyPool;
+        }
+        CartelGameModel.getMaintenanceCost = function() {
+            return this.swordLevel + this.armorLevel + this.innLevel + this.templeLevel + this.tavernLevel + this.shopLevel;
+        }
+        CartelGameModel.upgradeInn = function(cost) {
+            this.moneyPool -= cost;
+            this.innLevel++;
+            this.maxAdventurers += 10;
+        }
+        CartelGameModel.upgradeTemple = function(cost) {
+            this.moneyPool -= cost;
+            this.templeLevel++;
+            this.costPerHP++;
+        }
+        CartelGameModel.upgradeTavern = function(cost) {
+            this.moneyPool -= cost;
+            this.tavernLevel++;
+            this.expGainRoll++;
+        }
+        CartelGameModel.upgradeShop = function(cost) {
+            this.moneyPool -= cost;
+            this.shopLevel++;
+            this.goldGainRoll++;
+        }
+        CartelGameModel.upgradeBlackSmith = function(key, cost) {
+            this.moneyPool -= cost;
+            if (key === "sword") {
+                this.swordLevel++;
+                this.hpLossRoll++;
+            } else if (key === "armor") {
+                this.armorLevel++;
+                this.hpLossPercentage *= 0.9;
+            }
+        }
+        
+        //need these
+        CartelGameModel.getBlacksmithLevel = function(key) {
+            if (key === "sword")
+                return this.swordLevel;
+            else if (key === "armor")
+                return this.armorLevel;
+        }
+        
         //Price=BaseCost×Multiplier^(#Owned)
         CartelGameModel.adventurerCost = function() {
             return Math.floor(50 * Math.pow(1.07, this.adventurerList.length));
         }
-        CartelGameModel.hasAmount = function(amount) {
-            return amount <= this.moneyPool;
+        CartelGameModel.innCost = function() {
+            return Math.floor(1000 * Math.pow(1.27, this.innLevel));
+        }
+        CartelGameModel.templeCost = function() {
+            return Math.floor(2000 * Math.pow(1.37, this.templeLevel));
+        }
+        CartelGameModel.tavernCost = function() {
+            return Math.floor(2000 * Math.pow(1.3, this.tavernLevel));
+        }
+        CartelGameModel.shopCost = function() {
+            return Math.floor(3000 * Math.pow(1.5, this.shopLevel));
         }
         
-        CartelGameModel.updateHealingCost = function(newCost) {
-            this.costPerHP = newCost;
+        
+        CartelGameModel.getBlacksmithCost = function(key) {
+            if (key === "sword") {
+                return Math.floor(2500 * Math.pow(1.07, this.swordLevel));
+            } else if (key === "armor") {
+                return Math.floor(2500 * Math.pow(1.07, this.armorLevel));
+            }
         }
-        CartelGameModel.updateMonsterWeapons = function(newPercentage) {
-            this.hpLossPercentage = newPercentage;
-        }
-        CartelGameModel.updateMonsterStrength = function(newRoll) {
-            this.hpLossRoll = newRoll;
-        }
+        
+        //below 2 methods are main game loop
         CartelGameModel.goAdventuring = function() {
             var len = this.adventurerList.length;
             for (var i = len - 1; i > -1; i--) {
@@ -57,7 +120,7 @@
                     monName = this.monsterPool.get(lev);
                 var m = new Monster(lev, [0, Math.floor(this.adventurerList[i].hp / 2), Math.floor(this.adventurerList[i].fightStat / 2)], monName);*/
                 //SIMPLIFY - simulate battle by removing some percentage of adventurer's HP and giving a return based on level
-                this.adventurerList[i].takeDamage(Math.round(this.adventurerList[i].hp * this.hpLossPercentage) + dieRoll(this.hpLossRoll) - this.adventurerList[i].armorModifier);
+                this.adventurerList[i].takeDamage(Math.round(this.adventurerList[i].hpMax * this.hpLossPercentage) + dieRoll(this.hpLossRoll) - this.adventurerList[i].armorModifier);
                 if (this.adventurerList[i].alive) {
                     this.adventurerList[i].lootMonster(lev, this.expGainRoll, this.goldGainRoll);
                     this.adventurerList[i].checkLevel(this.expPool);
@@ -69,24 +132,44 @@
         CartelGameModel.visitTown = function() {
             var len = this.adventurerList.length;
             for (var i = len - 1; i > -1; i--) {
-                //pay for healing
+                //pay for as much healing as possible
                 this.moneyPool += this.adventurerList[i].heal(this.costPerHP);
                 //other items go in here as needed...
-                //if the adventurer is broke, handle accordingly
-                if (this.adventurerList[i].broke)
-                    this.brokeAdventurerList.push(this.adventurerList.splice(i, 1));
+                //if (this.adventurerList[i].broke)
+                    //this.brokeAdventurerList.push(this.adventurerList.splice(i, 1));
             }
+            this.moneyPool -= this.getMaintenanceCost();
         }
+        //below are reporting methods
         CartelGameModel.getOverview = function() {
-            var strBuild = "Total adventurers: " + this.adventurerList.length + "\n";
+            var strBuild = "Adventurers: " + this.adventurerList.length + "\n";
             strBuild += "Level 1-5: " + this.adventurerList.filter(function(a) { return a.level <= 5; }).length + "\n";
             strBuild += "Level 6-10: " + this.adventurerList.filter(function(a) { return a.level > 5 && a.level <= 10; }).length + "\n";
             strBuild += "Level 11-20: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 20; }).length + "\n";
             strBuild += "Level 21-30: " + this.adventurerList.filter(function(a) { return a.level > 20 && a.level <= 30; }).length + "\n";
             strBuild += "Level 31+: " + this.adventurerList.filter(function(a) { return a.level > 30; }).length + "\n";
             strBuild += "Dead adventurers: " + this.deadAdventurerList.length + "\n";
-            strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";            
+            //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";            
             strBuild += "Current funds: " + this.moneyPool + "\n";
+            return strBuild;
+        }
+        CartelGameModel.getHealth = function() {
+            var full = 0, half = 0, low = 0, nearDeath = 0;
+            this.adventurerList.forEach(function(a) {
+                if (a.hp === a.hpMax)
+                    full++;
+                else if (a.hp < a.hpMax && a.hp >= (a.hpMax / 2))
+                    half++;
+                else if (a.hp < (a.hpMax / 10))
+                    nearDeath++;
+                else
+                    low++;
+            });
+            var strBuild = "Adventurer health:\n";
+            strBuild += "Full HP: " + full + "\n";
+            strBuild += "Half to Full HP: " + half + "\n";
+            strBuild += "Less than Half HP Down to 10%: " + low + "\n";
+            strBuild += "Near Death (less than 10%): " + nearDeath + "\n";
             return strBuild;
         }
         
@@ -161,18 +244,20 @@
             }
         }
         Adventurer.prototype.heal = function(costPerHp) {
-            var moneySpent = costPerHp * (this.hpMax - this.hp);
-            if (this.gold < moneySpent) {
-                this.gold = 0;
-                this.broke = true;
-                moneySpent = 0;
-            } else {
-                this.hp = this.hpMax;
-                this.gold -= moneySpent;
-                this.totalGoldSpent += moneySpent;
-            }
-            return moneySpent;
+            //heal as much HP as possible
+            var needHeal = costPerHp * (this.hpMax - this.hp);
+            var healCost = 0;
+            if (this.gold < needHeal)
+                healCost = Math.floor(this.gold / costPerHp);
+            else
+                healCost = needHeal;
+            
+            this.hp += healCost / costPerHp;
+            this.gold -= healCost;
+            
+            return healCost;
         }
+        //weapons/armor currently not used
         Adventurer.prototype.equipWeapon = function(name, modifier) {
             this.weapon = name;
             this.weaponModifier = modifier;

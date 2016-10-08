@@ -12,7 +12,7 @@ Options.prototype = {
     , init: function () {
         this.titleText = game.make.text(game.world.centerX, 100, "The Townsfolk\nCartel", {
             font: 'bold 60pt TheMinion',
-            fill: '#FDFFB5',
+            fill: '#fc962f',
             align: 'center'
         });
         this.titleText.setShadow(3, 3, 'rgba(0,0,0,0.5)', 5);
@@ -30,16 +30,16 @@ Options.prototype = {
             gameOptions.playMusic = !gameOptions.playMusic;
             target.text = gameOptions.playMusic ? 'Mute Music' : 'Play Music';
             musicPlayer.volume = gameOptions.playMusic ? 1 : 0;
-        });
+        } , "Options", 200, 260);
         
         this.addMenuOption(gameOptions.playSound ? 'Mute Sound' : 'Play Sound', function (target) {
             gameOptions.playSound = !gameOptions.playSound;
             target.text = gameOptions.playSound ? 'Mute Sound' : 'Play Sound';
-        });
+        } , "Options", 200, 320);
         
         this.addMenuOption('<- Back', function () {
             game.state.start("MainMenu");
-        });
+        } , "Options", 200, 380);
     }
 };
 
