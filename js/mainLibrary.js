@@ -11,8 +11,9 @@
             this.deadAdventurerList = [];
             this.brokeAdventurerList = [];
             this.expPool = createExpPool(this.expData);
-            this.monsterPool = createMonsterPool(this.monsterData);
-            this.moneyPool = 50000;
+            this.maintenance = 0;
+            //this.monsterPool = createMonsterPool(this.monsterData);
+            this.moneyPool = new BigNumber(50);
             //blacksmith stats
             this.swordLevel = 0;
             this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
@@ -29,7 +30,7 @@
             this.expGainRoll = 4; //adjustable - die roll to add extra experience when an adventurer kills a monster
             //item shop stats
             this.shopLevel = 0;
-            this.goldGainRoll = 4; //adjustable - die roll to add extra gold when an adventurer kills a monster
+            this.goldGainRoll = 4; //adjustable - die roll to add extra gold when an adventurer kills a monster        
         }
         CartelGameModel.addAdventurers = function(num, cost) {
             this.moneyPool -= cost;
@@ -40,36 +41,39 @@
         CartelGameModel.hasAmount = function(amount) {
             return amount <= this.moneyPool;
         }
-        CartelGameModel.getMaintenanceCost = function() {
-            return this.swordLevel + this.armorLevel + this.innLevel + this.templeLevel + this.tavernLevel + this.shopLevel;
-        }
         CartelGameModel.upgradeInn = function(cost) {
             this.moneyPool -= cost;
             this.innLevel++;
+            this.maintenance += Math.pow(this.innLevel, 2);
             this.maxAdventurers += 10;
         }
         CartelGameModel.upgradeTemple = function(cost) {
             this.moneyPool -= cost;
             this.templeLevel++;
+            this.maintenance += Math.pow(this.templeLevel, 2);
             this.costPerHP++;
         }
         CartelGameModel.upgradeTavern = function(cost) {
             this.moneyPool -= cost;
             this.tavernLevel++;
+            this.maintenance += Math.pow(this.tavernLevel, 2);
             this.expGainRoll++;
         }
         CartelGameModel.upgradeShop = function(cost) {
             this.moneyPool -= cost;
             this.shopLevel++;
+            this.maintenance += Math.pow(this.shopLevel, 2);
             this.goldGainRoll++;
         }
         CartelGameModel.upgradeBlackSmith = function(key, cost) {
             this.moneyPool -= cost;
             if (key === "sword") {
                 this.swordLevel++;
+                this.maintenance += Math.pow(this.swordLevel, 2);
                 this.hpLossRoll++;
             } else if (key === "armor") {
                 this.armorLevel++;
+                this.maintenance += Math.pow(this.armorLevel, 2);
                 this.hpLossPercentage *= 0.9;
             }
         }
@@ -138,48 +142,51 @@
                 //if (this.adventurerList[i].broke)
                     //this.brokeAdventurerList.push(this.adventurerList.splice(i, 1));
             }
-            this.moneyPool -= this.getMaintenanceCost();
+            this.moneyPool -= this.maintenance;
         }
         //below are reporting methods
         CartelGameModel.getOverview = function() {
-            var strBuild = "Adventurers: " + this.adventurerList.length + "\n";
-            strBuild += "Level 1-5: " + this.adventurerList.filter(function(a) { return a.level <= 5; }).length + "\n";
-            strBuild += "Level 6-10: " + this.adventurerList.filter(function(a) { return a.level > 5 && a.level <= 10; }).length + "\n";
-            strBuild += "Level 11-20: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 20; }).length + "\n";
-            strBuild += "Level 21-30: " + this.adventurerList.filter(function(a) { return a.level > 20 && a.level <= 30; }).length + "\n";
-            strBuild += "Level 31+: " + this.adventurerList.filter(function(a) { return a.level > 30; }).length + "\n";
-            strBuild += "Dead adventurers: " + this.deadAdventurerList.length + "\n";
-            //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";            
-            strBuild += "Current funds: " + this.moneyPool + "\n";
+            var strBuild = "Active Adventurers: " + this.adventurerList.length + "\n";
+            strBuild += "Level 1-5: " + this.adventurerList.filter(function(a) { return a.level <= 5; }).length + "\t\t\t";
+            strBuild += "/   Level 6-10: " + this.adventurerList.filter(function(a) { return a.level > 5 && a.level <= 10; }).length + "\n";
+            strBuild += "Level 11-15: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 15; }).length + "\t\t\t";
+            strBuild += "/   Level 16-20: " + this.adventurerList.filter(function(a) { return a.level > 15 && a.level <= 20; }).length + "\n";
+            strBuild += "Level 21+: " + this.adventurerList.filter(function(a) { return a.level > 20; }).length + "\t\t\t";
+            strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
+            //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";
+            strBuild += "Town funds: " + this.moneyPool + "\n\n";
             return strBuild;
         }
         CartelGameModel.getHealth = function() {
-            var full = 0, half = 0, low = 0, nearDeath = 0;
+            var full = 0, half = 0, low = 0, totalLevel = 0, totalAdv = 0, totalGold = 0;
             this.adventurerList.forEach(function(a) {
+                totalLevel += a.level;
+                totalGold += a.gold;
+                totalAdv++;
                 if (a.hp === a.hpMax)
                     full++;
-                else if (a.hp < a.hpMax && a.hp >= (a.hpMax / 2))
-                    half++;
-                else if (a.hp < (a.hpMax / 10))
-                    nearDeath++;
-                else
+                else if (a.hp < a.hpMax / 2)
                     low++;
+                else
+                    half++;
             });
+            if (totalAdv == 0) totalAdv = 1;
             var strBuild = "Adventurer health:\n";
-            strBuild += "Full HP: " + full + "\n";
-            strBuild += "Half to Full HP: " + half + "\n";
-            strBuild += "Less than Half HP Down to 10%: " + low + "\n";
-            strBuild += "Near Death (less than 10%): " + nearDeath + "\n";
+            strBuild += "Full HP: " + full + "\t\t\t";
+            strBuild += "/   Half to Full HP: " + half + "\n";
+            strBuild += "Less than Half HP: " + low + "\t\t\t";
+            strBuild += "/   Average Level: " + totalLevel / totalAdv + "\n";
+            strBuild += "Total Adventurer Cash: " + totalGold + "\n";            
             return strBuild;
         }
         
-        function createMonsterPool(monsterData) {
+        /*function createMonsterPool(monsterData) {
             var pool = new Map();
             monsterData.forEach(function(m) {
                 pool.set(m.level, m.name);
             });
             return pool;
-        }
+        }*/
         
          function createExpPool(expData) {
             var pool = new Map();
@@ -223,7 +230,7 @@
         Adventurer.prototype = Object.create(Being.prototype);
         Adventurer.prototype.constructor = Adventurer;
         Adventurer.prototype.lootMonster = function(deadMonsterLevel, extraExpRoll, extraGoldRoll) {
-            var goldDrop = deadMonsterLevel * 2;
+            var goldDrop = 2 * Math.round(Math.pow(deadMonsterLevel, 1.5));
             var extraGold = dieRoll(extraGoldRoll);
             this.gold += goldDrop + extraGold;
             this.totalGoldEarned += goldDrop + extraGold;
@@ -267,6 +274,7 @@
             this.armorModifier = modifier;
         }
         //simplified - we no longer use this object (for now); logic moved to Adventurer.lootMonster method
+        /*
         var Monster = function(level, levelStats, name) {
             Being.call(this, level, levelStats);
             this.name = name;
@@ -275,14 +283,14 @@
         }
         Monster.prototype = Object.create(Being.prototype);
         Monster.prototype.constructor = Monster;
-         
+        */
          
         function dieRoll(size) {
             return Math.floor(Math.random() * size) + 1;
         }
         
         //level 21+ = "Boss Level " + level - 20
-        CartelGameModel.monsterData = [
+        /*CartelGameModel.monsterData = [
             { 'level': 1 , 'name':  'Wolf' }
             , { 'level': 2 , 'name':  'Boar' }
             , { 'level': 3 , 'name':  'Eagle' }
@@ -303,7 +311,7 @@
             , { 'level': 18 , 'name':  'Archer Prince' }
             , { 'level': 19 , 'name':  'Woodland Queen' }
             , { 'level': 20 , 'name':  'Forest King' }
-        ];
+        ];*/
         
         //[expNeeded, hpMax, fightStat]
         //follow this pattern after Level 5:

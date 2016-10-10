@@ -46,7 +46,7 @@ Game.prototype = {
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(50, 100, 'Maintenance\nCost:\n' + CartelGameModel.getMaintenanceCost(), {
+        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + CartelGameModel.maintenance, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -91,7 +91,10 @@ Game.prototype = {
             , { name: "Temple", color: "#fdf8f6", nav: "Temple" }
             , { name: "Blacksmith", color: "#c1b3b3", nav: "Blacksmith" }
             , { name: "Item Shop", color: "#6cf26c", nav: "ItemShop" }
-            , { name: "Dossiers", color: "#f7e664", nav: "Dossiers" }
+            , { name: "Statistics", color: "#f7e664", nav: "Statistics" }
+            , { name: "Buy Resources", color: "#d564f7", nav: "ResourceMap" }
+            , { name: "Resource Dossier", color: "#e89541", nav: "ResourceFiles" }
+            
         ];
         
         navButtonsData.forEach(function(buttonData, index) {
@@ -103,7 +106,7 @@ Game.prototype = {
             buttonImage.ctx.strokeRect(0, 0, 225, 48);
             var button;
             var x = 25 + 250 * (index % 2);
-            var y = 325 + 100 * Math.floor(index / 2);
+            var y = 325 + 50 * Math.floor(index / 2);
             button = this.game.add.button(x, y, buttonImage);
             //button.icon = button.addChild(this.game.add.image(6, 6, 'dagger'));
             button.text = button.addChild(this.game.add.text(12, 6, buttonData.name, {font: '18px TheMinion', fill: 'Black'}));

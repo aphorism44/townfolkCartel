@@ -5,6 +5,9 @@ Splash.prototype = {
         loadScripts: function () {
             game.load.script('style', 'lib/style.js');
             game.load.script('mixins', 'lib/mixins.js');
+            game.load.script('bignumber', 'vendor/bignumber.min.js');
+            
+            
             game.load.script('WebFont', 'vendor/webfontloader.js');
             game.load.script('mainmenu','states/MainMenu.js');
             game.load.script('gameover','states/GameOver.js');
@@ -17,7 +20,10 @@ Splash.prototype = {
             game.load.script('itemshop', 'states/ItemShop.js');
             game.load.script('blacksmith', 'states/Blacksmith.js');
             game.load.script('temple', 'states/Temple.js');
-            game.load.script('dossiers', 'states/Dossiers.js');
+            game.load.script('statistics', 'states/Statistics.js');
+            game.load.script('instructions', 'states/Instructions.js');
+            game.load.script('resourcemap', 'states/ResourceMap.js');
+            game.load.script('resourcefiles', 'states/ResourceFiles.js');
             
             game.load.script('gameModel',  'js/mainLibrary.js');
     }
@@ -98,7 +104,10 @@ Splash.prototype = {
         game.state.add("Tavern", Tavern);
         game.state.add("Inn", Inn);
         game.state.add("Temple", Temple);
-        game.state.add("Dossiers", Dossiers);
+        game.state.add("Statistics", Statistics);
+        game.state.add("Instructions", Instructions);
+        game.state.add("ResourceMap", ResourceMap);
+        game.state.add("ResourceFiles", ResourceFiles);
         game.state.add("GameOver", GameOver);
         game.state.add("Credits", Credits);
         game.state.add("Options", Options);

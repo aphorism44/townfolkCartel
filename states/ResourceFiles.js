@@ -1,6 +1,6 @@
-var Dossiers = function(game) {};
+var ResourceFiles = function(game) {};
 
-Dossiers.prototype = {
+ResourceFiles.prototype = {
     preload: function() {
         this.info = CartelGameModel.getOverview();
         this.healthInfo = CartelGameModel.getHealth();
@@ -26,7 +26,7 @@ Dossiers.prototype = {
         
         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, "Dossiers", 400, 500);
+        }, "ResourceFiles", 400, 500);
         
     }
     
@@ -38,4 +38,4 @@ Dossiers.prototype = {
     }
 };
 
-Phaser.Utils.mixinPrototype(Dossiers.prototype, mixins);
+Phaser.Utils.mixinPrototype(ResourceFiles.prototype, mixins);
