@@ -25,7 +25,8 @@ Splash.prototype = {
             game.load.script('resourcemap', 'states/ResourceMap.js');
             game.load.script('resourcefiles', 'states/ResourceFiles.js');
             
-            game.load.script('gameModel',  'js/mainLibrary.js');
+            game.load.script('townModel',  'js/TownModel.js');
+            game.load.script('resourceModel',  'js/ResourceModel.js');
     }
 
     , loadBgm: function () {
@@ -89,7 +90,15 @@ Splash.prototype = {
         game.add.existing(this.loadingBar);
         game.add.existing(this.status);
         this.load.setPreloadSprite(this.loadingBar);
-
+        //make button bitmap data
+        var buttonImage = this.game.add.bitmapData(476, 48);
+        buttonImage.ctx.fillStyle = 'white';
+        buttonImage.ctx.strokeStyle = '#35371c';
+        buttonImage.ctx.lineWidth = 4;
+        buttonImage.ctx.fillRect(0, 0, 225, 48);
+        buttonImage.ctx.strokeRect(0, 0, 225, 48);
+        this.game.cache.addBitmapData('button', buttonImage);
+        
         this.loadScripts();
         this.loadImages();
         this.loadFonts();

@@ -27,15 +27,15 @@ MainMenu.prototype = {
 
         this.addMenuOption('Start', function () {
             game.state.start("Game");
-        }, "MainMenu", 200, 260);
+        }, 200, 260);
         
         this.addMenuOption('Options', function () {
             game.state.start("Options");
-        }, "MainMenu", 200, 320);
+        }, 200, 320);
         
         this.addMenuOption('Credits', function () {
             game.state.start("Credits");
-        }, "MainMenu", 200, 380);
+        }, 200, 380);
     }
 };
 

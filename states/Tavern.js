@@ -5,7 +5,7 @@ Tavern.prototype = {
     getButtonImage: function() {
         //BUG - the button image below is not rendering; all other parts of button are
         var buttonImage = this.game.add.bitmapData(250, 48);
-        buttonImage.ctx.fillStyle = "White";
+        buttonImage.ctx.fillStyle = "#50ef6f";
         buttonImage.ctx.strokeStyle = '#35371c';
         buttonImage.ctx.lineWidth = 4;
         buttonImage.ctx.fillRect(0, 0, 250, 48);
@@ -19,12 +19,12 @@ Tavern.prototype = {
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'tavern-bg');
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + CartelGameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.expRoll = this.add.text(300, 50, 'Extra Experience Roll: ' + CartelGameModel.expGainRoll, {
+        this.expRoll = this.add.text(300, 50, 'Extra Experience Roll: ' + TownModel.expGainRoll, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -50,11 +50,11 @@ Tavern.prototype = {
             button = state.game.add.button(300, 100 + 50 * index, state.game.advImage);
             //button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.name = buttonData.name;
-            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(CartelGameModel.tavernLevel + 1), { font: '16px TheMinion'}));
-            button.cost = CartelGameModel.tavernCost();
+            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.tavernLevel + 1), { font: '16px TheMinion'}));
+            button.cost = TownModel.tavernCost();
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.upgradeTavern, state);
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -70,13 +70,13 @@ Tavern.prototype = {
         
         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, "Tavern", 400, 500);
+        }, 400, 500);
     }
 
     , upgradeTavern: function(button, statePointer) {
-        CartelGameModel.upgradeTavern(button.cost);
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.expRoll.text = 'Extra Experience Roll: ' + CartelGameModel.expGainRoll;
+        TownModel.upgradeTavern(button.cost);
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        this.expRoll.text = 'Extra Experience Roll: ' + TownModel.expGainRoll;
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -89,12 +89,12 @@ Tavern.prototype = {
                 return button.cost;
             }
             function getAdjustedLevel() {
-                return Number(CartelGameModel.tavernLevel + 1);
+                return Number(TownModel.tavernLevel + 1);
             }
-            button.cost = CartelGameModel.tavernCost();
+            button.cost = TownModel.tavernCost();
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -105,9 +105,9 @@ Tavern.prototype = {
     }
     
     , timerTrigger: function() {
-        CartelGameModel.goAdventuring();
-        CartelGameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
+        TownModel.goAdventuring();
+        TownModel.visitTown();        
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.updateButtons();
     }
 };

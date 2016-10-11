@@ -24,12 +24,12 @@ Temple.prototype = {
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'temple-bg');
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + CartelGameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.hpCost = this.add.text(300, 50, 'Cost to Heal One HP: ' + CartelGameModel.costPerHP, {
+        this.hpCost = this.add.text(300, 50, 'Cost to Heal One HP: ' + TownModel.costPerHP, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -55,11 +55,11 @@ Temple.prototype = {
             button = state.game.add.button(300, 100 + 50 * index, state.game.advImage);
             //button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.name = buttonData.name;
-            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(CartelGameModel.templeLevel + 1), { font: '16px TheMinion'}));
-            button.cost = CartelGameModel.templeCost();
+            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.templeLevel + 1), { font: '16px TheMinion'}));
+            button.cost = TownModel.templeCost();
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.upgradeTemple, state);
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -75,13 +75,13 @@ Temple.prototype = {
         
         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, "Temple", 400, 500);
+        }, 400, 500);
     }
 
     , upgradeTemple: function(button, statePointer) {
-        CartelGameModel.upgradeTemple(button.cost);
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.hpCost.text = 'Cost to Heal One HP: ' + CartelGameModel.costPerHP;
+        TownModel.upgradeTemple(button.cost);
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        this.hpCost.text = 'Cost to Heal One HP: ' + TownModel.costPerHP;
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -94,12 +94,12 @@ Temple.prototype = {
                 return button.cost;
             }
             function getAdjustedLevel() {
-                return Number(CartelGameModel.templeLevel + 1);
+                return Number(TownModel.templeLevel + 1);
             }
-            button.cost = CartelGameModel.templeCost();
+            button.cost = TownModel.templeCost();
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -110,9 +110,9 @@ Temple.prototype = {
     }
     
     , timerTrigger: function() {
-        CartelGameModel.goAdventuring();
-        CartelGameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
+        TownModel.goAdventuring();
+        TownModel.visitTown();        
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.updateButtons();
     }
 };

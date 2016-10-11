@@ -2,8 +2,8 @@ var Statistics = function(game) {};
 
 Statistics.prototype = {
     preload: function() {
-        this.info = CartelGameModel.getOverview();
-        this.healthInfo = CartelGameModel.getHealth();
+        this.info = TownModel.getOverview();
+        this.healthInfo = TownModel.getHealth();
     }
     
     , create: function() {
@@ -26,15 +26,15 @@ Statistics.prototype = {
         
         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, "Statistics", 400, 500);
+        }, 400, 500);
         
     }
     
     , timerTrigger: function() {
-        CartelGameModel.goAdventuring();
-        CartelGameModel.visitTown();        
-        this.infoText.text = CartelGameModel.getOverview();
-        this.healthText.text = CartelGameModel.getHealth();
+        TownModel.goAdventuring();
+        TownModel.visitTown();        
+        this.infoText.text = TownModel.getOverview();
+        this.healthText.text = TownModel.getHealth();
     }
 };
 

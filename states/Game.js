@@ -14,39 +14,27 @@ Game.prototype = {
         
     }
     
-    , getButtonImage: function() {
-        //BUG - the button image below is not rendering; all other parts of button are
-        var buttonImage = this.game.add.bitmapData(250, 48);
-        buttonImage.ctx.fillStyle = "White";
-        buttonImage.ctx.strokeStyle = '#35371c';
-        buttonImage.ctx.lineWidth = 4;
-        buttonImage.ctx.fillRect(0, 0, 250, 48);
-        buttonImage.ctx.strokeRect(0, 0, 250, 48);
-        
-        return buttonImage;  
-    }
-    
     , create: function () {
         var state = this;
-        //console.log(CartelGameModel.getOverview());
+        //console.log(TownModel.getOverview());
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'townmenu-bg');
         //this.addMenuOption('Quit ->', function (e) {
         //    this.game.state.start("GameOver");
         //});
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + CartelGameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + CartelGameModel.adventurerList.length + " / " + CartelGameModel.maxAdventurers, {
+        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + TownModel.adventurerList.length + " / " + TownModel.maxAdventurers, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + CartelGameModel.maintenance, {
+        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + TownModel.maintenance, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -62,16 +50,15 @@ Game.prototype = {
         advButtons = this.game.add.group();
         
         var button;
-        this.advImage = this.getButtonImage();
         advButtonsData.forEach(function(buttonData, index) {
-            button = state.game.add.button(200, 100 + 50 * index, state.game.advImage);
+            button = state.game.add.button(200, 100 + 50 * index, state.game.cache.getBitmapData('button'));
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
             button.multiplier = buttonData.multiplier;
-            button.cost = CartelGameModel.adventurerCost() * buttonData.multiplier;
+            button.cost = TownModel.adventurerCost() * buttonData.multiplier;
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.addAdventurers, state);
-            if (!CartelGameModel.hasAmount(button.cost) || CartelGameModel.adventurerList.length + button.multiplier >= CartelGameModel.maxAdventurers) {
+            if (!TownModel.hasAmount(button.cost) || TownModel.adventurerList.length + button.multiplier >= TownModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -120,17 +107,17 @@ Game.prototype = {
     }
     
     , timerTrigger: function() {
-        CartelGameModel.goAdventuring();
-        CartelGameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length+ " / " + CartelGameModel.maxAdventurers;
+        TownModel.goAdventuring();
+        TownModel.visitTown();        
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        this.playerAdvText.text = 'Adventurers: ' + TownModel.adventurerList.length+ " / " + TownModel.maxAdventurers;
         this.updateButtons();
     }
     
     , addAdventurers: function(button, statePointer) {
-        CartelGameModel.addAdventurers(button.multiplier, button.cost);
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + CartelGameModel.adventurerList.length+ " / " + CartelGameModel.maxAdventurers;
+        TownModel.addAdventurers(button.multiplier, button.cost);
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        this.playerAdvText.text = 'Adventurers: ' + TownModel.adventurerList.length+ " / " + TownModel.maxAdventurers;
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -142,9 +129,9 @@ Game.prototype = {
             function getAdjustedCost() {
                 return button.cost;
             }
-            button.cost = CartelGameModel.adventurerCost() * button.multiplier;
+            button.cost = TownModel.adventurerCost() * button.multiplier;
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!CartelGameModel.hasAmount(button.cost) || CartelGameModel.adventurerList.length + button.multiplier > CartelGameModel.maxAdventurers) {
+            if (!TownModel.hasAmount(button.cost) || TownModel.adventurerList.length + button.multiplier > TownModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {

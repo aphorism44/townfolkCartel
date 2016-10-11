@@ -2,11 +2,11 @@
 (function(window){
     'use strict';
     
-    function define_cartel_model() {
+    function define_resource_model() {
         
-        var CartelGameModel = {};
+        var ResourceModel = {};
         
-        CartelGameModel.init = function() {
+        ResourceModel.init = function() {
             this.adventurerList = [];
             this.deadAdventurerList = [];
             this.brokeAdventurerList = [];
@@ -32,40 +32,40 @@
             this.shopLevel = 0;
             this.goldGainRoll = 4; //adjustable - die roll to add extra gold when an adventurer kills a monster        
         }
-        CartelGameModel.addAdventurers = function(num, cost) {
+        ResourceModel.addAdventurers = function(num, cost) {
             this.moneyPool -= cost;
             for (var i = 0; i < num; i++)
                 this.adventurerList.push(new Adventurer(1, this.expPool.get(1)));
         }
         
-        CartelGameModel.hasAmount = function(amount) {
+        ResourceModel.hasAmount = function(amount) {
             return amount <= this.moneyPool;
         }
-        CartelGameModel.upgradeInn = function(cost) {
+        ResourceModel.upgradeInn = function(cost) {
             this.moneyPool -= cost;
             this.innLevel++;
             this.maintenance += Math.pow(this.innLevel, 2);
             this.maxAdventurers += 10;
         }
-        CartelGameModel.upgradeTemple = function(cost) {
+        ResourceModel.upgradeTemple = function(cost) {
             this.moneyPool -= cost;
             this.templeLevel++;
             this.maintenance += Math.pow(this.templeLevel, 2);
             this.costPerHP++;
         }
-        CartelGameModel.upgradeTavern = function(cost) {
+        ResourceModel.upgradeTavern = function(cost) {
             this.moneyPool -= cost;
             this.tavernLevel++;
             this.maintenance += Math.pow(this.tavernLevel, 2);
             this.expGainRoll++;
         }
-        CartelGameModel.upgradeShop = function(cost) {
+        ResourceModel.upgradeShop = function(cost) {
             this.moneyPool -= cost;
             this.shopLevel++;
             this.maintenance += Math.pow(this.shopLevel, 2);
             this.goldGainRoll++;
         }
-        CartelGameModel.upgradeBlackSmith = function(key, cost) {
+        ResourceModel.upgradeBlackSmith = function(key, cost) {
             this.moneyPool -= cost;
             if (key === "sword") {
                 this.swordLevel++;
@@ -79,7 +79,7 @@
         }
         
         //need these
-        CartelGameModel.getBlacksmithLevel = function(key) {
+        ResourceModel.getBlacksmithLevel = function(key) {
             if (key === "sword")
                 return this.swordLevel;
             else if (key === "armor")
@@ -87,24 +87,24 @@
         }
         
         //Price=BaseCost×Multiplier^(#Owned)
-        CartelGameModel.adventurerCost = function() {
+        ResourceModel.adventurerCost = function() {
             return Math.floor(50 * Math.pow(1.07, this.adventurerList.length));
         }
-        CartelGameModel.innCost = function() {
+        ResourceModel.innCost = function() {
             return Math.floor(1000 * Math.pow(1.27, this.innLevel));
         }
-        CartelGameModel.templeCost = function() {
+        ResourceModel.templeCost = function() {
             return Math.floor(2000 * Math.pow(1.37, this.templeLevel));
         }
-        CartelGameModel.tavernCost = function() {
+        ResourceModel.tavernCost = function() {
             return Math.floor(2000 * Math.pow(1.3, this.tavernLevel));
         }
-        CartelGameModel.shopCost = function() {
+        ResourceModel.shopCost = function() {
             return Math.floor(3000 * Math.pow(1.5, this.shopLevel));
         }
         
         
-        CartelGameModel.getBlacksmithCost = function(key) {
+        ResourceModel.getBlacksmithCost = function(key) {
             if (key === "sword") {
                 return Math.floor(2500 * Math.pow(1.07, this.swordLevel));
             } else if (key === "armor") {
@@ -113,7 +113,7 @@
         }
         
         //below 2 methods are main game loop
-        CartelGameModel.goAdventuring = function() {
+        ResourceModel.goAdventuring = function() {
             var len = this.adventurerList.length;
             for (var i = len - 1; i > -1; i--) {
                 var lev = this.adventurerList[i].level + this.adventurerList[i].weaponModifier;
@@ -133,7 +133,7 @@
                 }
             }
         }
-        CartelGameModel.visitTown = function() {
+        ResourceModel.visitTown = function() {
             var len = this.adventurerList.length;
             for (var i = len - 1; i > -1; i--) {
                 //pay for as much healing as possible
@@ -145,7 +145,7 @@
             this.moneyPool -= this.maintenance;
         }
         //below are reporting methods
-        CartelGameModel.getOverview = function() {
+        ResourceModel.getOverview = function() {
             var strBuild = "Active Adventurers: " + this.adventurerList.length + "\n";
             strBuild += "Level 1-5: " + this.adventurerList.filter(function(a) { return a.level <= 5; }).length + "\t\t\t";
             strBuild += "/   Level 6-10: " + this.adventurerList.filter(function(a) { return a.level > 5 && a.level <= 10; }).length + "\n";
@@ -157,7 +157,7 @@
             strBuild += "Town funds: " + this.moneyPool + "\n\n";
             return strBuild;
         }
-        CartelGameModel.getHealth = function() {
+        ResourceModel.getHealth = function() {
             var full = 0, half = 0, low = 0, totalLevel = 0, totalAdv = 0, totalGold = 0;
             this.adventurerList.forEach(function(a) {
                 totalLevel += a.level;
@@ -290,7 +290,7 @@
         }
         
         //level 21+ = "Boss Level " + level - 20
-        /*CartelGameModel.monsterData = [
+        /*ResourceModel.monsterData = [
             { 'level': 1 , 'name':  'Wolf' }
             , { 'level': 2 , 'name':  'Boar' }
             , { 'level': 3 , 'name':  'Eagle' }
@@ -318,7 +318,7 @@
         //expNeeded = 2 * the previous
         //hpMax += levelJustRaisedTo
         //fightStat += level div 10
-        CartelGameModel.expData = [
+        ResourceModel.expData = [
             { 'level': 1,  'stats': [8, 9, 3] }
             , { 'level': 2,  'stats': [24, 11, 4] }
             , { 'level': 3,  'stats': [96, 14, 5] }
@@ -326,15 +326,15 @@
             , { 'level': 5,  'stats': [400, 23, 7] }
         ];
         
-        CartelGameModel.init();
-        return CartelGameModel;
+        ResourceModel.init();
+        return ResourceModel;
     }
     
     //define globally if it doesn't already exist
-    if(typeof(CartelGameModel) === 'undefined'){
-        window.CartelGameModel = define_cartel_model();
+    if(typeof(ResourceModel) === 'undefined'){
+        window.ResourceModel = define_resource_model();
     }
     else{
-        console.log("CartelGameModel already defined.");
+        console.log("ResourceModel already defined.");
     }
 })(window);

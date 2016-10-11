@@ -5,9 +5,9 @@ Blacksmith.prototype = {
     getButtonImage: function() {
         //BUG - the button image below is not rendering; all other parts of button are
         var buttonImage = this.game.add.bitmapData(250, 48);
-        buttonImage.ctx.fillStyle = "White";
-        buttonImage.ctx.strokeStyle = '#35371c';
-        buttonImage.ctx.lineWidth = 4;
+        buttonImage.ctx.fillStyle = "#2dffef";
+        buttonImage.ctx.strokeStyle = '#000000';
+        buttonImage.ctx.lineWidth = 2;
         buttonImage.ctx.fillRect(0, 0, 250, 48);
         buttonImage.ctx.strokeRect(0, 0, 250, 48);
         
@@ -20,17 +20,17 @@ Blacksmith.prototype = {
         game.add.sprite(0, 0, 'blacksmith-bg');
         
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + CartelGameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.hpRollLoss = this.add.text(300, 50, 'HP Loss Roll: ' + CartelGameModel.hpLossRoll, {
+        this.hpRollLoss = this.add.text(300, 50, 'HP Loss Roll: ' + TownModel.hpLossRoll, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.hpPercentLoss = this.add.text(500, 50, 'HP Loss %: ' + CartelGameModel.hpLossPercentage.toFixed(2), {
+        this.hpPercentLoss = this.add.text(500, 50, 'HP Loss %: ' + TownModel.hpLossPercentage.toFixed(2), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -57,12 +57,12 @@ Blacksmith.prototype = {
             //button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.key = buttonData.key;
             button.name = buttonData.name;
-            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(CartelGameModel.getBlacksmithLevel(button.key) + 1), { font: '16px TheMinion'}));
-            button.cost = CartelGameModel.getBlacksmithCost(button.key);
+            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.getBlacksmithLevel(button.key) + 1), { font: '16px TheMinion'}));
+            button.cost = TownModel.getBlacksmithCost(button.key);
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             
             button.events.onInputDown.add(state.upgradeBlacksmith, state);
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -75,14 +75,14 @@ Blacksmith.prototype = {
         
         this.addMenuOption('Return', function () {
             game.state.start("Game");
-        }, "Blacksmith", 100, 500);
+        }, 100, 500);
     }
 
     , upgradeBlacksmith: function(button, statePointer) {
-        CartelGameModel.upgradeBlackSmith(button.key, button.cost);
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
-        this.hpRollLoss.text = 'HP Loss Roll: ' + CartelGameModel.hpLossRoll;
-        this.hpPercentLoss.text = 'HP Loss %: ' + CartelGameModel.hpLossPercentage.toFixed(2);
+        TownModel.upgradeBlackSmith(button.key, button.cost);
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        this.hpRollLoss.text = 'HP Loss Roll: ' + TownModel.hpLossRoll;
+        this.hpPercentLoss.text = 'HP Loss %: ' + TownModel.hpLossPercentage.toFixed(2);
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -95,12 +95,12 @@ Blacksmith.prototype = {
                 return button.cost;
             }
             function getAdjustedLevel() {
-                return Number(CartelGameModel.getBlacksmithLevel(button.key) + 1);
+                return Number(TownModel.getBlacksmithLevel(button.key) + 1);
             }
-            button.cost = CartelGameModel.getBlacksmithCost(button.key);
+            button.cost = TownModel.getBlacksmithCost(button.key);
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!CartelGameModel.hasAmount(button.cost)) {
+            if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -111,9 +111,9 @@ Blacksmith.prototype = {
     }
     
     , timerTrigger: function() {
-        CartelGameModel.goAdventuring();
-        CartelGameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + CartelGameModel.moneyPool;
+        TownModel.goAdventuring();
+        TownModel.visitTown();        
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.updateButtons();
     }
     
