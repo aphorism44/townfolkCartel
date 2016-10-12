@@ -59,10 +59,20 @@ Splash.prototype = {
         
         
         
-        //button info
+        //button icons
         game.load.image('swordA', 'assets/images/greenSword.png');
         game.load.image('swordB', 'assets/images/yellowSword.png');
         game.load.image('swordC', 'assets/images/redSword.png');
+        
+        game.load.image('tavernIcon', 'assets/images/tavernIcon.png');
+        game.load.image('innIcon', 'assets/images/innIcon.png');
+        game.load.image('shopIcon', 'assets/images/shopIcon.png');
+        game.load.image('swordIcon', 'assets/images/swordIcon.png');
+        game.load.image('armorIcon', 'assets/images/armorIcon.png');
+        game.load.image('templeIcon', 'assets/images/templeIcon.png');
+        
+        
+        
         
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600
@@ -91,10 +101,10 @@ Splash.prototype = {
         game.add.existing(this.status);
         this.load.setPreloadSprite(this.loadingBar);
         //make button bitmap data
-        var buttonImage = this.game.add.bitmapData(476, 48);
+        var buttonImage = this.game.add.bitmapData(500, 48);
         buttonImage.ctx.fillStyle = 'white';
         buttonImage.ctx.strokeStyle = '#35371c';
-        buttonImage.ctx.lineWidth = 4;
+        buttonImage.ctx.lineWidth = 2;
         buttonImage.ctx.fillRect(0, 0, 225, 48);
         buttonImage.ctx.strokeRect(0, 0, 225, 48);
         this.game.cache.addBitmapData('button', buttonImage);

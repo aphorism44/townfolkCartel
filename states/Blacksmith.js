@@ -2,19 +2,7 @@ var Blacksmith = function(game) {};
 
 Blacksmith.prototype = {
     
-    getButtonImage: function() {
-        //BUG - the button image below is not rendering; all other parts of button are
-        var buttonImage = this.game.add.bitmapData(250, 48);
-        buttonImage.ctx.fillStyle = "#2dffef";
-        buttonImage.ctx.strokeStyle = '#000000';
-        buttonImage.ctx.lineWidth = 2;
-        buttonImage.ctx.fillRect(0, 0, 250, 48);
-        buttonImage.ctx.strokeRect(0, 0, 250, 48);
-        
-        return buttonImage;
-    }
-    
-    , create: function() {
+    create: function() {
         var state = this;
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'blacksmith-bg');
@@ -36,11 +24,11 @@ Blacksmith.prototype = {
             strokeThickness: 4
         });
         var smithButtonData = [
-            {icon: 'swordA', name: "Upgrade Swords", level: 1, key: "sword"}
-            , {icon: 'swordB', name: "Upgrade Armor", level: 1, key: "armor" }
+            {icon: 'swordIcon', name: "Upgrade Swords", level: 1, key: "sword"}
+            , {icon: 'armorIcon', name: "Upgrade Armor", level: 1, key: "armor" }
         ];
         
-        var info = "When you level up swords,you increase\nthe danger (possible HP loss\nper battle) adventurers take.\nWhen you level up armor, you decrease the\namount of HP damage adventurers take every battle.\nBe very careful: too much damage may kill\nadventurers, while too little damage will cut down\nthe money they spend on healing."
+        var info = "When you level up swords, you increase\npossible HP loss per battle (a random\nroll). When you level up armor, you decrease\nHP damage taken every battle."
         
         this.infoText = this.add.text(50, 215, info, {
             font: '24px The Minion',
@@ -51,10 +39,10 @@ Blacksmith.prototype = {
         smithGroup = this.game.add.group();
         
         var button;
-        this.advImage = this.getButtonImage();
         smithButtonData.forEach(function(buttonData, index) {
-            button = state.game.add.button(200, 100 + 50 * index, state.game.advImage);
-            //button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
+            //don't use button image here
+            button = state.game.add.button(200, 100 + 50 * index, "");
+            button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.key = buttonData.key;
             button.name = buttonData.name;
             button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.getBlacksmithLevel(button.key) + 1), { font: '16px TheMinion'}));

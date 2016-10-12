@@ -2,19 +2,7 @@ var Tavern = function(game) {};
 
 Tavern.prototype = {
     
-    getButtonImage: function() {
-        //BUG - the button image below is not rendering; all other parts of button are
-        var buttonImage = this.game.add.bitmapData(250, 48);
-        buttonImage.ctx.fillStyle = "#50ef6f";
-        buttonImage.ctx.strokeStyle = '#35371c';
-        buttonImage.ctx.lineWidth = 4;
-        buttonImage.ctx.fillRect(0, 0, 250, 48);
-        buttonImage.ctx.strokeRect(0, 0, 250, 48);
-        
-        return buttonImage;
-    }
-    
-    , create: function() {
+    create: function() {
         var state = this;
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'tavern-bg');
@@ -31,7 +19,7 @@ Tavern.prototype = {
         });
         
         var tavernButtonData = [
-            {icon: 'swordA', name: "Upgrade Tavern" }
+            {icon: 'tavernIcon', name: "Upgrade" }
         ];
         
         var info = "Level up your tavern\nto give adventurers more\nexperience when they fight."
@@ -45,10 +33,9 @@ Tavern.prototype = {
         tavernGroup = this.game.add.group();
         
         var button;
-        this.advImage = this.getButtonImage();
         tavernButtonData.forEach(function(buttonData, index) {
-            button = state.game.add.button(300, 100 + 50 * index, state.game.advImage);
-            //button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
+            button = state.game.add.button(300, 100 + 50 * index, state.game.cache.getBitmapData('button'));
+            button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.name = buttonData.name;
             button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.tavernLevel + 1), { font: '16px TheMinion'}));
             button.cost = TownModel.tavernCost();

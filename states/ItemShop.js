@@ -2,19 +2,7 @@ var ItemShop = function(game) {};
 
 ItemShop.prototype = {
     
-    getButtonImage: function() {
-        //BUG - the button image below is not rendering; all other parts of button are
-        var buttonImage = this.game.add.bitmapData(250, 48);
-        buttonImage.ctx.fillStyle = "White";
-        buttonImage.ctx.strokeStyle = '#35371c';
-        buttonImage.ctx.lineWidth = 4;
-        buttonImage.ctx.fillRect(0, 0, 250, 48);
-        buttonImage.ctx.strokeRect(0, 0, 250, 48);
-        
-        return buttonImage;
-    }
-    
-    , create: function() {
+    create: function() {
         var state = this;
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'itemshop-bg');
@@ -31,7 +19,7 @@ ItemShop.prototype = {
         });
         
         var itemShopButtonData = [
-            {icon: 'swordA', name: "Upgrade Item Shop" }
+            {icon: 'shopIcon', name: "Upgrade" }
         ];
         var info = "Level up your item shop\nto give adventurers more\nmoney when they fight."
         
@@ -43,10 +31,9 @@ ItemShop.prototype = {
         
         itemShopGroup = this.game.add.group();
         var button;
-        this.advImage = this.getButtonImage();
         itemShopButtonData.forEach(function(buttonData, index) {
-            button = state.game.add.button(150, 100 + 50 * index, state.game.advImage);
-            //button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
+            button = state.game.add.button(150, 100 + 50 * index, state.game.cache.getBitmapData('button'));
+            button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.name = buttonData.name;
             button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.shopLevel + 1), { font: '16px TheMinion'}));
             button.cost = TownModel.shopCost();

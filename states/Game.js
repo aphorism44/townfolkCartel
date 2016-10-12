@@ -51,6 +51,7 @@ Game.prototype = {
         
         var button;
         advButtonsData.forEach(function(buttonData, index) {
+            button = 
             button = state.game.add.button(200, 100 + 50 * index, state.game.cache.getBitmapData('button'));
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
