@@ -37,13 +37,18 @@ Tavern.prototype = {
             button = state.game.add.button(300, 100 + 50 * index, state.game.cache.getBitmapData('button'));
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.name = buttonData.name;
-            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number(TownModel.tavernLevel + 1), { font: '16px TheMinion'}));
+            button.level = TownModel.tavernLevel;
+            button.text = button.addChild(state.game.add.text(42, 6, button.name + " To Level " + Number( button.level + 1), { font: '16px TheMinion'}));
             button.cost = TownModel.tavernCost();
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.upgradeTavern, state);
             if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
+            } else if (button.level > 11) {
+                button.inputEnabled = false;
+                button.alpha = 0.1;
+                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;
@@ -76,7 +81,8 @@ Tavern.prototype = {
                 return button.cost;
             }
             function getAdjustedLevel() {
-                return Number(TownModel.tavernLevel + 1);
+                button.level = TownModel.tavernLevel;
+                return Number(button.level + 1);
             }
             button.cost = TownModel.tavernCost();
             button.text.text = button.name + " To Level " + getAdjustedLevel();
@@ -84,6 +90,10 @@ Tavern.prototype = {
             if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
+            } else if (button.level > 11) {
+                button.inputEnabled = false;
+                button.alpha = 0.1;
+                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;

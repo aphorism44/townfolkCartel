@@ -7,323 +7,135 @@
         var ResourceModel = {};
         
         ResourceModel.init = function() {
-            this.adventurerList = [];
-            this.deadAdventurerList = [];
-            this.brokeAdventurerList = [];
-            this.expPool = createExpPool(this.expData);
-            this.maintenance = 0;
-            //this.monsterPool = createMonsterPool(this.monsterData);
-            this.moneyPool = new BigNumber(50);
-            //blacksmith stats
-            this.swordLevel = 0;
-            this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
-            this.armorLevel = 0;
-            this.hpLossPercentage = 0.4; //adjustable - what percentage of damage monsters do in a fight
-            //inn stats
-            this.innLevel = 0;
-            this.maxAdventurers = 20; //adjustable at inn
-            //temple stats
-            this.templeLevel = 0;
-            this.costPerHP = 1; //adjustable - cost to heal each lost HP
-            //tavern stats
-            this.tavernLevel = 0;
-            this.expGainRoll = 4; //adjustable - die roll to add extra experience when an adventurer kills a monster
-            //item shop stats
-            this.shopLevel = 0;
-            this.goldGainRoll = 4; //adjustable - die roll to add extra gold when an adventurer kills a monster        
-        }
-        ResourceModel.addAdventurers = function(num, cost) {
-            this.moneyPool -= cost;
-            for (var i = 0; i < num; i++)
-                this.adventurerList.push(new Adventurer(1, this.expPool.get(1)));
+            this.buildingMap = createBldgMap(this.bldgData);
+            this.itemMap = createItemMap(this.itemData);
+            this.ultimateItemMap = createUltimaMap(this.ultimateItemData);    
         }
         
-        ResourceModel.hasAmount = function(amount) {
-            return amount <= this.moneyPool;
+        ResourceModel.getItemList = function(category, level) {
+            var itemArray = [];
+            for (var i = 0; i < level; i++)
+                itemArray.push(this.itemMap.get(category)[i]);
+            if (itemArray.length < 1)
+                return "Nothing"
+            
+            return itemArray.join(",");
         }
-        ResourceModel.upgradeInn = function(cost) {
-            this.moneyPool -= cost;
-            this.innLevel++;
-            this.maintenance += Math.pow(this.innLevel, 2);
-            this.maxAdventurers += 10;
+        ResourceModel.getUltimateItemData = function(name) {
+            return this.ultimateItemMap.get(name);
         }
-        ResourceModel.upgradeTemple = function(cost) {
-            this.moneyPool -= cost;
-            this.templeLevel++;
-            this.maintenance += Math.pow(this.templeLevel, 2);
-            this.costPerHP++;
+        ResourceModel.getBuildingData = function() {
+            return this.buildingMap;
         }
-        ResourceModel.upgradeTavern = function(cost) {
-            this.moneyPool -= cost;
-            this.tavernLevel++;
-            this.maintenance += Math.pow(this.tavernLevel, 2);
-            this.expGainRoll++;
-        }
-        ResourceModel.upgradeShop = function(cost) {
-            this.moneyPool -= cost;
-            this.shopLevel++;
-            this.maintenance += Math.pow(this.shopLevel, 2);
-            this.goldGainRoll++;
-        }
-        ResourceModel.upgradeBlackSmith = function(key, cost) {
-            this.moneyPool -= cost;
-            if (key === "sword") {
-                this.swordLevel++;
-                this.maintenance += Math.pow(this.swordLevel, 2);
-                this.hpLossRoll++;
-            } else if (key === "armor") {
-                this.armorLevel++;
-                this.maintenance += Math.pow(this.armorLevel, 2);
-                this.hpLossPercentage *= 0.9;
+        ResourceModel.getPurchasedBuildings = function() {
+            var purchasedBuildings = [];
+            for (var [key, value] of this.buildingMap) {
+                if (value.purchased)
+                    purchasedBuildings.push(key);
             }
+            return purchasedBuildings;
         }
-        
-        //need these
-        ResourceModel.getBlacksmithLevel = function(key) {
-            if (key === "sword")
-                return this.swordLevel;
-            else if (key === "armor")
-                return this.armorLevel;
+        ResourceModel.buyBuilding = function(name) {
+            this.buildingMap.get(name).purchased = true;
         }
-        
-        //Price=BaseCost×Multiplier^(#Owned)
-        ResourceModel.adventurerCost = function() {
-            return Math.floor(50 * Math.pow(1.07, this.adventurerList.length));
+        ResourceModel.isBuildingAvailable = function(name) {
+            var needed = this.buildingMap.get(name).needsArray;
+            var bought = this.getPurchasedBuildings();
+            
+            if (needed.length < 0)
+                return true;
+            
+            for (var i = 0; i < needed.length; i++)
+                if (!bought.includes(needed[i]))
+                    return false;
+            
+            return true;
         }
-        ResourceModel.innCost = function() {
-            return Math.floor(1000 * Math.pow(1.27, this.innLevel));
+        ResourceModel.isUltimateItemAvailable = function(name) {
+            var needed = this.ultimateItemMap.get(name).needArray;
+            var bought = this.getPurchasedBuildings();
+            
+            for (var i = 0; i < needed.length; i++)
+                if (!bought.includes(needed[i]))
+                    return false;
+            
+            return true;
         }
-        ResourceModel.templeCost = function() {
-            return Math.floor(2000 * Math.pow(1.37, this.templeLevel));
-        }
-        ResourceModel.tavernCost = function() {
-            return Math.floor(2000 * Math.pow(1.3, this.tavernLevel));
-        }
-        ResourceModel.shopCost = function() {
-            return Math.floor(3000 * Math.pow(1.5, this.shopLevel));
-        }
-        
-        
-        ResourceModel.getBlacksmithCost = function(key) {
-            if (key === "sword") {
-                return Math.floor(2500 * Math.pow(1.07, this.swordLevel));
-            } else if (key === "armor") {
-                return Math.floor(2500 * Math.pow(1.07, this.armorLevel));
-            }
-        }
-        
-        //below 2 methods are main game loop
-        ResourceModel.goAdventuring = function() {
-            var len = this.adventurerList.length;
-            for (var i = len - 1; i > -1; i--) {
-                var lev = this.adventurerList[i].level + this.adventurerList[i].weaponModifier;
-                /*var monName = "";
-                if (lev > 20)
-                    monName = "Boss Level " + lev;
-                else
-                    monName = this.monsterPool.get(lev);
-                var m = new Monster(lev, [0, Math.floor(this.adventurerList[i].hp / 2), Math.floor(this.adventurerList[i].fightStat / 2)], monName);*/
-                //SIMPLIFY - simulate battle by removing some percentage of adventurer's HP and giving a return based on level
-                this.adventurerList[i].takeDamage(Math.round(this.adventurerList[i].hpMax * this.hpLossPercentage) + dieRoll(this.hpLossRoll) - this.adventurerList[i].armorModifier);
-                if (this.adventurerList[i].alive) {
-                    this.adventurerList[i].lootMonster(lev, this.expGainRoll, this.goldGainRoll);
-                    this.adventurerList[i].checkLevel(this.expPool);
-                } else {
-                    this.deadAdventurerList.push(this.adventurerList.splice(i, 1));
-                }
-            }
-        }
-        ResourceModel.visitTown = function() {
-            var len = this.adventurerList.length;
-            for (var i = len - 1; i > -1; i--) {
-                //pay for as much healing as possible
-                this.moneyPool += this.adventurerList[i].heal(this.costPerHP);
-                //other items go in here as needed...
-                //if (this.adventurerList[i].broke)
-                    //this.brokeAdventurerList.push(this.adventurerList.splice(i, 1));
-            }
-            this.moneyPool -= this.maintenance;
-        }
-        //below are reporting methods
-        ResourceModel.getOverview = function() {
-            var strBuild = "Active Adventurers: " + this.adventurerList.length + "\n";
-            strBuild += "Level 1-5: " + this.adventurerList.filter(function(a) { return a.level <= 5; }).length + "\t\t\t";
-            strBuild += "/   Level 6-10: " + this.adventurerList.filter(function(a) { return a.level > 5 && a.level <= 10; }).length + "\n";
-            strBuild += "Level 11-15: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 15; }).length + "\t\t\t";
-            strBuild += "/   Level 16-20: " + this.adventurerList.filter(function(a) { return a.level > 15 && a.level <= 20; }).length + "\n";
-            strBuild += "Level 21+: " + this.adventurerList.filter(function(a) { return a.level > 20; }).length + "\t\t\t";
-            strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
-            //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";
-            strBuild += "Town funds: " + this.moneyPool + "\n\n";
-            return strBuild;
-        }
-        ResourceModel.getHealth = function() {
-            var full = 0, half = 0, low = 0, totalLevel = 0, totalAdv = 0, totalGold = 0;
-            this.adventurerList.forEach(function(a) {
-                totalLevel += a.level;
-                totalGold += a.gold;
-                totalAdv++;
-                if (a.hp === a.hpMax)
-                    full++;
-                else if (a.hp < a.hpMax / 2)
-                    low++;
-                else
-                    half++;
-            });
-            if (totalAdv == 0) totalAdv = 1;
-            var strBuild = "Adventurer health:\n";
-            strBuild += "Full HP: " + full + "\t\t\t";
-            strBuild += "/   Half to Full HP: " + half + "\n";
-            strBuild += "Less than Half HP: " + low + "\t\t\t";
-            strBuild += "/   Average Level: " + totalLevel / totalAdv + "\n";
-            strBuild += "Total Adventurer Cash: " + totalGold + "\n";            
-            return strBuild;
-        }
-        
-        /*function createMonsterPool(monsterData) {
+        function createBldgMap(bldgData) {
             var pool = new Map();
-            monsterData.forEach(function(m) {
-                pool.set(m.level, m.name);
-            });
-            return pool;
-        }*/
-        
-         function createExpPool(expData) {
-            var pool = new Map();
-            expData.forEach(function(e) {
-                pool.set(e.level, e.stats);
+            bldgData.forEach(function(b) {
+                pool.set(b.name, {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'produce': b.produce, 'purchased': false });
             });
             return pool;
         }
-         
-         
-         var Being = function(level, levelStats) { 
-             this.alive = true;
-             this.level = level;
-             this.hp = levelStats[1];
-             this.fightStat = levelStats[2];
-         }
-         Being.prototype.takeDamage = function(hpLoss) {
-             if (hpLoss > 0) {
-                this.hp -= hpLoss;
-                if (this.hp <= 0) {
-                    this.hp = 0;
-                    this.alive = false;
-                } 
-             }
-         }
-         
-         var Adventurer = function(level, levelStats) {
-             Being.call(this, level, levelStats);
-             this.hpMax = levelStats[1];
-             this.gold = 25;
-             this.totalGoldEarned = 0;
-             this.totalGoldSpent = 0;
-             this.exp = 0;
-             this.expToNext = levelStats[0];
-             this.broke = false;
-             this.weapon = null;
-             this.armor = null;
-             this.weaponModifier = 0;
-             this.armorModifier = 0;
-         }
-        Adventurer.prototype = Object.create(Being.prototype);
-        Adventurer.prototype.constructor = Adventurer;
-        Adventurer.prototype.lootMonster = function(deadMonsterLevel, extraExpRoll, extraGoldRoll) {
-            var goldDrop = 2 * Math.round(Math.pow(deadMonsterLevel, 1.5));
-            var extraGold = dieRoll(extraGoldRoll);
-            this.gold += goldDrop + extraGold;
-            this.totalGoldEarned += goldDrop + extraGold;
-            this.exp += Math.floor(Math.pow(deadMonsterLevel, 1.5)) + dieRoll(extraExpRoll);
+        function createItemMap(itemData) {
+            var pool = new Map();
+            itemData.forEach(function(i) {
+                pool.set(i.category, i.list.split(",").map(function(e) { return e.trim(); }));
+            });
+            return pool;
         }
-        Adventurer.prototype.checkLevel = function(expPool) {
-            if (this.exp >= this.expToNext) {
-                this.level++;
-                if (this.level > 5) {
-                    this.expToNext *= 2;
-                    this.hpMax += this.level;
-                    this.fightStat += Math.ceil(this.level / 10);
-                } else {
-                    this.expToNext = expPool.get(this.level)[0];
-                    this.hpMax = expPool.get(this.level)[1];
-                    this.fightStat = expPool.get(this.level)[2];
-                }
-            }
-        }
-        Adventurer.prototype.heal = function(costPerHp) {
-            //heal as much HP as possible
-            var needHeal = costPerHp * (this.hpMax - this.hp);
-            var healCost = 0;
-            if (this.gold < needHeal)
-                healCost = Math.floor(this.gold / costPerHp);
-            else
-                healCost = needHeal;
-            
-            this.hp += healCost / costPerHp;
-            this.gold -= healCost;
-            
-            return healCost;
-        }
-        //weapons/armor currently not used
-        Adventurer.prototype.equipWeapon = function(name, modifier) {
-            this.weapon = name;
-            this.weaponModifier = modifier;
-        }
-        Adventurer.prototype.equipArmor = function(name, modifier) {
-            this.armor = name;
-            this.armorModifier = modifier;
-        }
-        //simplified - we no longer use this object (for now); logic moved to Adventurer.lootMonster method
-        /*
-        var Monster = function(level, levelStats, name) {
-            Being.call(this, level, levelStats);
-            this.name = name;
-            this.goldDrop = level * 2;
-            this.expDrop = Math.floor(Math.pow(level, 1.5));
-        }
-        Monster.prototype = Object.create(Being.prototype);
-        Monster.prototype.constructor = Monster;
-        */
-         
-        function dieRoll(size) {
-            return Math.floor(Math.random() * size) + 1;
+        function createUltimaMap(ultimateItemData) {
+            var pool = new Map();
+            ultimateItemData.forEach(function(u) {
+                pool.set(u.name, { 'needArray': u.needList.split(",").map(function(e) { return e.trim(); }), 'location': u.location, 'needText': u.needtext, 'desc': u.desc });
+            });
+            return pool;
         }
         
-        //level 21+ = "Boss Level " + level - 20
-        /*ResourceModel.monsterData = [
-            { 'level': 1 , 'name':  'Wolf' }
-            , { 'level': 2 , 'name':  'Boar' }
-            , { 'level': 3 , 'name':  'Eagle' }
-            , { 'level': 4 , 'name':  'Lion' }
-            , { 'level': 5 , 'name':  'Bear' }
-            , { 'level': 6 , 'name':  'Direwolf' }
-            , { 'level': 7 , 'name':  'Deathwolf' }
-            , { 'level': 8 , 'name':  'Werewolf' }
-            , { 'level': 9 , 'name':  'Hippopatamus' }
-            , { 'level': 10 , 'name':  'Dragon' }
-            , { 'level': 11 , 'name':  'Ghost' }
-            , { 'level': 12 , 'name':  'Ghoul' }
-            , { 'level': 13 , 'name':  'Doppleganger' }
-            , { 'level': 14 , 'name':  'Fire Fairy' }
-            , { 'level': 15 , 'name':  'Rogue Thief' }
-            , { 'level': 16 , 'name':  'Rogue Knight' }
-            , { 'level': 17 , 'name':  'Rogue Wizard' }
-            , { 'level': 18 , 'name':  'Archer Prince' }
-            , { 'level': 19 , 'name':  'Woodland Queen' }
-            , { 'level': 20 , 'name':  'Forest King' }
-        ];*/
+        ResourceModel.bldgData = [
+            { 'level' : 0, 'name': 'Mountains', 'needs': '', 'cost': 1000, 'produce' : '' }
+            , { 'level' : 0, 'name': 'Prairie', 'needs': '', 'cost': 1000, 'produce' : '' }
+            , { 'level' : 0, 'name': 'Pastures', 'needs': '', 'cost': 1000, 'produce' : '' }
+            , { 'level' : 0, 'name': 'Seacoast', 'needs': '', 'cost': 1000, 'produce' : '' }
+            , { 'level' : 0, 'name': 'Forest', 'needs': '', 'cost': 1000, 'produce' : '' }
+            , { 'level' : 1, 'name': 'Ore Mine', 'needs': 'Mountains', 'cost': 10000, 'produce' : 'Ore' }
+            , { 'level' : 1, 'name': 'Alum Mine', 'needs': 'Mountains', 'cost': 10000, 'produce' : 'Shale' }
+            , { 'level' : 1, 'name': 'Grain Farm', 'needs': 'Prairie', 'cost': 10000, 'produce' : 'Grain' }
+            , { 'level' : 1, 'name': 'Hops Farm', 'needs': 'Prairie', 'cost': 10000, 'produce' : 'Hops' }
+            , { 'level' : 1, 'name': 'Vineyard', 'needs': 'Prairie', 'cost': 10000, 'produce' : 'Grapes' }
+            , { 'level' : 1, 'name': 'Sheep Pasture', 'needs': 'Pasture', 'cost': 10000, 'produce' : 'Sheep' }
+            , { 'level' : 1, 'name': 'Cattle Ranch', 'needs': 'Pasture', 'cost': 10000, 'produce' : 'Cattle' }
+            , { 'level' : 1, 'name': 'Dock', 'needs': 'Seacoast', 'cost': 10000, 'produce' : 'Fish' }
+            , { 'level' : 1, 'name': 'Saltbeds', 'needs': 'Seacoast', 'cost': 10000, 'produce' : 'Brine' }
+            , { 'level' : 1, 'name': 'Lumberjack Camp', 'needs': 'Forest', 'cost': 10000, 'produce' : 'Logs' }
+            , { 'level' : 2, 'name': 'Blast Furnace', 'needs': 'Ore Mine', 'cost': 1000000, 'produce' : 'Slag' }
+            , { 'level' : 2, 'name': 'Calcinator', 'needs': 'Alum Mine', 'cost': 1000000, 'produce' : 'Sulfates' }
+            , { 'level' : 2, 'name': 'Mill', 'needs': 'Grain Farm', 'cost': 1000000, 'produce' : 'Flour' }
+            , { 'level' : 2, 'name': 'Ale Brewery', 'needs': 'Grain Farm', 'cost': 1000000, 'produce' : 'Small Ale' }
+            , { 'level' : 2, 'name': 'Beer Brewery', 'needs': 'Grain Farm, Hops Farm', 'cost': 1000000, 'produce' : 'Small Beer' }
+            , { 'level' : 2, 'name': 'Winery', 'needs': 'Vineyard', 'cost': 1000000, 'produce' : 'Wine' }
+            , { 'level' : 2, 'name': 'Shearing Shed', 'needs': 'Sheep Station', 'cost': 1000000, 'produce' : 'Wool' }
+            , { 'level' : 2, 'name': 'Slaughterhouse', 'needs': 'Cattle Ranch', 'cost': 1000000, 'produce' : 'Meat' }
+            , { 'level' : 2, 'name': 'Fishery', 'needs': 'Dock', 'cost': 1000000, 'produce' : 'Fish Fillets' }
+            , { 'level' : 2, 'name': 'Saltpans', 'needs': 'Saltbeds', 'cost': 1000000, 'produce' : 'Crast' }
+            , { 'level' : 2, 'name': 'Sawmill', 'needs': 'Lumberjack Camp', 'cost': 1000000, 'produce' : 'Timber' }
+            , { 'level' : 3, 'name': 'Forge', 'needs': 'Blast Furnace, Charcoal Kiln', 'cost': 10000000, 'produce' : 'Iron' }
+            , { 'level' : 3, 'name': 'Lixiviator', 'needs': 'Calcinator', 'cost': 10000000, 'produce' : 'Alum' }
+            , { 'level' : 3, 'name': 'Bakery', 'needs': 'Mill, Sawmill', 'cost': 10000000, 'produce' : 'Bread' }
+            , { 'level' : 3, 'name': 'Ale Conditioner', 'needs': 'Ale Brewery', 'cost': 10000000, 'produce' : 'Dark Ale' }
+            , { 'level' : 3, 'name': 'Beer Filtrator', 'needs': 'Beer Brewery', 'cost': 10000000, 'produce' : 'Bright Beer' }
+            , { 'level' : 3, 'name': 'Distillery', 'needs': 'Winery, Charcoal Kiln', 'cost': 10000000, 'produce' : 'Liquor' }
+            , { 'level' : 3, 'name': 'Spinning Jenny', 'needs': 'Shearing Shed, Sawmill, Forge', 'cost': 10000000, 'produce' : 'Yarn' }
+            , { 'level' : 3, 'name': 'Smokehouse', 'needs': 'Slaughterhouse, Sawmill', 'cost': 10000000, 'produce' : 'Jerky' }
+            , { 'level' : 3, 'name': 'Brinery', 'needs': 'Fishery, Sawmill, Saltbeds', 'cost': 10000000, 'produce' : 'Saltfish' }
+            , { 'level' : 3, 'name': 'Saltern', 'needs': 'Saltpans, Sawmill', 'cost': 10000000, 'produce' : 'Salt' }
+            , { 'level' : 3, 'name': 'Charcoal Kiln', 'needs': 'Sawmill', 'cost': 10000000, 'produce' : 'Charcoal' }
+        ];
         
-        //[expNeeded, hpMax, fightStat]
-        //follow this pattern after Level 5:
-        //expNeeded = 2 * the previous
-        //hpMax += levelJustRaisedTo
-        //fightStat += level div 10
-        ResourceModel.expData = [
-            { 'level': 1,  'stats': [8, 9, 3] }
-            , { 'level': 2,  'stats': [24, 11, 4] }
-            , { 'level': 3,  'stats': [96, 14, 5] }
-            , { 'level': 4,  'stats': [175, 18, 6] }
-            , { 'level': 5,  'stats': [400, 23, 7] }
+        ResourceModel.itemData = [
+            {'category' : 'weapons', 'list': 'club, knife, hatchet, morningstar, shortsword, shortbow, longsword, longbow, battleaxe, broadsword, falchion, crossbow' }
+            , {'category' : 'armor', 'list': 'leather armon, buckler, short hauberk, roundshield, long hauberk, kite shield, lamellar, scale armor, partial plate, pavise, full plate, cuirass' }
+            , {'category' : 'items', 'list': 'knapsack, tent, flint, dried fruit, canteen, boots, cloak, jerky, waterproof poncho, cuttlefish, waterproof jersey, portable stove' }
+            , {'category' : 'medicine', 'list': 'chicken soup, bandages, splints, herbs, iodine, crutches, leeches, tincture, bloodletting, mineral salt, scalpel, elixir' }
+        ];
+        
+        ResourceModel.ultimateItemData = [
+           { 'name' : 'Arquebus', 'location': 'Blacksmith', 'needtext' : 'Forge (iron castings)\nLixiviator (potassium)\nCharcoal Kiln (charcoal)', 'desc' : 'The newest weapon on the market – makes a crossbow look tame! Just load it with this new “gunpowder” powder, aim, and shoot!', 'needList': 'Forge, Lixiviator, Charcoal Kiln' }
+            , { 'name' : 'Brigandine', 'location': 'Blacksmith', 'needtext' : 'Forge (iron patches)\nSpinning Jenny (padding)\nCharcoal Kiln (charcoal)', 'desc' : 'Looking for armor that is strong but also light? Try the brigandine, with its thick padding with strategically placed sheets of armot stitched throughout.', 'needList': 'Forge, Spinning Jenny, Lixiciator' }
+            , { 'name' : 'Pemmican', 'location': 'Item Shop', 'needtext' : 'Smokehouse (jerky)\nDistillery (leftover fruit)\nCharcoal Kiln (charcoal)', 'desc' : 'The ultimate in adventuring rations! A mixture of ground jerky, fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Distillery, Charcoal Kiln' }
+            , { 'name' : 'Poultice', 'location': 'Temple', 'needtext' : 'Lixiciator (alum)\nSpinning Jenny (cloth)\nSaltern (salt)', 'desc' : 'Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Lixiciator, Spinning Jenny, Saltern' }
+            , { 'name' : 'Black Velvet', 'location': 'Tavern', 'needtext' : 'Ale Brewery (dark ale)\nBeer Brewery (stout)\nDistillery (champagne)', 'desc' : 'Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Ale Brewery, Beer Brewery, Distillery' }
         ];
         
         ResourceModel.init();
