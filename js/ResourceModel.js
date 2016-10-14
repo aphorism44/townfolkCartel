@@ -14,6 +14,7 @@
         
         ResourceModel.getItemList = function(category, level) {
             var itemArray = [];
+            if (level > 12) level = 12;
             for (var i = 0; i < level; i++)
                 itemArray.push(this.itemMap.get(category)[i]);
             if (itemArray.length < 1)

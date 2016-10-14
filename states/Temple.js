@@ -30,6 +30,13 @@ Temple.prototype = {
             strokeThickness: 0
         });
         
+        var list = "Available Items: " + ResourceModel.getItemList("medicine", TownModel.templeLevel);
+        this.itemText = this.add.text(300, 475, info, {
+            font: '24px The Minion',
+            fill: '#d41515',
+            strokeThickness: 0
+        });
+        
         templeGroup = this.game.add.group();
         
         var button;

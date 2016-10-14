@@ -30,6 +30,7 @@ Tavern.prototype = {
             strokeThickness: 0
         });
         
+        
         tavernGroup = this.game.add.group();
         
         var button;
