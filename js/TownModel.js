@@ -12,6 +12,7 @@
             this.brokeAdventurerList = [];
             this.expPool = createExpPool(this.expData);
             this.maintenance = 0;
+            this.lastIncome = 0;
             //this.monsterPool = createMonsterPool(this.monsterData);
             this.moneyPool = new BigNumber(1000000);
             //blacksmith stats
@@ -135,13 +136,15 @@
         }
         TownModel.visitTown = function() {
             var len = this.adventurerList.length;
+            this.lastIncome = 0;
             for (var i = len - 1; i > -1; i--) {
                 //pay for as much healing as possible
-                this.moneyPool += this.adventurerList[i].heal(this.costPerHP);
+                this.lastIncome += this.adventurerList[i].heal(this.costPerHP);
                 //other items go in here as needed...
                 //if (this.adventurerList[i].broke)
                     //this.brokeAdventurerList.push(this.adventurerList.splice(i, 1));
             }
+            this.moneyPool += this.lastIncome
             this.moneyPool -= this.maintenance;
         }
         //below are reporting methods
@@ -154,6 +157,7 @@
             strBuild += "Level 21+: " + this.adventurerList.filter(function(a) { return a.level > 20; }).length + "\t\t\t";
             strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
             //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";
+            strBuild += "Daily Costs: " + this.maintenance + " / Daily Revenue: " + this.lastIncome + " / Cash Flow: " + Number(this.lastIncome - this.maintenance) + "\n";
             strBuild += "Town funds: " + this.moneyPool + "\n\n";
             return strBuild;
         }

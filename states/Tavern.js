@@ -29,6 +29,14 @@ Tavern.prototype = {
             fill: '#d41515',
             strokeThickness: 0
         });
+        var list = "Available Items: " + ResourceModel.getItemList("tavern", TownModel.tavernLevel);
+        this.itemText = this.add.text(300, 350, list, {
+            font: '24px The Minion',
+            fill: '#d41515',
+            wordWrap: true,
+            wordWrapWidth: 400,
+            align: 'left'
+        });
         
         
         tavernGroup = this.game.add.group();
@@ -43,13 +51,14 @@ Tavern.prototype = {
             button.cost = TownModel.tavernCost();
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.upgradeTavern, state);
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;
@@ -70,6 +79,7 @@ Tavern.prototype = {
         TownModel.upgradeTavern(button.cost);
         this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.expRoll.text = 'Extra Experience Roll: ' + TownModel.expGainRoll;
+        this.itemText.text = "Available Items: " + ResourceModel.getItemList("tavern", TownModel.tavernLevel);
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -88,13 +98,14 @@ Tavern.prototype = {
             button.cost = TownModel.tavernCost();
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;

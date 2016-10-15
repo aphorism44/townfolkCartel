@@ -16,9 +16,9 @@
             var itemArray = [];
             if (level > 12) level = 12;
             for (var i = 0; i < level; i++)
-                itemArray.push(this.itemMap.get(category)[i]);
+                itemArray.push(" " + this.itemMap.get(category)[i]);
             if (itemArray.length < 1)
-                return "Nothing"
+                return "nothing"
             
             return itemArray.join(",");
         }
@@ -129,6 +129,8 @@
             , {'category' : 'armor', 'list': 'leather armon, buckler, short hauberk, roundshield, long hauberk, kite shield, lamellar, scale armor, partial plate, pavise, full plate, cuirass' }
             , {'category' : 'items', 'list': 'knapsack, tent, flint, dried fruit, canteen, boots, cloak, jerky, waterproof poncho, cuttlefish, waterproof jersey, portable stove' }
             , {'category' : 'medicine', 'list': 'chicken soup, bandages, splints, herbs, iodine, crutches, leeches, tincture, bloodletting, mineral salt, scalpel, elixir' }
+            , {'category' : 'tavern', 'list': 'bread, cheese, stew, ale, coffee, fried chicken, whiskey, fish and chips, pork chops, steak, caviar, champagne' }
+            , {'category' : 'inn', 'list': 'straw, blankets, pillows, bunkbeds, stable, singles, showers, catering, groom, hot baths, room service, bordello' }
         ];
         
         ResourceModel.ultimateItemData = [

@@ -24,16 +24,32 @@ Blacksmith.prototype = {
             strokeThickness: 4
         });
         var smithButtonData = [
-            {icon: 'swordIcon', name: "Upgrade Swords", level: 1, key: "sword"}
+            {icon: 'swordIcon', name: "Upgrade Weapons", level: 1, key: "sword"}
             , {icon: 'armorIcon', name: "Upgrade Armor", level: 1, key: "armor" }
         ];
         
-        var info = "When you level up swords, you increase\npossible HP loss per battle (a random\nroll). When you level up armor, you decrease\nHP damage taken every battle."
+        var info = "When you level up weapons, you increase possible HP\nloss per battle (a random roll). When you level up armor,\n you decrease HP damage taken every battle."
         
-        this.infoText = this.add.text(50, 215, info, {
+        this.infoText = this.add.text(25, 200, info, {
             font: '24px The Minion',
             fill: '#d41515',
             strokeThickness: 0
+        });
+        var list1 = "Available Items: " + ResourceModel.getItemList("weapons", TownModel.swordLevel);
+        this.itemText1 = this.add.text(25, 300, list1, {
+            font: '24px The Minion',
+            fill: '#d41515',
+            wordWrap: true,
+            wordWrapWidth: 550,
+            align: 'left'
+        });
+        var list2 = "Available Items: " + ResourceModel.getItemList("armor", TownModel.armorLevel);
+        this.itemText2 = this.add.text(25, 400, list2, {
+            font: '24px The Minion',
+            fill: '#d41515',
+            wordWrap: true,
+            wordWrapWidth: 550,
+            align: 'left'
         });
         
         smithGroup = this.game.add.group();
@@ -51,13 +67,14 @@ Blacksmith.prototype = {
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             
             button.events.onInputDown.add(state.upgradeBlacksmith, state);
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';  
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;
@@ -76,6 +93,8 @@ Blacksmith.prototype = {
         this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.hpRollLoss.text = 'HP Loss Roll: ' + TownModel.hpLossRoll;
         this.hpPercentLoss.text = 'HP Loss %: ' + TownModel.hpLossPercentage.toFixed(2);
+        this.itemText1.text = "Available Items: " + ResourceModel.getItemList("weapons", TownModel.swordLevel);
+        this.itemText2.text = "Available Items: " + ResourceModel.getItemList("armor", TownModel.armorLevel);
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -94,13 +113,14 @@ Blacksmith.prototype = {
             button.cost = TownModel.getBlacksmithCost(button.key);
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;

@@ -23,10 +23,18 @@ ItemShop.prototype = {
         ];
         var info = "Level up your item shop\nto give adventurers more\nmoney when they fight."
         
-        this.infoText = this.add.text(150, 200, info, {
+        this.infoText = this.add.text(75, 200, info, {
             font: '24px The Minion',
             fill: '#d41515',
             strokeThickness: 0
+        });
+        var list = "Available Items: " + ResourceModel.getItemList("items", TownModel.shopLevel);
+        this.itemText = this.add.text(75, 350, list, {
+            font: '24px The Minion',
+            fill: '#d41515',
+            wordWrap: true,
+            wordWrapWidth: 400,
+            align: 'left'
         });
         
         itemShopGroup = this.game.add.group();
@@ -40,14 +48,15 @@ ItemShop.prototype = {
             button.cost = TownModel.shopCost();
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.upgradeItemShop, state);
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-           } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT'; 
-            } else {
+           } else {
                 button.inputEnabled = true;
                 button.alpha = 1;
             }
@@ -67,6 +76,7 @@ ItemShop.prototype = {
         TownModel.upgradeShop(button.cost);
         this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.goldRoll.text = 'Extra Money Roll: ' + TownModel.goldGainRoll;
+        this.itemText.text = "Available Items: " + ResourceModel.getItemList("items", TownModel.shopLevel);
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -85,13 +95,14 @@ ItemShop.prototype = {
             button.cost = TownModel.shopCost();
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;

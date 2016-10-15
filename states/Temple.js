@@ -22,7 +22,7 @@ Temple.prototype = {
             {icon: 'templeIcon', name: "Upgrade" }
         ];
         
-        var info = "Level up your temple to charge\nadventurers more for healing. Watch out - \nif they can't afford it, they might die!"
+        var info = "Level up your temple to charge\nadventurers more for healing. Watch out - \nif they can't afford to heal, they might die!"
         
         this.infoText = this.add.text(300, 200, info, {
             font: '24px The Minion',
@@ -31,10 +31,12 @@ Temple.prototype = {
         });
         
         var list = "Available Items: " + ResourceModel.getItemList("medicine", TownModel.templeLevel);
-        this.itemText = this.add.text(300, 475, info, {
+        this.itemText = this.add.text(300, 350, list, {
             font: '24px The Minion',
             fill: '#d41515',
-            strokeThickness: 0
+            wordWrap: true,
+            wordWrapWidth: 450,
+            align: 'left'
         });
         
         templeGroup = this.game.add.group();
@@ -49,13 +51,14 @@ Temple.prototype = {
             button.cost = TownModel.templeCost();
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.upgradeTemple, state);
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;
@@ -76,6 +79,7 @@ Temple.prototype = {
         TownModel.upgradeTemple(button.cost);
         this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.hpCost.text = 'Cost to Heal One HP: ' + TownModel.costPerHP;
+        this.itemText.text = "Available Items: " + ResourceModel.getItemList("medicine", TownModel.templeLevel);
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -94,13 +98,14 @@ Temple.prototype = {
             button.cost = TownModel.templeCost();
             button.text.text = button.name + " To Level " + getAdjustedLevel();
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!TownModel.hasAmount(button.cost)) {
+            if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-            } else if (button.level > 11) {
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
+            } else if (!TownModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
-                button.costText.text = 'MAXED OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;
