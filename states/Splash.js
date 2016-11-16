@@ -7,7 +7,6 @@ Splash.prototype = {
             game.load.script('mixins', 'lib/mixins.js');
             game.load.script('bignumber', 'vendor/bignumber.min.js');
             
-            
             game.load.script('WebFont', 'vendor/webfontloader.js');
             game.load.script('mainmenu','states/MainMenu.js');
             game.load.script('gameover','states/GameOver.js');
@@ -43,6 +42,7 @@ Splash.prototype = {
         game.load.image('blacksmith-bg', 'assets/images/smith.jpg');
         game.load.image('itemshop-bg', 'assets/images/itemshop.jpg');
         game.load.image('temple-bg', 'assets/images/temple.jpg');
+        game.load.image('map-bg', 'assets/images/resourceMap.jpg');
         
         //character images (200x200)
         game.load.image('mizak', 'assets/images/mizak.png');

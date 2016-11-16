@@ -84,6 +84,23 @@
             return pool;
         }
         
+        ResourceModel.ultimateItemData = [
+           { 'name' : 'Arquebus', 'location': 'Blacksmith', 'needtext' : 'Forge (iron castings)\nLixiviator (potassium)\nCharcoal Kiln (charcoal)', 'desc' : 'The newest weapon on the market – makes a crossbow look lame! Just load it with this new “gunpowder” mixture, aim, and fire!', 'needList': 'Forge, Lixiviator, Charcoal Kiln' }
+            , { 'name' : 'Brigandine', 'location': 'Blacksmith', 'needtext' : 'Forge (iron patches)\nSpinning Jenny (padding)\nCharcoal Kiln (charcoal)', 'desc' : 'Looking for armor that is strong but also light? Try the brigandine, with its thick padding with strategically placed sheets of armor stitched throughout.', 'needList': 'Forge, Spinning Jenny, Lixiciator' }
+            , { 'name' : 'Pemmican', 'location': 'Item Shop', 'needtext' : 'Smokehouse (jerky)\nDistillery (leftover fruit)\nCharcoal Kiln (charcoal)', 'desc' : 'The ultimate in adventuring rations! A mixture of ground jerky, fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Distillery, Charcoal Kiln' }
+            , { 'name' : 'Poultice', 'location': 'Temple', 'needtext' : 'Lixiciator (alum)\nSpinning Jenny (cloth)\nSaltern (salt)', 'desc' : 'Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Lixiciator, Spinning Jenny, Saltern' }
+            , { 'name' : 'Black Velvet', 'location': 'Tavern', 'needtext' : 'Ale Brewery (dark ale)\nBeer Brewery (stout)\nDistillery (champagne)', 'desc' : 'Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Ale Brewery, Beer Brewery, Distillery' }
+        ];
+
+        ResourceModel.itemData = [
+            {'category' : 'weapons', 'list': 'club, knife, hatchet, morningstar, shortsword, shortbow, longsword, longbow, battleaxe, broadsword, falchion, crossbow' }
+            , {'category' : 'armor', 'list': 'leather armor, buckler, short hauberk, roundshield, long hauberk, kite shield, lamellar, scale armor, partial plate, pavise, full plate, cuirass' }
+            , {'category' : 'items', 'list': 'knapsack, tent, flint, dried fruit, canteen, boots, cloak, jerky, waterproof poncho, cuttlefish, waterproof jersey, portable stove' }
+            , {'category' : 'medicine', 'list': 'chicken soup, bandages, splints, herbs, iodine, crutches, leeches, tincture, bloodletting, mineral salt, scalpel, elixir' }
+            , {'category' : 'tavern', 'list': 'bread, cheese, stew, ale, coffee, fried chicken, whiskey, fish and chips, pork chops, steak, caviar, champagne' }
+            , {'category' : 'inn', 'list': 'straw, blankets, pillows, bunkbeds, stable, singles, showers, catering, groom, hot baths, room service, bordello' }
+        ];
+
         ResourceModel.bldgData = [
             { 'level' : 0, 'name': 'Mountains', 'needs': '', 'cost': 1000, 'produce' : '' }
             , { 'level' : 0, 'name': 'Prairie', 'needs': '', 'cost': 1000, 'produce' : '' }
@@ -124,23 +141,7 @@
             , { 'level' : 3, 'name': 'Charcoal Kiln', 'needs': 'Sawmill', 'cost': 10000000, 'produce' : 'Charcoal' }
         ];
         
-        ResourceModel.itemData = [
-            {'category' : 'weapons', 'list': 'club, knife, hatchet, morningstar, shortsword, shortbow, longsword, longbow, battleaxe, broadsword, falchion, crossbow' }
-            , {'category' : 'armor', 'list': 'leather armon, buckler, short hauberk, roundshield, long hauberk, kite shield, lamellar, scale armor, partial plate, pavise, full plate, cuirass' }
-            , {'category' : 'items', 'list': 'knapsack, tent, flint, dried fruit, canteen, boots, cloak, jerky, waterproof poncho, cuttlefish, waterproof jersey, portable stove' }
-            , {'category' : 'medicine', 'list': 'chicken soup, bandages, splints, herbs, iodine, crutches, leeches, tincture, bloodletting, mineral salt, scalpel, elixir' }
-            , {'category' : 'tavern', 'list': 'bread, cheese, stew, ale, coffee, fried chicken, whiskey, fish and chips, pork chops, steak, caviar, champagne' }
-            , {'category' : 'inn', 'list': 'straw, blankets, pillows, bunkbeds, stable, singles, showers, catering, groom, hot baths, room service, bordello' }
-        ];
-        
-        ResourceModel.ultimateItemData = [
-           { 'name' : 'Arquebus', 'location': 'Blacksmith', 'needtext' : 'Forge (iron castings)\nLixiviator (potassium)\nCharcoal Kiln (charcoal)', 'desc' : 'The newest weapon on the market – makes a crossbow look tame! Just load it with this new “gunpowder” powder, aim, and shoot!', 'needList': 'Forge, Lixiviator, Charcoal Kiln' }
-            , { 'name' : 'Brigandine', 'location': 'Blacksmith', 'needtext' : 'Forge (iron patches)\nSpinning Jenny (padding)\nCharcoal Kiln (charcoal)', 'desc' : 'Looking for armor that is strong but also light? Try the brigandine, with its thick padding with strategically placed sheets of armot stitched throughout.', 'needList': 'Forge, Spinning Jenny, Lixiciator' }
-            , { 'name' : 'Pemmican', 'location': 'Item Shop', 'needtext' : 'Smokehouse (jerky)\nDistillery (leftover fruit)\nCharcoal Kiln (charcoal)', 'desc' : 'The ultimate in adventuring rations! A mixture of ground jerky, fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Distillery, Charcoal Kiln' }
-            , { 'name' : 'Poultice', 'location': 'Temple', 'needtext' : 'Lixiciator (alum)\nSpinning Jenny (cloth)\nSaltern (salt)', 'desc' : 'Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Lixiciator, Spinning Jenny, Saltern' }
-            , { 'name' : 'Black Velvet', 'location': 'Tavern', 'needtext' : 'Ale Brewery (dark ale)\nBeer Brewery (stout)\nDistillery (champagne)', 'desc' : 'Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Ale Brewery, Beer Brewery, Distillery' }
-        ];
-        
+           
         ResourceModel.init();
         return ResourceModel;
     }

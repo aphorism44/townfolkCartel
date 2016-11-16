@@ -58,6 +58,7 @@ Credits.prototype = {
         }
 
         //http://www.pixelstalk.net/author/pixelstalk/ - the backgrounds  
+        //http://nicubunu.deviantart.com/gallery/25130237/gaming - the buildings
 
         var bg = game.add.sprite(0, 0, 'parchment-bg');
         this.addCredit('Music', 'Exit Vehicles');

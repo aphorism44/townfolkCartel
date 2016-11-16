@@ -28,14 +28,15 @@ Blacksmith.prototype = {
             , {icon: 'armorIcon', name: "Upgrade Armor", level: 1, key: "armor" }
         ];
         
-        var info = "When you level up weapons, you increase possible HP\nloss per battle (a random roll). When you level up armor,\n you decrease HP damage taken every battle."
+        var info = "When you level up weapons, you increase possible HP\nloss per battle (a random roll). When you level up armor,\n you decrease HP damage taken every battle.";
         
         this.infoText = this.add.text(25, 200, info, {
             font: '24px The Minion',
             fill: '#d41515',
             strokeThickness: 0
         });
-        var list1 = "Available Items: " + ResourceModel.getItemList("weapons", TownModel.swordLevel);
+        
+        var list1 = "Available Weapons: " + ResourceModel.getItemList("weapons", TownModel.swordLevel);
         this.itemText1 = this.add.text(25, 300, list1, {
             font: '24px The Minion',
             fill: '#d41515',
@@ -43,7 +44,8 @@ Blacksmith.prototype = {
             wordWrapWidth: 550,
             align: 'left'
         });
-        var list2 = "Available Items: " + ResourceModel.getItemList("armor", TownModel.armorLevel);
+        
+        var list2 = "Available Armor: " + ResourceModel.getItemList("armor", TownModel.armorLevel);
         this.itemText2 = this.add.text(25, 400, list2, {
             font: '24px The Minion',
             fill: '#d41515',
@@ -93,8 +95,8 @@ Blacksmith.prototype = {
         this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
         this.hpRollLoss.text = 'HP Loss Roll: ' + TownModel.hpLossRoll;
         this.hpPercentLoss.text = 'HP Loss %: ' + TownModel.hpLossPercentage.toFixed(2);
-        this.itemText1.text = "Available Items: " + ResourceModel.getItemList("weapons", TownModel.swordLevel);
-        this.itemText2.text = "Available Items: " + ResourceModel.getItemList("armor", TownModel.armorLevel);
+        this.itemText1.text = "Available Weapons: " + ResourceModel.getItemList("weapons", TownModel.swordLevel);
+        this.itemText2.text = "Available Armor: " + ResourceModel.getItemList("armor", TownModel.armorLevel);
         //update cost and availability for all
         this.updateButtons(statePointer);
     }

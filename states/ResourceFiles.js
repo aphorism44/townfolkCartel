@@ -4,37 +4,38 @@ ResourceFiles.prototype = {
     preload: function() {
         this.info = TownModel.getOverview();
         this.healthInfo = TownModel.getHealth();
-    }
+        }
     
     , create: function() {
         var state = this;
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, 'parchment-bg');
-        this.infoText = this.add.text(50, 50, this.info, {
-            font: '24px The Minion',
-            fill: '#000000',
-            strokeThickness: 0
+        
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
+            font: '24px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
         });
-        this.healthText = this.add.text(50, 300, this.healthInfo, {
-            font: '24px The Minion',
-            fill: '#000000',
-            strokeThickness: 0
-        });
+        
+        
+        
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         
-        this.addMenuOption('Return', function () {
+        //text
+        
+        
+         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, "ResourceFiles", 400, 500);
+        }, 400, 500);
         
     }
-    
+        
     , timerTrigger: function() {
         TownModel.goAdventuring();
-        TownModel.visitTown();        
-        this.infoText.text = TownModel.getOverview();
-        this.healthText.text = TownModel.getHealth();
+        TownModel.visitTown();
+        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
     }
 };
 
