@@ -24,6 +24,12 @@ Splash.prototype = {
             game.load.script('resourcemap', 'states/ResourceMap.js');
             game.load.script('resourcefiles', 'states/ResourceFiles.js');
             
+            game.load.script('oceanindustries', 'states/OceanIndustries.js');
+            game.load.script('forestindustries', 'states/ForestIndustries.js');
+            game.load.script('mountainindustries', 'states/MountainIndustries.js');
+            game.load.script('prairieindustries', 'states/PrairieIndustries.js');
+            game.load.script('pastureindustries', 'states/PastureIndustries.js');
+            
             game.load.script('townModel',  'js/TownModel.js');
             game.load.script('resourceModel',  'js/ResourceModel.js');
     }
@@ -56,9 +62,6 @@ Splash.prototype = {
         game.load.image('lissetteFull', 'assets/images/lissetteFull.png');
         game.load.image('clavoFull', 'assets/images/clavoFull.png');
         
-        
-        
-        
         //button icons
         game.load.image('swordA', 'assets/images/greenSword.png');
         game.load.image('swordB', 'assets/images/yellowSword.png');
@@ -71,8 +74,43 @@ Splash.prototype = {
         game.load.image('armorIcon', 'assets/images/armorIcon.png');
         game.load.image('templeIcon', 'assets/images/templeIcon.png');
         
+        //resource buildings
+        game.load.image('bldgDock', 'assets/images/docks.png');
+        game.load.image('bldgFishery', 'assets/images/fishery.png');
+        game.load.image('bldgBrinery', 'assets/images/brinery.png');
+        game.load.image('bldgSaltbeds', 'assets/images/saltbeds.png');
+        game.load.image('bldgSaltpans', 'assets/images/saltpans.png');
+        game.load.image('bldgIodiner', 'assets/images/iodiner.png');
         
+        game.load.image('bldgCamp', 'assets/images/lumberCamp.png');
+        game.load.image('bldgSawmill', 'assets/images/lumbermill.png');
+        game.load.image('bldgKiln', 'assets/images/kiln.png');
         
+        game.load.image('bldgOreMine', 'assets/images/oreMine.png');
+        game.load.image('bldgSmelter', 'assets/images/smelter.png');
+        game.load.image('bldgRoller', 'assets/images/roller.png');
+        game.load.image('bldgAlumMine', 'assets/images/alumMine.png');
+        game.load.image('bldgSeperator', 'assets/images/seperator.png');
+        game.load.image('bldgChemist', 'assets/images/chemist.png');
+        
+        game.load.image('bldgWheatFarm', 'assets/images/wheatFarm.png');
+        game.load.image('bldgMill', 'assets/images/mill.png');
+        game.load.image('bldgBakery', 'assets/images/bakery.png');
+        game.load.image('bldgHopsFarm', 'assets/images/hopsFarm.png');
+        game.load.image('bldgAleBrewery', 'assets/images/aleBrewery.png');
+        game.load.image('bldgAleBottler', 'assets/images/aleBottler.png');
+        game.load.image('bldgBeerBrewery', 'assets/images/beerBrewery.png');
+        game.load.image('bldgBeerBottler', 'assets/images/beerBottler.png');
+        game.load.image('bldgVineyard', 'assets/images/vineyard.png');
+        game.load.image('bldgWinepress', 'assets/images/winepress.png');
+        game.load.image('bldgWinery', 'assets/images/winery.png');
+        
+        game.load.image('bldgSheep', 'assets/images/sheepRanch.png');
+        game.load.image('bldgShearer', 'assets/images/shearer.png');
+        game.load.image('bldgLoom', 'assets/images/loom.png');
+        game.load.image('bldgCattle', 'assets/images/cattleRanch.png');
+        game.load.image('bldgSlaughterhouse', 'assets/images/slaughterhouse.png');
+        game.load.image('bldgSmokehouse', 'assets/images/smokehouse.png');
         
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600
@@ -126,6 +164,11 @@ Splash.prototype = {
         game.state.add("Statistics", Statistics);
         game.state.add("Instructions", Instructions);
         game.state.add("ResourceMap", ResourceMap);
+        game.state.add("OceanIndustries", OceanIndustries);
+        game.state.add("ForestIndustries", ForestIndustries);
+        game.state.add("MountainIndustries", MountainIndustries);
+        game.state.add("PrairieIndustries", PrairieIndustries);
+        game.state.add("PastureIndustries", PastureIndustries);
         game.state.add("ResourceFiles", ResourceFiles);
         game.state.add("GameOver", GameOver);
         game.state.add("Credits", Credits);

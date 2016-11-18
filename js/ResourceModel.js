@@ -52,6 +52,14 @@
             
             return true;
         }
+        ResourceModel.getLocationBldgs = function(loc) {
+            var locBuildings = new Map();
+            for (var [key, value] of this.buildingMap) {
+                if (value.location === loc)
+                    locBuildings.set(key, value);
+            }
+            return locBuildings;
+        }
         ResourceModel.isUltimateItemAvailable = function(name) {
             var needed = this.ultimateItemMap.get(name).needArray;
             var bought = this.getPurchasedBuildings();
@@ -65,7 +73,7 @@
         function createBldgMap(bldgData) {
             var pool = new Map();
             bldgData.forEach(function(b) {
-                pool.set(b.name, {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'produce': b.produce, 'purchased': false });
+                pool.set(b.name, {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'graphic': b.graphic, 'location': b.location, 'purchased': false });
             });
             return pool;
         }
@@ -102,43 +110,42 @@
         ];
 
         ResourceModel.bldgData = [
-            { 'level' : 0, 'name': 'Mountains', 'needs': '', 'cost': 1000, 'produce' : '' }
-            , { 'level' : 0, 'name': 'Prairie', 'needs': '', 'cost': 1000, 'produce' : '' }
-            , { 'level' : 0, 'name': 'Pastures', 'needs': '', 'cost': 1000, 'produce' : '' }
-            , { 'level' : 0, 'name': 'Seacoast', 'needs': '', 'cost': 1000, 'produce' : '' }
-            , { 'level' : 0, 'name': 'Forest', 'needs': '', 'cost': 1000, 'produce' : '' }
-            , { 'level' : 1, 'name': 'Ore Mine', 'needs': 'Mountains', 'cost': 10000, 'produce' : 'Ore' }
-            , { 'level' : 1, 'name': 'Alum Mine', 'needs': 'Mountains', 'cost': 10000, 'produce' : 'Shale' }
-            , { 'level' : 1, 'name': 'Grain Farm', 'needs': 'Prairie', 'cost': 10000, 'produce' : 'Grain' }
-            , { 'level' : 1, 'name': 'Hops Farm', 'needs': 'Prairie', 'cost': 10000, 'produce' : 'Hops' }
-            , { 'level' : 1, 'name': 'Vineyard', 'needs': 'Prairie', 'cost': 10000, 'produce' : 'Grapes' }
-            , { 'level' : 1, 'name': 'Sheep Pasture', 'needs': 'Pasture', 'cost': 10000, 'produce' : 'Sheep' }
-            , { 'level' : 1, 'name': 'Cattle Ranch', 'needs': 'Pasture', 'cost': 10000, 'produce' : 'Cattle' }
-            , { 'level' : 1, 'name': 'Dock', 'needs': 'Seacoast', 'cost': 10000, 'produce' : 'Fish' }
-            , { 'level' : 1, 'name': 'Saltbeds', 'needs': 'Seacoast', 'cost': 10000, 'produce' : 'Brine' }
-            , { 'level' : 1, 'name': 'Lumberjack Camp', 'needs': 'Forest', 'cost': 10000, 'produce' : 'Logs' }
-            , { 'level' : 2, 'name': 'Blast Furnace', 'needs': 'Ore Mine', 'cost': 1000000, 'produce' : 'Slag' }
-            , { 'level' : 2, 'name': 'Calcinator', 'needs': 'Alum Mine', 'cost': 1000000, 'produce' : 'Sulfates' }
-            , { 'level' : 2, 'name': 'Mill', 'needs': 'Grain Farm', 'cost': 1000000, 'produce' : 'Flour' }
-            , { 'level' : 2, 'name': 'Ale Brewery', 'needs': 'Grain Farm', 'cost': 1000000, 'produce' : 'Small Ale' }
-            , { 'level' : 2, 'name': 'Beer Brewery', 'needs': 'Grain Farm, Hops Farm', 'cost': 1000000, 'produce' : 'Small Beer' }
-            , { 'level' : 2, 'name': 'Winery', 'needs': 'Vineyard', 'cost': 1000000, 'produce' : 'Wine' }
-            , { 'level' : 2, 'name': 'Shearing Shed', 'needs': 'Sheep Station', 'cost': 1000000, 'produce' : 'Wool' }
-            , { 'level' : 2, 'name': 'Slaughterhouse', 'needs': 'Cattle Ranch', 'cost': 1000000, 'produce' : 'Meat' }
-            , { 'level' : 2, 'name': 'Fishery', 'needs': 'Dock', 'cost': 1000000, 'produce' : 'Fish Fillets' }
-            , { 'level' : 2, 'name': 'Saltpans', 'needs': 'Saltbeds', 'cost': 1000000, 'produce' : 'Crast' }
-            , { 'level' : 2, 'name': 'Sawmill', 'needs': 'Lumberjack Camp', 'cost': 1000000, 'produce' : 'Timber' }
-            , { 'level' : 3, 'name': 'Forge', 'needs': 'Blast Furnace, Charcoal Kiln', 'cost': 10000000, 'produce' : 'Iron' }
-            , { 'level' : 3, 'name': 'Lixiviator', 'needs': 'Calcinator', 'cost': 10000000, 'produce' : 'Alum' }
-            , { 'level' : 3, 'name': 'Bakery', 'needs': 'Mill, Sawmill', 'cost': 10000000, 'produce' : 'Bread' }
-            , { 'level' : 3, 'name': 'Ale Conditioner', 'needs': 'Ale Brewery', 'cost': 10000000, 'produce' : 'Dark Ale' }
-            , { 'level' : 3, 'name': 'Beer Filtrator', 'needs': 'Beer Brewery', 'cost': 10000000, 'produce' : 'Bright Beer' }
-            , { 'level' : 3, 'name': 'Distillery', 'needs': 'Winery, Charcoal Kiln', 'cost': 10000000, 'produce' : 'Liquor' }
-            , { 'level' : 3, 'name': 'Spinning Jenny', 'needs': 'Shearing Shed, Sawmill, Forge', 'cost': 10000000, 'produce' : 'Yarn' }
-            , { 'level' : 3, 'name': 'Smokehouse', 'needs': 'Slaughterhouse, Sawmill', 'cost': 10000000, 'produce' : 'Jerky' }
-            , { 'level' : 3, 'name': 'Brinery', 'needs': 'Fishery, Sawmill, Saltbeds', 'cost': 10000000, 'produce' : 'Saltfish' }
-            , { 'level' : 3, 'name': 'Saltern', 'needs': 'Saltpans, Sawmill', 'cost': 10000000, 'produce' : 'Salt' }
-            , { 'level' : 3, 'name': 'Charcoal Kiln', 'needs': 'Sawmill', 'cost': 10000000, 'produce' : 'Charcoal' }
+            { 'level' : 1, 'name': 'Docks', 'needs': '', 'cost': 10000, 'graphic' : 'bldgDock', 'location': 'sea' }
+            , { 'level' : 1, 'name': 'Saltbeds', 'needs': '', 'cost': 10000, 'graphic' : 'bldgSaltbeds', 'location': 'sea' }
+            , { 'level' : 2, 'name': 'Fishery', 'needs': 'Dock', 'cost': 1000000, 'graphic' : 'bldgFishery', 'location': 'sea' }
+            , { 'level' : 2, 'name': 'Saltpans', 'needs': 'Saltbeds', 'cost': 1000000, 'graphic' : 'bldgSaltpans', 'location': 'sea' }
+            , { 'level' : 3, 'name': 'Brinery', 'needs': 'Fishery, Sawmill, Saltbeds', 'cost': 10000000, 'graphic' : 'bldgBrinery', 'location': 'sea' }
+            , { 'level' : 3, 'name': 'Saltern', 'needs': 'Saltpans, Sawmill', 'cost': 10000000, 'graphic' : 'bldgIodiner', 'location': 'sea' }
+            
+            , { 'level' : 1, 'name': 'Lumberjack Camp', 'needs': '', 'cost': 10000, 'graphic' : 'bldgCamp', 'location': 'forest' }
+            , { 'level' : 2, 'name': 'Sawmill', 'needs': 'Lumberjack Camp', 'cost': 1000000, 'graphic' : 'bldgSawmill', 'location': 'forest' }
+            , { 'level' : 3, 'name': 'Charcoal Kiln', 'needs': 'Sawmill', 'cost': 10000000, 'graphic' : 'bldgKiln', 'location': 'forest' }
+            
+            , { 'level' : 1, 'name': 'Ore Mine', 'needs': '', 'cost': 10000, 'graphic' : 'bldgOreMine', 'location': 'mountains' }
+            , { 'level' : 1, 'name': 'Alum Mine', 'needs': '', 'cost': 10000, 'graphic' : 'bldgAlumMine', 'location': 'mountains' }
+            , { 'level' : 2, 'name': 'Smelter', 'needs': 'Ore Mine', 'cost': 1000000, 'graphic' : 'bldgSmelter', 'location': 'mountains' }
+            , { 'level' : 2, 'name': 'Seperator', 'needs': 'Alum Mine', 'cost': 1000000, 'graphic' : 'bldgSeperator', 'location': 'mountains' }
+            , { 'level' : 3, 'name': 'Iron Roller', 'needs': 'Smelter, Charcoal Kiln', 'cost': 10000000, 'graphic' : 'bldgRoller', 'location': 'mountains' }
+            , { 'level' : 3, 'name': 'Chemist', 'needs': 'Seperator', 'cost': 10000000, 'graphic' : 'bldgChemist', 'location': 'mountains' }
+            
+            , { 'level' : 1, 'name': 'Grain Farm', 'needs': '', 'cost': 10000, 'graphic' : 'bldgWheatFarm', 'location': 'prairie' }
+            , { 'level' : 1, 'name': 'Hops Farm', 'needs': '', 'cost': 10000, 'graphic' : 'bldgHopsFarm', 'location': 'prairie' }
+            , { 'level' : 1, 'name': 'Vineyard', 'needs': '', 'cost': 10000, 'graphic' : 'bldgVineyard', 'location': 'prairie' }
+            , { 'level' : 2, 'name': 'Mill', 'needs': 'Grain Farm', 'cost': 1000000, 'graphic' : 'bldgMill', 'location': 'prairie' }
+            , { 'level' : 2, 'name': 'Ale Brewery', 'needs': 'Grain Farm', 'cost': 1000000, 'graphic' : 'bldgAleBrewery', 'location': 'prairie' }
+            , { 'level' : 2, 'name': 'Beer Brewery', 'needs': 'Grain Farm, Hops Farm', 'cost': 1000000, 'graphic' : 'bldgBeerBrewery', 'location': 'prairie' }
+            , { 'level' : 2, 'name': 'Winepress', 'needs': 'Vineyard', 'cost': 1000000, 'graphic' : 'bldgWinepress', 'location': 'prairie' }
+            , { 'level' : 3, 'name': 'Bakery', 'needs': 'Mill, Sawmill', 'cost': 10000000, 'graphic' : 'bldgBakery', 'location': 'prairie' }
+            , { 'level' : 3, 'name': 'Ale Bottler', 'needs': 'Ale Brewery', 'cost': 10000000, 'graphic' : 'bldgAleBottler', 'location': 'prairie' }
+            , { 'level' : 3, 'name': 'Beer Bottler', 'needs': 'Beer Brewery', 'cost': 10000000, 'graphic' : 'bldgBeerBottler', 'location': 'prairie' }
+            , { 'level' : 3, 'name': 'Winery', 'needs': 'Winepress, Charcoal Kiln', 'cost': 10000000, 'graphic' : 'bldgWinery', 'location': 'prairie' }
+            
+            , { 'level' : 1, 'name': 'Sheep Pasture', 'needs': '', 'cost': 10000, 'graphic' : 'bldgSheep', 'location': 'pasture' }
+            , { 'level' : 1, 'name': 'Cattle Ranch', 'needs': '', 'cost': 10000, 'graphic' : 'bldgCattle', 'location': 'pasture' }
+            , { 'level' : 2, 'name': 'Shearing Shed', 'needs': 'Sheep Pasture', 'cost': 1000000, 'graphic' : 'bldgShearer', 'location': 'pasture' }
+            , { 'level' : 2, 'name': 'Slaughterhouse', 'needs': 'Cattle Ranch', 'cost': 1000000, 'graphic' : 'bldgSlaughterhouse', 'location': 'pasture' }
+            , { 'level' : 3, 'name': 'Loom', 'needs': 'Shearing Shed, Sawmill, Forge', 'cost': 10000000, 'graphic' : 'bldgLoom', 'location': 'pasture' }
+            , { 'level' : 3, 'name': 'Smokehouse', 'needs': 'Slaughterhouse, Sawmill', 'cost': 10000000, 'graphic' : 'bldgSmokehouse', 'location': 'pasture' }
         ];
         
            

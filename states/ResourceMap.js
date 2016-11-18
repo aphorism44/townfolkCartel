@@ -21,12 +21,26 @@ ResourceMap.prototype = {
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         
-        //text
+        //resource areas
+        this.addMenuOption('Ocean', function () {
+            game.state.start("OceanIndustries")
+        }, 600, 450);
+        this.addMenuOption('Forest', function () {
+            game.state.start("ForestIndustries")
+        }, 125, 175);
+        this.addMenuOption('Mountains', function () {
+            game.state.start("MountainIndustries")
+        }, 80, 300);
+        this.addMenuOption('Prairie', function () {
+            game.state.start("PrairieIndustries")
+        }, 525, 75);
+        this.addMenuOption('Pasture', function () {
+            game.state.start("PastureIndustries")
+        }, 125, 430);
         
-        
-         this.addMenuOption('Return', function () {
+         this.addMenuOption('[Return]', function () {
             game.state.start("Game")
-        }, 400, 500);
+        }, 300, 525);
         
     }
         
