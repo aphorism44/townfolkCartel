@@ -49,6 +49,11 @@ Splash.prototype = {
         game.load.image('itemshop-bg', 'assets/images/itemshop.jpg');
         game.load.image('temple-bg', 'assets/images/temple.jpg');
         game.load.image('map-bg', 'assets/images/resourceMap.jpg');
+        game.load.image('sea-bg', 'assets/images/seaBg.jpg');
+        game.load.image('mountain-bg', 'assets/images/mountainBg.jpg');
+        game.load.image('forest-bg', 'assets/images/forestBg.jpg');
+        game.load.image('prairie-bg', 'assets/images/prairieBg.jpg');
+        game.load.image('pasture-bg', 'assets/images/pastureBg.jpg');
         
         //character images (200x200)
         game.load.image('mizak', 'assets/images/mizak.png');
