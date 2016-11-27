@@ -71,19 +71,16 @@
             return true;
         }
         ResourceModel.getIndustries = function(loc) {
-            var industrySet = new Set();
-            this.buildingMap.forEach(function(key, value) {
-              if (value.location === loc)
-                  industrySet.add(value.industry);
-            });
-            
-            console.log(0);
+            var types = new Set();
+            for (var [key, value] of this.buildingMap)
+                if (value.location === loc)
+                    types.add(value.industry);
+            return Array.from(types);
         }
-        
         function createBldgMap(bldgData) {
             var pool = new Map();
             bldgData.forEach(function(b) {
-                pool.set(b.name, {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'graphic': b.graphic, 'location': b.location, 'purchased': false });
+                pool.set(b.name, {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'graphic': b.graphic, 'location': b.location, 'industry': b.industry, 'purchased': false });
             });
             return pool;
         }
