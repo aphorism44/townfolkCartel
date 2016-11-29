@@ -20,21 +20,8 @@ OceanIndustries.prototype = {
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
-        
-        //buildings
-        this.bldgData = ResourceModel.getLocationBldgs('sea');
-        this.bldgTypes = ResourceModel.getIndustries('sea');
-        bldgGroup = this.game.add.group();
-        
-        for (var i = 0; i < this.bldgTypes.length; i++) {
-            for (var [key, value] of this.bldgData) {
-                if (value.industry === this.bldgTypes[i]) {
-                    var b = this.addBuilding(key, value, i);
-                    bldgGroup.addChild(b);
-                }
-            }
-        };
-        
+        //place buildings
+        this.updateBuildings('sea');
         
          this.addMenuOption('[Return to Map]', function () {
             game.state.start("ResourceMap")
@@ -48,10 +35,36 @@ OceanIndustries.prototype = {
         this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
     }
     
+    , updateBuildings: function(loc) {
+        var bldgData = ResourceModel.getLocationBldgs(loc);
+        var bldgTypes = ResourceModel.getIndustries(loc);
+        bldgGroup = this.game.add.group();
+        
+        for (var i = 0; i < bldgTypes.length; i++) {
+            for (var [key, value] of bldgData) {
+                if (value.industry === bldgTypes[i]) {
+                    var b = this.addBuilding(key, value, i);
+                    bldgGroup.addChild(b);
+                }
+            }
+        }
+    }
+    
     , addBuilding: function(key, value, col) {
-        var bldg = game.add.sprite(25 + col * 130, 50 + value.level * 100, value.graphic);
+        var bldg = game.add.button(25 + col * 130, 50 + value.level * 100, value.graphic);
+        bldg.cost = value.cost;
+        bldg.name = key;
+        bldg.isPurchased = value.purchased;
+        bldg.events.onInputDown.add(this.buyBuilding, this); //how to pass a parameter here?
         return bldg;
     }
+    
+    , buyBuilding: function(bName) {
+        console.log(this.name);
+        ResourceModel.buyBuilding(bName);
+        this.updateBuildings();
+    }
+    
 };
 
 Phaser.Utils.mixinPrototype(OceanIndustries.prototype, mixins);
