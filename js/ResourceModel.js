@@ -119,7 +119,7 @@
         ResourceModel.bldgData = [
             { 'level' : 1, 'name': 'Docks', 'needs': '', 'cost': 10000, 'graphic' : 'bldgDock', 'location': 'sea', 'industry': 'fish' }
             , { 'level' : 1, 'name': 'Saltbeds', 'needs': '', 'cost': 10000, 'graphic' : 'bldgSaltbeds', 'location': 'sea', 'industry': 'salt' }
-            , { 'level' : 2, 'name': 'Fishery', 'needs': 'Dock', 'cost': 1000000, 'graphic' : 'bldgFishery', 'location': 'sea', 'industry': 'fish' }
+            , { 'level' : 2, 'name': 'Fishery', 'needs': 'Docks', 'cost': 1000000, 'graphic' : 'bldgFishery', 'location': 'sea', 'industry': 'fish' }
             , { 'level' : 2, 'name': 'Saltpans', 'needs': 'Saltbeds', 'cost': 1000000, 'graphic' : 'bldgSaltpans', 'location': 'sea', 'industry': 'salt' }
             , { 'level' : 3, 'name': 'Brinery', 'needs': 'Fishery, Sawmill, Saltbeds', 'cost': 10000000, 'graphic' : 'bldgBrinery', 'location': 'sea', 'industry': 'fish' }
             , { 'level' : 3, 'name': 'Saltern', 'needs': 'Saltpans, Sawmill', 'cost': 10000000, 'graphic' : 'bldgIodiner', 'location': 'sea', 'industry': 'salt' }
@@ -151,7 +151,7 @@
             , { 'level' : 1, 'name': 'Cattle Ranch', 'needs': '', 'cost': 10000, 'graphic' : 'bldgCattle', 'location': 'pasture', 'industry': 'beef' }
             , { 'level' : 2, 'name': 'Shearing Shed', 'needs': 'Sheep Pasture', 'cost': 1000000, 'graphic' : 'bldgShearer', 'location': 'pasture', 'industry': 'wool' }
             , { 'level' : 2, 'name': 'Slaughterhouse', 'needs': 'Cattle Ranch', 'cost': 1000000, 'graphic' : 'bldgSlaughterhouse', 'location': 'pasture', 'industry': 'beef' }
-            , { 'level' : 3, 'name': 'Loom', 'needs': 'Shearing Shed, Sawmill, Forge', 'cost': 10000000, 'graphic' : 'bldgLoom', 'location': 'pasture', 'industry': 'wool' }
+            , { 'level' : 3, 'name': 'Loom', 'needs': 'Shearing Shed, Sawmill, Smelter', 'cost': 10000000, 'graphic' : 'bldgLoom', 'location': 'pasture', 'industry': 'wool' }
             , { 'level' : 3, 'name': 'Smokehouse', 'needs': 'Slaughterhouse, Sawmill', 'cost': 10000000, 'graphic' : 'bldgSmokehouse', 'location': 'pasture', 'industry': 'beef' }
         ];
         

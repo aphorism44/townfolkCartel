@@ -23,13 +23,7 @@ Splash.prototype = {
             game.load.script('instructions', 'states/Instructions.js');
             game.load.script('resourcemap', 'states/ResourceMap.js');
             game.load.script('resourcefiles', 'states/ResourceFiles.js');
-            
-            game.load.script('oceanindustries', 'states/OceanIndustries.js');
-            game.load.script('forestindustries', 'states/ForestIndustries.js');
-            game.load.script('mountainindustries', 'states/MountainIndustries.js');
-            game.load.script('prairieindustries', 'states/PrairieIndustries.js');
-            game.load.script('pastureindustries', 'states/PastureIndustries.js');
-            
+            game.load.script('industries', 'states/Industries.js');
             game.load.script('townModel',  'js/TownModel.js');
             game.load.script('resourceModel',  'js/ResourceModel.js');
     }
@@ -50,7 +44,7 @@ Splash.prototype = {
         game.load.image('temple-bg', 'assets/images/temple.jpg');
         game.load.image('map-bg', 'assets/images/resourceMap.jpg');
         game.load.image('sea-bg', 'assets/images/seaBg.jpg');
-        game.load.image('mountain-bg', 'assets/images/mountainBg.jpg');
+        game.load.image('mountains-bg', 'assets/images/mountainBg.jpg');
         game.load.image('forest-bg', 'assets/images/forestBg.jpg');
         game.load.image('prairie-bg', 'assets/images/prairieBg.jpg');
         game.load.image('pasture-bg', 'assets/images/pastureBg.jpg');
@@ -169,11 +163,7 @@ Splash.prototype = {
         game.state.add("Statistics", Statistics);
         game.state.add("Instructions", Instructions);
         game.state.add("ResourceMap", ResourceMap);
-        game.state.add("OceanIndustries", OceanIndustries);
-        game.state.add("ForestIndustries", ForestIndustries);
-        game.state.add("MountainIndustries", MountainIndustries);
-        game.state.add("PrairieIndustries", PrairieIndustries);
-        game.state.add("PastureIndustries", PastureIndustries);
+        game.state.add("Industries", Industries);
         game.state.add("ResourceFiles", ResourceFiles);
         game.state.add("GameOver", GameOver);
         game.state.add("Credits", Credits);

@@ -23,19 +23,24 @@ ResourceMap.prototype = {
         
         //resource areas
         this.addMenuOption('Ocean', function () {
-            game.state.start("OceanIndustries")
+            game.currentIndustry = 'sea';
+            game.state.start("Industries") 
         }, 600, 450);
         this.addMenuOption('Forest', function () {
-            game.state.start("ForestIndustries")
+            game.currentIndustry = 'forest';
+            game.state.start("Industries") 
         }, 125, 175);
         this.addMenuOption('Mountains', function () {
-            game.state.start("MountainIndustries")
+            game.currentIndustry = 'mountains';
+            game.state.start("Industries")
         }, 80, 300);
         this.addMenuOption('Prairie', function () {
-            game.state.start("PrairieIndustries")
+            game.currentIndustry = 'prairie';
+            game.state.start("Industries")
         }, 525, 75);
         this.addMenuOption('Pasture', function () {
-            game.state.start("PastureIndustries")
+            game.currentIndustry = 'pasture';
+            game.state.start("Industries")
         }, 125, 430);
         
          this.addMenuOption('[Return]', function () {
