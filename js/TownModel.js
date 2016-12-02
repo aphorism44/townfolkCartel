@@ -11,6 +11,8 @@
             this.deadAdventurerList = [];
             this.brokeAdventurerList = [];
             this.expPool = createExpPool(this.expData);
+            this.shopPool = createShopPool(this.shopData);
+            this.shopButtonPool = createButtonPool(this.shopButtonData);
             this.maintenance = 0;
             this.lastIncome = 0;
             //this.monsterPool = createMonsterPool(this.monsterData);
@@ -42,49 +44,40 @@
         TownModel.hasAmount = function(amount) {
             return amount <= this.moneyPool;
         }
-        TownModel.upgradeInn = function(cost) {
+        TownModel.upgradeTown = function(tag, cost) {
             this.moneyPool -= cost;
+            var functionName = tag[0].toUpperCase() + tag.slice(1);
+            TownModel[functionName]();
+        }
+        TownModel.upgradeInn = function() {
             this.innLevel++;
             this.maintenance += Math.pow(this.innLevel, 2);
             this.maxAdventurers += 10;
         }
-        TownModel.upgradeTemple = function(cost) {
-            this.moneyPool -= cost;
+        TownModel.upgradeTemple = function() {
             this.templeLevel++;
             this.maintenance += Math.pow(this.templeLevel, 2);
             this.costPerHP++;
         }
-        TownModel.upgradeTavern = function(cost) {
-            this.moneyPool -= cost;
+        TownModel.upgradeTavern = function() {
             this.tavernLevel++;
             this.maintenance += Math.pow(this.tavernLevel, 2);
             this.expGainRoll++;
         }
-        TownModel.upgradeShop = function(cost) {
-            this.moneyPool -= cost;
+        TownModel.upgradeShop = function() {
             this.shopLevel++;
             this.maintenance += Math.pow(this.shopLevel, 2);
             this.goldGainRoll++;
         }
-        TownModel.upgradeBlackSmith = function(key, cost) {
-            this.moneyPool -= cost;
-            if (key === "sword") {
-                this.swordLevel++;
-                this.maintenance += Math.pow(this.swordLevel, 2);
-                this.hpLossRoll++;
-            } else if (key === "armor") {
-                this.armorLevel++;
-                this.maintenance += Math.pow(this.armorLevel, 2);
-                this.hpLossPercentage *= 0.9;
-            }
+        TownModel.upgradeSword = function() {
+            this.swordLevel++;
+            this.maintenance += Math.pow(this.swordLevel, 2);
+            this.hpLossRoll++;
         }
-        
-        //need these
-        TownModel.getBlacksmithLevel = function(key) {
-            if (key === "sword")
-                return this.swordLevel;
-            else if (key === "armor")
-                return this.armorLevel;
+        TownModel.upgradeArmor = function() {
+            this.armorLevel++;
+            this.maintenance += Math.pow(this.armorLevel, 2);
+            this.hpLossPercentage *= 0.9;
         }
         
         //Price=BaseCost×Multiplier^(#Owned)
@@ -103,14 +96,22 @@
         TownModel.shopCost = function() {
             return Math.floor(3000 * Math.pow(1.5, this.shopLevel));
         }
+        TownModel.swordCost = function() {
+            return Math.floor(2500 * Math.pow(1.07, this.swordLevel));
+        }
+        TownModel.armorCost = function() {
+            return Math.floor(2500 * Math.pow(1.07, this.armorLevel));
+        }
         
-        
-        TownModel.getBlacksmithCost = function(key) {
-            if (key === "sword") {
-                return Math.floor(2500 * Math.pow(1.07, this.swordLevel));
-            } else if (key === "armor") {
-                return Math.floor(2500 * Math.pow(1.07, this.armorLevel));
-            }
+        TownModel.getStoreData = function(loc) {
+            return this.shopPool.get(loc);
+        }
+        TownModel.getButtons = function(loc) {
+            var buttons = new Map();
+            for (var [key, value] of this.shopButtonPool)
+                if (value.shop === loc)
+                    buttons.set(key, value);
+            return buttons;
         }
         
         //below 2 methods are main game loop
@@ -196,6 +197,21 @@
             var pool = new Map();
             expData.forEach(function(e) {
                 pool.set(e.level, e.stats);
+            });
+            return pool;
+        }
+        function createShopPool(shopData) {
+            var pool = new Map();
+            shopData.forEach(function(u) {
+                pool.set(u.name, { 'graphic': u.graphic, 'text': u.text });
+            });
+            return pool;
+        }
+        function createButtonPool(buttonData) {
+            var pool = new Map();
+            buttonData.forEach(function(u) {
+                
+                pool.set(u.tag, { 'shop': u.shopName, 'goodsText': u.goodsText, 'labelText': u.labelText });
             });
             return pool;
         }
@@ -328,6 +344,21 @@
             , { 'level': 3,  'stats': [96, 14, 5] }
             , { 'level': 4,  'stats': [175, 18, 6] }
             , { 'level': 5,  'stats': [400, 23, 7] }
+        ];
+        TownModel.shopData = [
+              { 'name': 'tavern', 'graphic': 'lissetteFull', 'text': 'Level up your tavern to give adventurers more experience when they fight.' }
+            , { 'name': 'inn', 'graphic': 'clavoFull', 'text': 'Level up your inn to allow more adventurers to stay in town.' }
+            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to charge adventurers more for healing. Watch out -  if they can\'t afford to heal, they might die!' }
+            , { 'name': 'itemshop', 'graphic': 'mizakFull', 'text': 'Level up your item shop to give adventurers more money when they fight.' }
+            , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'When you level up weapons, you increase possible HP loss per battle (a random roll). When you level up armor, you decrease HP damage taken every battle.' }
+        ];
+        TownModel.shopButtonData = [
+            { 'shopName': 'inn', 'goodsText': 'Amenities', 'tag': 'inn', 'labelText': 'Maximum Adventurers' }
+            , { 'shopName': 'tavern', 'goodsText': 'Food and Drink', 'tag': 'tavern', 'labelText': 'Extra Experience Roll' }
+            , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll' }
+            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Cost to Heal 1 HP' }
+            , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll' }
+            , { 'shopName': 'blacksmith', 'goodsText': 'Armor', 'tag': 'armor', 'labelText': 'HP Loss %' }
         ];
         
         TownModel.init();

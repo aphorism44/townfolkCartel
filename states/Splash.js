@@ -14,11 +14,7 @@ Splash.prototype = {
             game.load.script('options', 'states/Options.js');
 
             game.load.script('game', 'states/Game.js');
-            game.load.script('tavern', 'states/Tavern.js');
-            game.load.script('inn', 'states/Inn.js');
-            game.load.script('itemshop', 'states/ItemShop.js');
-            game.load.script('blacksmith', 'states/Blacksmith.js');
-            game.load.script('temple', 'states/Temple.js');
+            game.load.script('townshop', 'states/TownShop.js');
             game.load.script('statistics', 'states/Statistics.js');
             game.load.script('instructions', 'states/Instructions.js');
             game.load.script('resourcemap', 'states/ResourceMap.js');
@@ -155,11 +151,7 @@ Splash.prototype = {
     , addGameStates: function () {
         game.state.add("MainMenu", MainMenu);
         game.state.add("Game", Game);
-        game.state.add("Blacksmith", Blacksmith);
-        game.state.add("ItemShop", ItemShop);
-        game.state.add("Tavern", Tavern);
-        game.state.add("Inn", Inn);
-        game.state.add("Temple", Temple);
+        game.state.add("TownShop", TownShop);
         game.state.add("Statistics", Statistics);
         game.state.add("Instructions", Instructions);
         game.state.add("ResourceMap", ResourceMap);
