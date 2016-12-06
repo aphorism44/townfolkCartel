@@ -65,6 +65,7 @@ Industries.prototype = {
         bldg.isPurchased = value.purchased;
         bldg.requires = value.needsArray.length < 1 ? 'nothing': value.needsArray.join(', ');
         bldg.isAvailable = ResourceModel.isBuildingAvailable(bldg.name);
+        bldg.desc = value.desc;
         bldg.events.onInputOver.add(this.describeBuilding, this);
         //black out unavailable bldgs; mark sold as such; others are clickable
         if (bldg.isPurchased) {
@@ -85,7 +86,7 @@ Industries.prototype = {
     }
     
     , describeBuilding: function(button) {
-        this.bldgText.text = button.name + "\n\n" + "Requires: " + button.requires;
+        this.bldgText.text = button.name + "\n\nRequires: " + button.requires + "\n\n" + button.desc;
     }
     
     , buyBuilding: function(bName) {

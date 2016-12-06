@@ -1,6 +1,6 @@
-var ResourceFiles = function(game) {};
+var Achievements = function(game) {};
 
-ResourceFiles.prototype = {
+Achievements.prototype = {
     preload: function() {
         this.info = TownModel.getOverview();
         this.healthInfo = TownModel.getHealth();
@@ -39,4 +39,4 @@ ResourceFiles.prototype = {
     }
 };
 
-Phaser.Utils.mixinPrototype(ResourceFiles.prototype, mixins);
+Phaser.Utils.mixinPrototype(Achievements.prototype, mixins);

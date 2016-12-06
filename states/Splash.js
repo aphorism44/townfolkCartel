@@ -18,7 +18,7 @@ Splash.prototype = {
             game.load.script('statistics', 'states/Statistics.js');
             game.load.script('instructions', 'states/Instructions.js');
             game.load.script('resourcemap', 'states/ResourceMap.js');
-            game.load.script('resourcefiles', 'states/ResourceFiles.js');
+            game.load.script('achievements', 'states/Achievements.js');
             game.load.script('industries', 'states/Industries.js');
             game.load.script('townModel',  'js/TownModel.js');
             game.load.script('resourceModel',  'js/ResourceModel.js');
@@ -156,7 +156,7 @@ Splash.prototype = {
         game.state.add("Instructions", Instructions);
         game.state.add("ResourceMap", ResourceMap);
         game.state.add("Industries", Industries);
-        game.state.add("ResourceFiles", ResourceFiles);
+        game.state.add("Achievements", Achievements);
         game.state.add("GameOver", GameOver);
         game.state.add("Credits", Credits);
         game.state.add("Options", Options);

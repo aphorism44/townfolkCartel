@@ -36,6 +36,8 @@ MainMenu.prototype = {
         this.addMenuOption('Credits', function () {
             game.state.start("Credits");
         }, 200, 380);
+        
+        game.add.sprite(525, 125, 'mizakDeform');
     }
 };
 

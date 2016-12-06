@@ -81,7 +81,7 @@ Game.prototype = {
             , { name: "Item Shop", color: "#6cf26c", nav: "TownShop", shop: "itemshop" }
             , { name: "Statistics", color: "#f7e664", nav: "Statistics" }
             , { name: "Buy Resources", color: "#d564f7", nav: "ResourceMap" }
-            , { name: "Resource Dossier", color: "#e89541", nav: "ResourceFiles" }
+            , { name: "Achievements", color: "#e89541", nav: "Achievements" }
         ];
         
         navButtonsData.forEach(function(buttonData, index) {
@@ -103,8 +103,6 @@ Game.prototype = {
                 game.state.start(buttonData.nav);
             });
         });
-        
-        game.add.sprite(450, 100, 'mizakDeform');
         
     }
     
