@@ -51,8 +51,7 @@ Game.prototype = {
         
         var button;
         advButtonsData.forEach(function(buttonData, index) {
-            button = 
-            button = state.game.add.button(200, 100 + 50 * index, state.game.cache.getBitmapData('button'));
+            var button = state.game.add.button(200, 100 + 50 * index, state.game.cache.getBitmapData('button'));
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
             button.multiplier = buttonData.multiplier;
@@ -74,28 +73,22 @@ Game.prototype = {
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         //navigation buttons
         var navButtonsData = [
-            { name: "Tavern", color: "#f79764", nav: "TownShop", shop: "tavern" }
-            , { name: "Inn", color: "#64f7db", nav: "TownShop", shop: "inn" }
-            , { name: "Temple", color: "#fdf8f6", nav: "TownShop", shop: "temple" }
-            , { name: "Blacksmith", color: "#c1b3b3", nav: "TownShop", shop: "blacksmith" }
-            , { name: "Item Shop", color: "#6cf26c", nav: "TownShop", shop: "itemshop" }
-            , { name: "Statistics", color: "#f7e664", nav: "Statistics" }
-            , { name: "Buy Resources", color: "#d564f7", nav: "ResourceMap" }
-            , { name: "Achievements", color: "#e89541", nav: "Achievements" }
+            { name: "Tavern", color: "Orange", nav: "TownShop", shop: "tavern" }
+            , { name: "Inn", color: "LtBlue", nav: "TownShop", shop: "inn" }
+            , { name: "Temple", color: "Pink", nav: "TownShop", shop: "temple" }
+            , { name: "Blacksmith", color: "Brown", nav: "TownShop", shop: "blacksmith" }
+            , { name: "Item Shop", color: "Blue", nav: "TownShop", shop: "itemshop" }
+            , { name: "Statistics", color: "Red", nav: "Statistics" }
+            , { name: "Buy Resources", color: "Green", nav: "ResourceMap" }
+            , { name: "Achievements", color: "Yellow", nav: "Achievements" }
         ];
         
         navButtonsData.forEach(function(buttonData, index) {
-            var buttonImage = this.game.add.bitmapData(476, 48);
-            buttonImage.ctx.fillStyle = buttonData.color;
-            buttonImage.ctx.strokeStyle = '#35371c';
-            buttonImage.ctx.lineWidth = 4;
-            buttonImage.ctx.fillRect(0, 0, 225, 48);
-            buttonImage.ctx.strokeRect(0, 0, 225, 48);
-            var button;
             var x = 25 + 250 * (index % 2);
             var y = 325 + 50 * Math.floor(index / 2);
+            var buttonImage = 'button' + buttonData.color;
+            buttonImage.height = 48;
             button = this.game.add.button(x, y, buttonImage);
-            //button.icon = button.addChild(this.game.add.image(6, 6, 'dagger'));
             button.text = button.addChild(this.game.add.text(12, 6, buttonData.name, {font: '18px TheMinion', fill: 'Black'}));
             button.events.onInputDown.add(function() {
                 if (buttonData.shop)

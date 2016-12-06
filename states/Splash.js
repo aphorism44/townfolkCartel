@@ -107,6 +107,20 @@ Splash.prototype = {
         game.load.image('bldgSlaughterhouse', 'assets/images/slaughterhouse.png');
         game.load.image('bldgSmokehouse', 'assets/images/smokehouse.png');
         
+        //buttons
+        game.load.image('buttonBlack', 'assets/images/buttonBlack.png');
+        
+        game.load.image('buttonBlue', 'assets/images/buttonBlue.png');
+        game.load.image('buttonLtBlue', 'assets/images/buttonLtBlue.png');
+        game.load.image('buttonBrown', 'assets/images/buttonBrown.png');
+        game.load.image('buttonRed', 'assets/images/buttonRed.png');
+        game.load.image('buttonOrange', 'assets/images/buttonOrange.png');
+        game.load.image('buttonGreen', 'assets/images/buttonGreen.png');
+        game.load.image('buttonPurple', 'assets/images/buttonPurple.png');
+        game.load.image('buttonYellow', 'assets/images/buttonYellow.png');
+        game.load.image('buttonPink', 'assets/images/buttonPink.png');
+        
+        
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600
     }
@@ -133,6 +147,7 @@ Splash.prototype = {
         game.add.existing(this.loadingBar);
         game.add.existing(this.status);
         this.load.setPreloadSprite(this.loadingBar);
+        
         //create button bitmap data
         var buttonImage = this.game.add.bitmapData(500, 48);
         buttonImage.ctx.fillStyle = 'white';
