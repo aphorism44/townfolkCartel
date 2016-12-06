@@ -46,7 +46,8 @@
         }
         TownModel.upgradeTown = function(tag, cost) {
             this.moneyPool -= cost;
-            var functionName = tag[0].toUpperCase() + tag.slice(1);
+            var functionName = 'upgrade' + tag[0].toUpperCase() + tag.slice(1);
+            console.log(functionName);
             TownModel[functionName]();
         }
         TownModel.upgradeInn = function() {

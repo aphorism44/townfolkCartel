@@ -17,33 +17,30 @@ TownShop.prototype = {
         
         //grab relevant data
         this.shopData = TownModel.getStoreData(this.loc);
-        console.log(this.shopData);
         this.buttonData = TownModel.getButtons(this.loc);
-        console.log(this.buttonData);
         
         //add all the button data to page
         this.shopGroup = this.game.add.group();
         this.updatePage(this.buttonData);
         
         //shop-level info text
-        this.infoText = this.add.text(300, 200, this.shopData.text, {
+        this.infoText = this.add.text(275, 225, this.shopData.text, {
             font: '24px The Minion',
             fill: '#d41515',
             strokeThickness: 0,
             wordWrap: true,
-            wordWrapWidth: 300
-            
+            wordWrapWidth: 500 
         });
         
         //shop-level graphic
-        game.add.sprite(50, 100, this.shopData.graphic);
+        game.add.sprite(0, 80, this.shopData.graphic);
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         
         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, 400, 500);
+        }, 75, 500);
     }
 
     , upgradeStore: function(button, statePointer) {
@@ -58,7 +55,7 @@ TownShop.prototype = {
     , updatePage: function(buttonMap) {
         this.shopGroup.removeAll();
         this.addHeaderTags(buttonMap);
-        //this.addButtons(buttonMap);
+        this.addButtons(buttonMap);
         this.addLists(buttonMap);
     }
     
@@ -87,7 +84,7 @@ TownShop.prototype = {
             button.text = button.addChild(this.game.add.text(42, 6, button.name + " To Level " + Number( button.level + 1), { font: '16px TheMinion'}));
             button.cost = TownModel[key + 'Cost']();
             button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
-            button.events.onInputDown.add(this.upgradeStore, state);
+            button.events.onInputDown.add(this.upgradeStore, this);
             if (button.level > 11) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
@@ -110,14 +107,14 @@ TownShop.prototype = {
         var k = 0;
         for (var [key, value] of buttonMap) {
             var list = "Available " + value.goodsText + ": " + ResourceModel.getItemList(key, TownModel[key + 'Level']);
-            this.itemText = this.add.text(300, 400 + (50 * k), list, {
+            var itemText = this.add.text(275, 350 + (100 * k), list, {
                 font: '24px The Minion',
                 fill: '#d41515',
                 wordWrap: true,
-                wordWrapWidth: 400,
+                wordWrapWidth: 500,
                 align: 'left'
             });
-            
+            this.shopGroup.addChild(itemText);
             k++;
         }
     }
