@@ -133,7 +133,7 @@ Splash.prototype = {
         game.add.existing(this.loadingBar);
         game.add.existing(this.status);
         this.load.setPreloadSprite(this.loadingBar);
-        //make button bitmap data
+        //create button bitmap data
         var buttonImage = this.game.add.bitmapData(500, 48);
         buttonImage.ctx.fillStyle = 'white';
         buttonImage.ctx.strokeStyle = '#35371c';
