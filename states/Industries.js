@@ -20,9 +20,10 @@ Industries.prototype = {
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
+        
         //buildings
         this.bldgGroup = this.game.add.group();
-        this.updateBuildings(this.locationName);
+        this.updateBuildings();
         //textbox
         this.bldgText = this.add.text(450, 100, '', {
             font: '24px The Minion',

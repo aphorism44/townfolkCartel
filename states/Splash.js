@@ -119,7 +119,7 @@ Splash.prototype = {
         game.load.image('buttonPurple', 'assets/images/buttonPurple.png');
         game.load.image('buttonYellow', 'assets/images/buttonYellow.png');
         game.load.image('buttonPink', 'assets/images/buttonPink.png');
-        
+        game.load.image('buttonTab', 'assets/images/tab.png');
         
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600

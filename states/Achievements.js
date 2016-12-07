@@ -17,34 +17,22 @@ Achievements.prototype = {
             strokeThickness: 4
         });
         
-        this.ultimateItemList = ResourceModel.ultimateItemMap;
-        console.log(this.ultimateItemList);
-        
-        
-        
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         
         //tabs at top
-        tabGroup = this.game.add.group();
-        this.tabData = [
-            { 'industry': 'sword', 'color': 'Red' }
-            , { 'industry': 'armor', 'color': 'Blue' }
-            , { 'industry': 'shop', 'color': 'Brown' }
-            , { 'industry': 'temple', 'color': 'Pink' }
-            , { 'industry': 'tavern', 'color': 'Orange' }
-            , { 'industry': 'inn', 'color': 'Yellow' }
-        ];
-        this.tabData.forEach(function(d, index) {
-            var tab = game.add.button(25 + (index * 50), 25, 'button' + d.color);
-            tab.name = d.industry;
-            tab.tabText = tab.addChild(game.add.text(42, 6, ResourceModel.getUltItemTabText(d.industry), { font: '16px TheMinion'}));
-            tab.events.onInputDown.add(this.updateText);
-            tabGroup.addChild(tab);
-        });
+        this.tabGroup = this.game.add.group();
+        this.addTabs();
         
         //tab-specific graphic and text
-        
+        this.tabGraphic = game.add.sprite(100, 250, '');
+        this.tabText = this.add.text(100, 350, 'Click Tabs for Info', {
+            font: '24px Arial Black'
+            , fill: '#d41515'
+            , strokeThickness = 0
+            , wordWrap = true
+            , wordWrapWidth = 600
+        });
         
          this.addMenuOption('Return', function () {
             game.state.start("Game")
@@ -52,8 +40,30 @@ Achievements.prototype = {
         
     }
     
-    , updateText: function() {
+    , addTabs: function() {
+        var i = 0;
+        for (var [key, value] of ResourceModel.ultimateItemMap) {
+            var tab = game.add.button(i * 125, 100, 'buttonTab');
+            tab.width = 150;
+            tab.height = 150;
+            tab.name = key;
+            tab.desc = value.desc;
+            tab.inputEnabled = true;
+            tab.tabText = tab.addChild(game.add.text(80, 20, value.tab.replace(' ', '\n'), {    
+                font: '20px TheMinion'
+                , wordWrap: true
+                , wordWrapWidth: 150
+                }));
+            tab.events.onInputDown.add(this.updateTabs, tab);
+            this.tabGroup.addChild(tab);
+            i++;
+        }
+    }
     
+    , updateTabs: function(tab) {
+        //console.log(tab);
+        this.tabGraphic.image = 'ultItem' + tab.name;
+        this.tabText.text = tab.desc;
     }
         
     , timerTrigger: function() {
