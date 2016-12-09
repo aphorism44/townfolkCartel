@@ -9,15 +9,15 @@ TownShop.prototype = {
         game.add.sprite(0, 0, this.loc + '-bg');
         
         //gold
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
         
         //grab relevant data
-        this.shopData = TownModel.getStoreData(this.loc);
-        this.buttonData = TownModel.getButtons(this.loc);
+        this.shopData = GameModel.getStoreData(this.loc);
+        this.buttonData = GameModel.getButtons(this.loc);
         
         //add all the button data to page
         this.shopGroup = this.game.add.group();
@@ -44,9 +44,9 @@ TownShop.prototype = {
     }
 
     , upgradeStore: function(button, statePointer) {
-        TownModel.upgradeTown(button.name, button.cost);
+        GameModel.upgradeTown(button.name, button.cost);
         //update cost and availability for all
-        this.buttonData = TownModel.getButtons(this.loc);
+        this.buttonData = GameModel.getButtons(this.loc);
         console.log(this.buttonData);
         this.updatePage(this.buttonData);
     }
@@ -62,7 +62,7 @@ TownShop.prototype = {
     , addHeaderTags: function(buttonMap) {
         var i = 0;
         for (var [key, value] of buttonMap) {
-            var tag = this.add.text(300 + (200 * i), 50, value.labelText + ": " + TownModel[key + 'Level'] , {
+            var tag = this.add.text(300 + (200 * i), 50, value.labelText + ": " + GameModel[key + 'Level'] , {
                 font: '24px Arial Black',
                 fill: '#fff',
                 strokeThickness: 4
@@ -80,9 +80,9 @@ TownShop.prototype = {
             button = this.add.button(300, 100 + 50 * j, this.game.cache.getBitmapData('button'));
             button.icon = button.addChild(this.game.add.image(6, 6, key + 'Icon'));
             button.name = key;
-            button.level = TownModel[key + "Level"];
+            button.level = GameModel[key + "Level"];
             button.text = button.addChild(this.game.add.text(42, 6, button.name + " To Level " + Number( button.level + 1), { font: '16px TheMinion'}));
-            button.cost = TownModel[key + 'Cost']();
+            button.cost = GameModel[key + 'Cost']();
             button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(this.upgradeStore, this);
             if (button.level > 11) {
@@ -90,7 +90,7 @@ TownShop.prototype = {
                 button.alpha = 0.1;
                 button.text.text = 'MAXED';
                 button.costText.text = 'OUT';
-            } else if (!TownModel.hasAmount(button.cost)) {
+            } else if (!GameModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -106,7 +106,7 @@ TownShop.prototype = {
     , addLists: function(buttonMap) {
         var k = 0;
         for (var [key, value] of buttonMap) {
-            var list = "Available " + value.goodsText + ": " + ResourceModel.getItemList(key, TownModel[key + 'Level']);
+            var list = "Available " + value.goodsText + ": " + GameModel.getItemList(key, GameModel[key + 'Level']);
             var itemText = this.add.text(275, 350 + (100 * k), list, {
                 font: '24px The Minion',
                 fill: '#d41515',
@@ -120,10 +120,10 @@ TownShop.prototype = {
     }
     
     , timerTrigger: function() {
-        TownModel.goAdventuring();
-        TownModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
-        this.buttonData = TownModel.getButtons(this.loc);
+        GameModel.goAdventuring();
+        GameModel.visitTown();        
+        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.buttonData = GameModel.getButtons(this.loc);
         this.updatePage(this.buttonData);
     }
 };

@@ -2,8 +2,8 @@ var Achievements = function(game) {};
 
 Achievements.prototype = {
     preload: function() {
-        this.info = TownModel.getOverview();
-        this.healthInfo = TownModel.getHealth();
+        this.info = GameModel.getOverview();
+        this.healthInfo = GameModel.getHealth();
         }
     
     , create: function() {
@@ -11,7 +11,7 @@ Achievements.prototype = {
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, 'parchment-bg');
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -26,12 +26,12 @@ Achievements.prototype = {
         
         //tab-specific graphic and text
         this.tabGraphic = game.add.sprite(100, 250, '');
-        this.tabText = this.add.text(100, 350, 'Click Tabs for Info', {
-            font: '24px Arial Black'
-            , fill: '#d41515'
-            , strokeThickness = 0
-            , wordWrap = true
-            , wordWrapWidth = 600
+        this.tabText = this.add.text(275, 225, 'Click Tabs for Info', {
+            font: '24px The Minion'
+            ,fill: '#d41515'
+            ,strokeThickness: 0
+            ,wordWrap: true
+            ,wordWrapWidth: 600 
         });
         
          this.addMenuOption('Return', function () {
@@ -39,10 +39,10 @@ Achievements.prototype = {
         }, 400, 500);
         
     }
-    
+       
     , addTabs: function() {
         var i = 0;
-        for (var [key, value] of ResourceModel.ultimateItemMap) {
+        for (var [key, value] of GameModel.ultimateItemMap) {
             var tab = game.add.button(i * 125, 100, 'buttonTab');
             tab.width = 150;
             tab.height = 150;
@@ -61,15 +61,15 @@ Achievements.prototype = {
     }
     
     , updateTabs: function(tab) {
-        //console.log(tab);
-        this.tabGraphic.image = 'ultItem' + tab.name;
+        console.log(tab.name);
+        this.tabGraphic.image = 'ult' + tab.name[0].toLowerCase() + tab.name.splice(1);
         this.tabText.text = tab.desc;
     }
-        
+      
     , timerTrigger: function() {
-        TownModel.goAdventuring();
-        TownModel.visitTown();
-        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        GameModel.goAdventuring();
+        GameModel.visitTown();
+        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
     }
 };
 

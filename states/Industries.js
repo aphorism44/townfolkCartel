@@ -2,8 +2,8 @@ var Industries = function(game) {};
 
 Industries.prototype = {
     preload: function() {
-        this.info = TownModel.getOverview();
-        this.healthInfo = TownModel.getHealth();
+        this.info = GameModel.getOverview();
+        this.healthInfo = GameModel.getHealth();
         this.locationName = game.currentIndustry;
         }
     
@@ -12,7 +12,7 @@ Industries.prototype = {
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, this.locationName + '-bg');
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -40,15 +40,15 @@ Industries.prototype = {
     }
         
     , timerTrigger: function() {
-        TownModel.goAdventuring();
-        TownModel.visitTown();
-        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        GameModel.goAdventuring();
+        GameModel.visitTown();
+        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
     }
     
     , updateBuildings: function() {
         this.bldgGroup.removeAll();
-        var bldgData = ResourceModel.getLocationBldgs(this.locationName);
-        var bldgTypes = ResourceModel.getIndustries(this.locationName);
+        var bldgData = GameModel.getLocationBldgs(this.locationName);
+        var bldgTypes = GameModel.getIndustries(this.locationName);
         for (var i = 0; i < bldgTypes.length; i++) {
             for (var [key, value] of bldgData) {
                 if (value.industry === bldgTypes[i]) {
@@ -65,7 +65,7 @@ Industries.prototype = {
         bldg.name = key;
         bldg.isPurchased = value.purchased;
         bldg.requires = value.needsArray.length < 1 ? 'nothing': value.needsArray.join(', ');
-        bldg.isAvailable = ResourceModel.isBuildingAvailable(bldg.name);
+        bldg.isAvailable = GameModel.isBuildingAvailable(bldg.name);
         bldg.desc = value.desc;
         bldg.events.onInputOver.add(this.describeBuilding, this);
         //black out unavailable bldgs; mark sold as such; others are clickable
@@ -91,7 +91,7 @@ Industries.prototype = {
     }
     
     , buyBuilding: function(bName) {
-        ResourceModel.buyBuilding(bName);
+        GameModel.buyBuilding(bName);
         this.updateBuildings(this.locationName);
     }
     

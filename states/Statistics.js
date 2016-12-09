@@ -2,8 +2,8 @@ var Statistics = function(game) {};
 
 Statistics.prototype = {
     preload: function() {
-        this.info = TownModel.getOverview();
-        this.healthInfo = TownModel.getHealth();
+        this.info = GameModel.getOverview();
+        this.healthInfo = GameModel.getHealth();
     }
     
     , create: function() {
@@ -31,10 +31,10 @@ Statistics.prototype = {
     }
     
     , timerTrigger: function() {
-        TownModel.goAdventuring();
-        TownModel.visitTown();        
-        this.infoText.text = TownModel.getOverview();
-        this.healthText.text = TownModel.getHealth();
+        GameModel.goAdventuring();
+        GameModel.visitTown();        
+        this.infoText.text = GameModel.getOverview();
+        this.healthText.text = GameModel.getHealth();
     }
 };
 

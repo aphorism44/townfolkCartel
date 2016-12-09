@@ -20,8 +20,7 @@ Splash.prototype = {
             game.load.script('resourcemap', 'states/ResourceMap.js');
             game.load.script('achievements', 'states/Achievements.js');
             game.load.script('industries', 'states/Industries.js');
-            game.load.script('townModel',  'js/TownModel.js');
-            game.load.script('resourceModel',  'js/ResourceModel.js');
+            game.load.script('gameModel',  'js/GameModel.js');
     }
 
     , loadBgm: function () {
@@ -107,9 +106,16 @@ Splash.prototype = {
         game.load.image('bldgSlaughterhouse', 'assets/images/slaughterhouse.png');
         game.load.image('bldgSmokehouse', 'assets/images/smokehouse.png');
         
+        //items
+        game.load.image('ultSword', 'assets/images/ultSword.png');
+        game.load.image('ultArmor', 'assets/images/ultArmor.png');
+        game.load.image('ultShop', 'assets/images/ultShop.png');
+        game.load.image('ultTemple', 'assets/images/ultTemple.png');
+        game.load.image('ultTavern', 'assets/images/ultTavern.png');
+        game.load.image('ultInn', 'assets/images/ultInn.png');
+        
         //buttons
         game.load.image('buttonBlack', 'assets/images/buttonBlack.png');
-        
         game.load.image('buttonBlue', 'assets/images/buttonBlue.png');
         game.load.image('buttonLtBlue', 'assets/images/buttonLtBlue.png');
         game.load.image('buttonBrown', 'assets/images/buttonBrown.png');

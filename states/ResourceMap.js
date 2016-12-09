@@ -2,8 +2,8 @@ var ResourceMap = function(game) {};
 
 ResourceMap.prototype = {
     preload: function() {
-        this.info = TownModel.getOverview();
-        this.healthInfo = TownModel.getHealth();
+        this.info = GameModel.getOverview();
+        this.healthInfo = GameModel.getHealth();
         }
     
     , create: function() {
@@ -11,7 +11,7 @@ ResourceMap.prototype = {
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, 'map-bg');
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -50,9 +50,9 @@ ResourceMap.prototype = {
     }
         
     , timerTrigger: function() {
-        TownModel.goAdventuring();
-        TownModel.visitTown();
-        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
+        GameModel.goAdventuring();
+        GameModel.visitTown();
+        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
     }
 };
 

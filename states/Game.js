@@ -16,25 +16,25 @@ Game.prototype = {
     
     , create: function () {
         var state = this;
-        //console.log(TownModel.getOverview());
+        //console.log(GameModel.getOverview());
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'townmenu-bg');
         //this.addMenuOption('Quit ->', function (e) {
         //    this.game.state.start("GameOver");
         //});
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + TownModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + TownModel.adventurerList.length + " / " + TownModel.maxAdventurers, {
+        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + GameModel.adventurerList.length + " / " + GameModel.maxAdventurers, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + TownModel.maintenance, {
+        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + GameModel.maintenance, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -55,10 +55,10 @@ Game.prototype = {
             button.icon = button.addChild(state.game.add.image(6, 6, buttonData.icon));
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
             button.multiplier = buttonData.multiplier;
-            button.cost = TownModel.adventurerCost() * buttonData.multiplier;
+            button.cost = GameModel.adventurerCost(buttonData.multiplier);
             button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.addAdventurers, state);
-            if (!TownModel.hasAmount(button.cost) || TownModel.adventurerList.length + button.multiplier >= TownModel.maxAdventurers) {
+            if (!GameModel.hasAmount(button.cost) || GameModel.adventurerList.length + button.multiplier >= GameModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
@@ -100,17 +100,17 @@ Game.prototype = {
     }
     
     , timerTrigger: function() {
-        TownModel.goAdventuring();
-        TownModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + TownModel.adventurerList.length+ " / " + TownModel.maxAdventurers;
+        GameModel.goAdventuring();
+        GameModel.visitTown();        
+        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
         this.updateButtons();
     }
     
     , addAdventurers: function(button, statePointer) {
-        TownModel.addAdventurers(button.multiplier, button.cost);
-        this.playerGoldText.text = 'Thalers: ' + TownModel.moneyPool;
-        this.playerAdvText.text = 'Adventurers: ' + TownModel.adventurerList.length+ " / " + TownModel.maxAdventurers;
+        GameModel.addAdventurers(button.multiplier, button.cost);
+        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
         //update cost and availability for all
         this.updateButtons(statePointer);
     }
@@ -122,9 +122,9 @@ Game.prototype = {
             function getAdjustedCost() {
                 return button.cost;
             }
-            button.cost = TownModel.adventurerCost() * button.multiplier;
+            button.cost = GameModel.adventurerCost() * button.multiplier;
             button.costText.text = 'Cost: ' + getAdjustedCost();
-            if (!TownModel.hasAmount(button.cost) || TownModel.adventurerList.length + button.multiplier > TownModel.maxAdventurers) {
+            if (!GameModel.hasAmount(button.cost) || GameModel.adventurerList.length + button.multiplier > GameModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {
