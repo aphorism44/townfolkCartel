@@ -9,7 +9,7 @@ TownShop.prototype = {
         game.add.sprite(0, 0, this.loc + '-bg');
         
         //gold
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -123,7 +123,7 @@ TownShop.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
         this.buttonData = GameModel.getButtons(this.loc);
         this.updatePage(this.buttonData);
     }

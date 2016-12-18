@@ -13,7 +13,7 @@
             this.expPool = createExpPool(this.expData);
             this.shopPool = createShopPool(this.shopData);
             this.shopButtonPool = createButtonPool(this.shopButtonData);
-            this.lastIncome = 0;
+            this.lastIncome = new BigNumber(0);
             this.monsterPool = createMonsterPool(this.monsterData);
             this.moneyPool = new BigNumber(1000000);
             //blacksmith stats
@@ -43,9 +43,17 @@
             //resource buildings (merged)
             this.buildingMap = createBldgMap(this.bldgData);
             this.itemMap = createItemMap(this.itemData);
-            this.ultimateItemMap = createUltimaMap(this.ultimateItemData);
+            this.ultimateItemMap = createUltimaMap(this.ultimateItemData);    
         }
-        
+        //reported bug on this at GitHub
+        GameModel.getMoneyPool = function() {
+            var format = {
+                groupSeparator: ','
+                , groupSize: 3
+            };
+            BigNumber.config({ FORMAT: format });
+            return this.moneyPool.toFormat();
+        }
         GameModel.addAdventurers = function(num) {
             this.moneyPool -= this.adventurerCost(num);
             for (var i = 0; i < num; i++)
@@ -147,11 +155,11 @@
             var len = this.adventurerList.length;
             this.lastIncome = 0;
             for (var i = len - 1; i > -1; i--) {
-                //pay for as much healing as possible
+                //pay for as much healing as possible                
                 this.lastIncome += this.adventurerList[i].heal(this.costPerHP);
             }
             this.moneyPool += this.lastIncome;
-            this.moneyPool -= this.getMaintenanceCost;
+            this.moneyPool -= this.getMaintenanceCost();
         }
         GameModel.getMaintenanceCost = function() {
             return 1;
@@ -172,7 +180,10 @@
             return strBuild;
         }
         GameModel.getHealth = function() {
-            var full = 0, half = 0, low = 0, totalLevel = 0, totalAdv = 0, totalGold = 0;
+            var full = 0, half = 0, low = 0, totalAdv = 0;
+            var totalLevel = new BigNumber(0);
+            var totalGold = new BigNumber(0);
+            
             this.adventurerList.forEach(function(a) {
                 totalLevel += a.level;
                 totalGold += a.gold;

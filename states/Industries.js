@@ -12,7 +12,7 @@ Industries.prototype = {
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, this.locationName + '-bg');
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -42,7 +42,7 @@ Industries.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();
-        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
     }
     
     , updateBuildings: function() {

@@ -23,7 +23,7 @@ Game.prototype = {
         //    this.game.state.start("GameOver");
         //});
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.moneyPool, {
+        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -34,7 +34,7 @@ Game.prototype = {
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + GameModel.maintenance, {
+        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + GameModel.getMaintenanceCost(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -102,14 +102,14 @@ Game.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
         this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
         this.updateButtons();
     }
     
     , addAdventurers: function(button, statePointer) {
         GameModel.addAdventurers(button.multiplier, button.cost);
-        this.playerGoldText.text = 'Thalers: ' + GameModel.moneyPool;
+        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
         this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
         //update cost and availability for all
         this.updateButtons(statePointer);
