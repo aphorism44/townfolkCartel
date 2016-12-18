@@ -80,7 +80,7 @@ Industries.prototype = {
         if (!bldg.isAvailable) {
             bldg.tint = "0x000000";
         } else {
-            bldg.tint = "0xFFFFFF"
+            bldg.tint = "0xFFFFFF";
         }
         
         return bldg;

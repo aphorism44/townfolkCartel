@@ -129,6 +129,7 @@ Splash.prototype = {
         
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600
+        game.load.image('checkmark', 'assets/images/checkmark.png'); //200x600
     }
 
     , loadFonts: function () {

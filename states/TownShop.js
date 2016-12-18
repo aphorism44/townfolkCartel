@@ -47,7 +47,7 @@ TownShop.prototype = {
         GameModel.upgradeTown(button.name, button.cost);
         //update cost and availability for all
         this.buttonData = GameModel.getButtons(this.loc);
-        console.log(this.buttonData);
+        //console.log(this.buttonData);
         this.updatePage(this.buttonData);
     }
     
@@ -77,6 +77,7 @@ TownShop.prototype = {
         var j = 0;
         for (var [key, value] of buttonMap) {
             var button;
+            //why does the below work???
             button = this.add.button(300, 100 + 50 * j, this.game.cache.getBitmapData('button'));
             button.icon = button.addChild(this.game.add.image(6, 6, key + 'Icon'));
             button.name = key;

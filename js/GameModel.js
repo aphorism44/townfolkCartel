@@ -26,7 +26,7 @@
             this.maxAdventurers = 20; //adjustable at inn
             //temple stats
             this.templeLevel = 0;
-            this.donationMultiplier = 1; //adjustable at temple
+            this.idleDayNumber = 1; //adjustable at temple
             //tavern stats
             this.tavernLevel = 0;
             this.expGainRoll = 4; //adjustable - die roll to add extra experience when an adventurer kills a monster
@@ -66,7 +66,7 @@
         }
         GameModel.upgradeTemple = function() {
             this.templeLevel++;
-            this.costPerHP++;
+            this.idleDayNumber++;
         }
         GameModel.upgradeTavern = function() {
             this.tavernLevel++;
@@ -150,7 +150,7 @@
                 //pay for as much healing as possible
                 this.lastIncome += this.adventurerList[i].heal(this.costPerHP);
             }
-            this.moneyPool += this.lastIncome * this.donationMultiplier;
+            this.moneyPool += this.lastIncome;
             this.moneyPool -= this.getMaintenanceCost;
         }
         GameModel.getMaintenanceCost = function() {
@@ -335,7 +335,7 @@
         GameModel.shopData = [
               { 'name': 'tavern', 'graphic': 'lissetteFull', 'text': 'Level up your tavern to give adventurers more experience when they fight.' }
             , { 'name': 'inn', 'graphic': 'clavoFull', 'text': 'Level up your inn to allow more adventurers to stay in town.' }
-            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the \'matching\' donations from healing adventurers.' }
+            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the game speed when you\'re not playing.' }
             , { 'name': 'itemshop', 'graphic': 'mizakFull', 'text': 'Level up your item shop to give adventurers more money when they fight.' }
             , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'When you level up weapons, you increase adventurers\' HP loss per battle (more money made from healing). When you level up armor, you decrease adventurers\' HP damage. Balance these!' }
         ];
@@ -343,7 +343,7 @@
             { 'shopName': 'inn', 'goodsText': 'Amenities', 'tag': 'inn', 'labelText': 'Maximum Adventurers' }
             , { 'shopName': 'tavern', 'goodsText': 'Food and Drink', 'tag': 'tavern', 'labelText': 'Extra Experience Roll' }
             , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll' }
-            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Donation Multiplier' }
+            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Game Days per Idle Day' }
             , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll' }
             , { 'shopName': 'blacksmith', 'goodsText': 'Armor', 'tag': 'armor', 'labelText': 'HP Loss %' }
         ];
@@ -375,6 +375,9 @@
         }
         GameModel.buyBuilding = function(name) {
             this.buildingMap.get(name).purchased = true;
+        }
+        GameModel.isBuildingPurchased = function(name) {
+            return this.buildingMap.get(name).purchased;
         }
         GameModel.isBuildingAvailable = function(name) {
             var needed = this.buildingMap.get(name).needsArray;
@@ -437,12 +440,12 @@
         }
         
         GameModel.ultimateItemData = [
-           { 'name' : 'Arquebus', 'location': 'sword', 'needtext' : 'Iron Roller (castings)\nChemist (potassium)\nCharcoal Kiln (forge charcoal)', 'desc' : '<b>Mizak\’s Notes.</b> The newest weapon on the market – makes a crossbow look tame! Just load it with this new “gunpowder” powder, aim, and shoot!', 'needList': 'Iron Roller, Chemist, Charcoal Kiln', 'tab': 'Ultimate Weapon' }
-            , { 'name' : 'Brigandine', 'location': 'armor', 'needtext' : 'Iron Roller (plate)\nLoom (padding)\nCharcoal Kiln (forge charcoal)', 'desc' : '<b>Mizak\’s Notes.</b> Looking for armor that is strong but also light? Try the brigandine, with its thick padding with strategically placed sheets of armot stitched throughout.', 'needList': 'Iron Roller, Loom, Charcoal Kiln', 'tab': 'Ultimate Armor' }
-            , { 'name' : 'Pemmican', 'location': 'shop', 'needtext' : 'Smokehouse (jerky)\nWinepress (leftover fruit)\nSawmill (firewood)', 'desc' : '<b>Mizak\’s Notes.</b> The ultimate in adventuring rations! A mixture of ground jerky, dried fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Winepress, Sawmill', 'tab': 'Ultimate Item' }
-            , { 'name' : 'Poultice', 'location': 'temple', 'needtext' : 'Hops Farm (herbs from weeds)\nLoom (cloth bangages)\nSaltern (sea minerals)', 'desc' : '<b>Mizak\’s Notes.</b> Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Hops Farm, Loom, Saltern', 'tab': 'Ultimate Medicine' }
-            , { 'name' : 'Black Velvet', 'location': 'tavern', 'needtext' : 'Beer Brewery (stout)\nWinery (champagne)\nBakery (pretzels…)', 'desc' : '<b>Mizak\’s Notes.</b> Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Beer Brewery, Winery, Bakery', 'tab': 'Ultimate Drink' }
-            , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees…)', 'desc' : '<b>Mizak\’s Notes.</b> Why should I be ashamed? It\’s the world’s oldest profession, and we need to accommodate our brave adventurers! I\’m not sexist – we’ll hire both men and women! And don\’t worry! I\’ll only hire from out of town, and we\’ll make everyone use protection!', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
+           { 'name' : 'Arquebus', 'location': 'sword', 'needtext' : 'Iron Roller (castings)\nChemist (potassium)\nCharcoal Kiln (forge charcoal)', 'desc' : 'Mizak\'s Notes:   The newest weapon on the market – makes a crossbow look tame! Just load it with this newfangled “gunpowder,” aim, and pull a small metal trigger.', 'needList': 'Iron Roller, Chemist, Charcoal Kiln', 'tab': 'Ultimate Weapon' }
+            , { 'name' : 'Brigandine', 'location': 'armor', 'needtext' : 'Iron Roller (plate)\nLoom (padding)\nCharcoal Kiln (forge charcoal)', 'desc' : 'Mizak\'s Notes:   Looking for armor that is strong but also light? Try the brigandine, with its thick padding with strategically placed sheets of armor stitched throughout.', 'needList': 'Iron Roller, Loom, Charcoal Kiln', 'tab': 'Ultimate Armor' }
+            , { 'name' : 'Pemmican', 'location': 'shop', 'needtext' : 'Smokehouse (jerky)\nWinepress (leftover fruit)\nSawmill (firewood)', 'desc' : 'Mizak\'s Notes:   The ultimate in adventuring rations! A mixture of ground jerky, dried fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Winepress, Sawmill', 'tab': 'Ultimate Item' }
+            , { 'name' : 'Poultice', 'location': 'temple', 'needtext' : 'Hops Farm (herbs from weeds)\nLoom (cloth bangages)\nSaltern (sea minerals)', 'desc' : 'Mizak\'s Notes:   Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Hops Farm, Loom, Saltern', 'tab': 'Ultimate Medicine' }
+            , { 'name' : 'Black Velvet', 'location': 'tavern', 'needtext' : 'Beer Brewery (stout)\nWinery (champagne)\nBakery (pretzels…)', 'desc' : 'Mizak\'s Notes:   Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Beer Brewery, Winery, Bakery', 'tab': 'Ultimate Drink' }
+            , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees…)', 'desc' : 'Mizak\'s Notes:   Why should I be ashamed? It\’s the world’s oldest profession, and we need to accommodate our brave adventurers! I\’m not sexist – we’ll hire both men and women! And don\’t worry! I\’ll only hire from out of town, and we\’ll make everyone use protection!', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
         ];
 
         GameModel.itemData = [
