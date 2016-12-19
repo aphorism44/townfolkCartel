@@ -4,6 +4,7 @@ Statistics.prototype = {
     preload: function() {
         this.info = GameModel.getOverview();
         this.healthInfo = GameModel.getHealth();
+        this.game.plugin.createChart(3);
     }
     
     , create: function() {
@@ -35,6 +36,7 @@ Statistics.prototype = {
         GameModel.visitTown();        
         this.infoText.text = GameModel.getOverview();
         this.healthText.text = GameModel.getHealth();
+        this.game.plugin.testIt();
     }
 };
 

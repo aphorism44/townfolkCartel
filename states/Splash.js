@@ -21,6 +21,9 @@ Splash.prototype = {
             game.load.script('achievements', 'states/Achievements.js');
             game.load.script('industries', 'states/Industries.js');
             game.load.script('gameModel',  'js/GameModel.js');
+            
+            //my first Phaser.io plugin/API
+            game.plugin = game.plugins.add(Phaser.Plugin.BarchartPlugin);
     }
 
     , loadBgm: function () {
