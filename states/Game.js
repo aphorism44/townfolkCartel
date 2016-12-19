@@ -122,7 +122,7 @@ Game.prototype = {
             function getAdjustedCost() {
                 return button.cost;
             }
-            button.cost = GameModel.adventurerCost() * button.multiplier;
+            button.cost = GameModel.adventurerCost(button.multiplier);
             button.costText.text = 'Cost: ' + getAdjustedCost();
             if (!GameModel.hasAmount(button.cost) || GameModel.adventurerList.length + button.multiplier > GameModel.maxAdventurers) {
                 button.inputEnabled = false;

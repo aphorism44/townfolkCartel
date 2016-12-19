@@ -42,6 +42,7 @@ Industries.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();
+        this.updateBuildings();
         this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
     }
     
@@ -73,9 +74,13 @@ Industries.prototype = {
             bldg.text = bldg.addChild(this.game.add.text(50, 50, "SOLD", { font: '16px TheMinion', fill: '#d90e0e' }));
         }
         if (bldg.isAvailable && !bldg.isPurchased) {
-            bldg.events.onInputDown.add(function() { 
-                this.buyBuilding(bldg.name); 
-            } , this);
+            if (!GameModel.hasAmount(bldg.cost)) {
+                bldg.text = bldg.addChild(this.game.add.text(25, 50, "NEED MORE $", { font: '16px TheMinion', fill: '#d90e0e' }));
+            } else {
+                bldg.events.onInputDown.add(function() { 
+                    this.buyBuilding(bldg.name); 
+                } , this);
+            }
         }
         if (!bldg.isAvailable) {
             bldg.tint = "0x000000";
@@ -87,12 +92,13 @@ Industries.prototype = {
     }
     
     , describeBuilding: function(button) {
-        this.bldgText.text = button.name + "\n\nRequires: " + button.requires + "\n\n" + button.desc;
+        this.bldgText.text = button.name + "\n\nRequires: " + button.requires + "\n\n" + button.desc + "\n\nCost: " + new BigNumber(button.cost).toFormat();
     }
     
     , buyBuilding: function(bName) {
         GameModel.buyBuilding(bName);
         this.updateBuildings(this.locationName);
+        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
     }
     
 };

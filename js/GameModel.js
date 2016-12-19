@@ -15,7 +15,7 @@
             this.shopButtonPool = createButtonPool(this.shopButtonData);
             this.lastIncome = new BigNumber(0);
             this.monsterPool = createMonsterPool(this.monsterData);
-            this.moneyPool = new BigNumber(1000000);
+            this.moneyPool = new BigNumber(109000);
             //blacksmith stats
             this.swordLevel = 0;
             this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
@@ -43,29 +43,31 @@
             //resource buildings (merged)
             this.buildingMap = createBldgMap(this.bldgData);
             this.itemMap = createItemMap(this.itemData);
-            this.ultimateItemMap = createUltimaMap(this.ultimateItemData);    
-        }
-        //reported bug on this at GitHub
-        GameModel.getMoneyPool = function() {
+            this.ultimateItemMap = createUltimaMap(this.ultimateItemData);  
             var format = {
                 groupSeparator: ','
                 , groupSize: 3
             };
             BigNumber.config({ FORMAT: format });
+        }
+        //below functions used to format numbers expected to get really large
+        GameModel.getMoneyPool = function() {
             return this.moneyPool.toFormat();
         }
+        GameModel.getLastIncome = function() {
+            return this.lastIncome.toFormat();
+        }
+        GameModel.hasAmount = function(amount) {
+            return this.moneyPool.greaterThanOrEqualTo(new BigNumber(amount));
+        }
         GameModel.addAdventurers = function(num) {
-            this.moneyPool -= this.adventurerCost(num);
+            this.moneyPool = this.moneyPool.minus(new BigNumber(this.adventurerCost(num)));
             for (var i = 0; i < num; i++)
                 this.adventurerList.push(new Adventurer(1, this.expPool.get(1)));
         }
-        GameModel.hasAmount = function(amount) {
-            return amount <= this.moneyPool;
-        }
         GameModel.upgradeTown = function(tag, cost) {
-            this.moneyPool -= cost;
+            this.moneyPool = this.moneyPool.minus(new BigNumber(cost));
             var functionName = 'upgrade' + tag[0].toUpperCase() + tag.slice(1);
-            console.log(functionName);
             GameModel[functionName]();
         }
         GameModel.upgradeInn = function() {
@@ -90,7 +92,14 @@
         }
         GameModel.upgradeArmor = function() {
             this.armorLevel++;
-            this.hpLossPercentage *= 0.9;
+            this.hpLossPercentage *= 0.95;
+        }
+        GameModel.getShopStat = function(varName) {
+            //this is needed since one of the variables is a decimal
+            if (varName === 'hpLossPercentage' )
+                return this[varName].toFixed(3);
+            else
+                return this[varName];
         }
         
         GameModel.adventurerCost = function(numOfAdv) {
@@ -153,13 +162,13 @@
         }
         GameModel.visitTown = function() {
             var len = this.adventurerList.length;
-            this.lastIncome = 0;
+            this.lastIncome = new BigNumber(0);
             for (var i = len - 1; i > -1; i--) {
                 //pay for as much healing as possible                
-                this.lastIncome += this.adventurerList[i].heal(this.costPerHP);
+                this.lastIncome = this.lastIncome.plus(new BigNumber(this.adventurerList[i].heal()));
             }
-            this.moneyPool += this.lastIncome;
-            this.moneyPool -= this.getMaintenanceCost();
+            this.moneyPool = this.moneyPool.plus(this.lastIncome);
+            this.moneyPool = this.moneyPool.minus(new BigNumber(this.getMaintenanceCost()));
         }
         GameModel.getMaintenanceCost = function() {
             return 1;
@@ -175,8 +184,8 @@
             strBuild += "Level 21+: " + this.adventurerList.filter(function(a) { return a.level > 20; }).length + "\t\t\t";
             strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
             //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";
-            strBuild += "Daily Costs: " + maintainance + " / Daily Revenue: " + this.lastIncome + " / Cash Flow: " + Number(this.lastIncome - maintainance) + "\n";
-            strBuild += "Town funds: " + this.moneyPool + "\n\n";
+            strBuild += "Daily Costs: " + maintainance + " / Daily Revenue: " + this.getLastIncome() + " / Cash Flow: " + new BigNumber(this.lastIncome.minus(new BigNumber(maintainance))).toFormat() + "\n";
+            strBuild += "Town funds: " + this.moneyPool.toFormat() + "\n\n";
             return strBuild;
         }
         GameModel.getHealth = function() {
@@ -185,8 +194,8 @@
             var totalGold = new BigNumber(0);
             
             this.adventurerList.forEach(function(a) {
-                totalLevel += a.level;
-                totalGold += a.gold;
+                totalLevel = totalLevel.plus(new BigNumber(a.level));
+                totalGold = totalGold.plus(new BigNumber(a.gold));
                 totalAdv++;
                 if (a.hp === a.hpMax)
                     full++;
@@ -195,13 +204,13 @@
                 else
                     half++;
             });
-            if (totalAdv == 0) totalAdv = 1;
+            if (totalAdv === 0) totalAdv = 1;
             var strBuild = "Adventurer health:\n";
             strBuild += "Full HP: " + full + "\t\t\t";
             strBuild += "/   Half to Full HP: " + half + "\n";
             strBuild += "Less than Half HP: " + low + "\t\t\t";
-            strBuild += "/   Average Level: " + totalLevel / totalAdv + "\n";
-            strBuild += "Total Adventurer Cash: " + totalGold + "\n";            
+            strBuild += "/   Average Level: " + totalLevel.dividedBy(new BigNumber(totalAdv)) + "\n";
+            strBuild += "Total Adventurer Cash: " + totalGold.toFormat() + "\n";            
             return strBuild;
         }
         
@@ -229,8 +238,7 @@
         function createButtonPool(buttonData) {
             var pool = new Map();
             buttonData.forEach(function(u) {
-                
-                pool.set(u.tag, { 'shop': u.shopName, 'goodsText': u.goodsText, 'labelText': u.labelText });
+                pool.set(u.tag, { 'shop': u.shopName, 'goodsText': u.goodsText, 'labelText': u.labelText, 'variable': u.variable });
             });
             return pool;
         }
@@ -348,21 +356,23 @@
             , { 'name': 'inn', 'graphic': 'clavoFull', 'text': 'Level up your inn to allow more adventurers to stay in town.' }
             , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the game speed when you\'re not playing.' }
             , { 'name': 'itemshop', 'graphic': 'mizakFull', 'text': 'Level up your item shop to give adventurers more money when they fight.' }
-            , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'When you level up weapons, you increase adventurers\' HP loss per battle (more money made from healing). When you level up armor, you decrease adventurers\' HP damage. Balance these!' }
+            , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'Weapon levels increase adventurers\' HP loss per battle (higher risk of dying, but more money made from healing). Armor levels decrease adventurers\' HP damage (the opposite effect of weapon levels).' }
         ];
         GameModel.shopButtonData = [
-            { 'shopName': 'inn', 'goodsText': 'Amenities', 'tag': 'inn', 'labelText': 'Maximum Adventurers' }
-            , { 'shopName': 'tavern', 'goodsText': 'Food and Drink', 'tag': 'tavern', 'labelText': 'Extra Experience Roll' }
-            , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll' }
-            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Game Days per Idle Day' }
-            , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll' }
-            , { 'shopName': 'blacksmith', 'goodsText': 'Armor', 'tag': 'armor', 'labelText': 'HP Loss %' }
+            { 'shopName': 'inn', 'goodsText': 'Amenities', 'tag': 'inn', 'labelText': 'Maximum Adventurers', variable: 'maxAdventurers' }
+            , { 'shopName': 'tavern', 'goodsText': 'Food and Drink', 'tag': 'tavern', 'labelText': 'Extra Experience Roll', variable: 'expGainRoll' }
+            , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll', variable: 'goldGainRoll' }
+            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Game Days per Idle Day', variable: 'idleDayNumber' }
+            , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll', variable: 'hpLossRoll' }
+            , { 'shopName': 'blacksmith', 'goodsText': 'Armor', 'tag': 'armor', 'labelText': 'HP Loss %', variable: 'hpLossPercentage' }
         ];
         
         //resource building functions(merged)
         GameModel.getItemList = function(category, level) {
             var itemArray = [];
-            if (level > 12) level = 12;
+            //instead of one item per level (too easy to max out), take square root (max level 144)
+            if (level > 144) level = 144;
+            level = Math.floor(Math.sqrt(level));
             for (var i = 0; i < level; i++)
                 itemArray.push(" " + this.itemMap.get(category)[i]);
             if (itemArray.length < 1)
@@ -385,6 +395,7 @@
             return purchasedBuildings;
         }
         GameModel.buyBuilding = function(name) {
+            this.moneyPool = this.moneyPool.minus(new BigNumber(this.buildingMap.get(name).cost));
             this.buildingMap.get(name).purchased = true;
         }
         GameModel.isBuildingPurchased = function(name) {
@@ -456,7 +467,7 @@
             , { 'name' : 'Pemmican', 'location': 'shop', 'needtext' : 'Smokehouse (jerky)\nWinepress (leftover fruit)\nSawmill (firewood)', 'desc' : 'Mizak\'s Notes:   The ultimate in adventuring rations! A mixture of ground jerky, dried fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Winepress, Sawmill', 'tab': 'Ultimate Item' }
             , { 'name' : 'Poultice', 'location': 'temple', 'needtext' : 'Hops Farm (herbs from weeds)\nLoom (cloth bangages)\nSaltern (sea minerals)', 'desc' : 'Mizak\'s Notes:   Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Hops Farm, Loom, Saltern', 'tab': 'Ultimate Medicine' }
             , { 'name' : 'Black Velvet', 'location': 'tavern', 'needtext' : 'Beer Brewery (stout)\nWinery (champagne)\nBakery (pretzels…)', 'desc' : 'Mizak\'s Notes:   Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Beer Brewery, Winery, Bakery', 'tab': 'Ultimate Drink' }
-            , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees…)', 'desc' : 'Mizak\'s Notes:   Why should I be ashamed? It\’s the world’s oldest profession, and we need to accommodate our brave adventurers! I\’m not sexist – we’ll hire both men and women! And don\’t worry! I\’ll only hire from out of town, and we\’ll make everyone use protection!', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
+            , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees…)', 'desc' : 'Mizak\'s Notes:   Sorry, but it\’s the world’s oldest profession, and we need to accommodate our brave adventurers! I\’m not sexist – we’ll hire both men and women! And don\’t worry! I\’ll only hire from out of town, and we\’ll make everyone use protection!', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
         ];
 
         GameModel.itemData = [

@@ -24,7 +24,7 @@ TownShop.prototype = {
         this.updatePage(this.buttonData);
         
         //shop-level info text
-        this.infoText = this.add.text(275, 225, this.shopData.text, {
+        this.infoText = this.add.text(275, 215, this.shopData.text, {
             font: '24px The Minion',
             fill: '#d41515',
             strokeThickness: 0,
@@ -54,6 +54,7 @@ TownShop.prototype = {
     
     , updatePage: function(buttonMap) {
         this.shopGroup.removeAll();
+        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
         this.addHeaderTags(buttonMap);
         this.addButtons(buttonMap);
         this.addLists(buttonMap);
@@ -62,7 +63,7 @@ TownShop.prototype = {
     , addHeaderTags: function(buttonMap) {
         var i = 0;
         for (var [key, value] of buttonMap) {
-            var tag = this.add.text(300 + (200 * i), 50, value.labelText + ": " + GameModel[key + 'Level'] , {
+            var tag = this.add.text(300 + (200 * i), 50, value.labelText + ": " + GameModel.getShopStat(value.variable) , {
                 font: '24px Arial Black',
                 fill: '#fff',
                 strokeThickness: 4
@@ -77,7 +78,6 @@ TownShop.prototype = {
         var j = 0;
         for (var [key, value] of buttonMap) {
             var button;
-            //why does the below work???
             button = this.add.button(300, 100 + 50 * j, this.game.cache.getBitmapData('button'));
             button.icon = button.addChild(this.game.add.image(6, 6, key + 'Icon'));
             button.name = key;
@@ -86,12 +86,7 @@ TownShop.prototype = {
             button.cost = GameModel[key + 'Cost']();
             button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
             button.events.onInputDown.add(this.upgradeStore, this);
-            if (button.level > 11) {
-                button.inputEnabled = false;
-                button.alpha = 0.1;
-                button.text.text = 'MAXED';
-                button.costText.text = 'OUT';
-            } else if (!GameModel.hasAmount(button.cost)) {
+            if (!GameModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
             } else {

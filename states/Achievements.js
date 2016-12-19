@@ -28,16 +28,16 @@ Achievements.prototype = {
         
         //tab-specific graphic and text
         this.tabGraphic = game.add.sprite(50, 250, ''); 
-        this.tabText = game.add.text(300, 275, 'Click Tabs for Info', {
+        this.tabText = game.add.text(300, 175, 'Click Tabs for Info', {
             font: '24px The Minion'
-            ,fill: '#d41515'
+            ,fill: '#0b0101'
             ,strokeThickness: 0
             ,wordWrap: true
             ,wordWrapWidth: 450 
         });
         this.needsTextbox = game.add.text(50, 400, '', {
             font: '24px The Minion'
-            ,fill: '#d41515'
+            ,fill: '#150101'
             ,strokeThickness: 0
             ,wordWrap: true
             ,wordWrapWidth: 300
@@ -91,7 +91,7 @@ Achievements.prototype = {
         }
         if (!GameModel.isUltimateItemAvailable(tab.name)) {
             this.tabGraphic.tint = "0x000000";
-            this.tabText.text = "This item is not yet available.";
+            this.tabText.text = "This item is not yet available. You still need to purchase the resources marked by an asterisk(*).";
         } else {
             this.tabGraphic.tint = "0xFFFFFF";
             this.tabText.text = tab.itemName + "\n\n" + tab.desc;
