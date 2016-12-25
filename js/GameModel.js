@@ -15,7 +15,10 @@
             this.shopButtonPool = createButtonPool(this.shopButtonData);
             this.lastIncome = new BigNumber(0);
             this.monsterPool = createMonsterPool(this.monsterData);
-            this.moneyPool = new BigNumber(109000);
+            this.moneyPool = new BigNumber(100);
+            //keep records for charts
+            this.moneyRecord = [];
+            this.adventurerRecord = [];
             //blacksmith stats
             this.swordLevel = 0;
             this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
@@ -169,6 +172,16 @@
             }
             this.moneyPool = this.moneyPool.plus(this.lastIncome);
             this.moneyPool = this.moneyPool.minus(new BigNumber(this.getMaintenanceCost()));
+            this.recordData();
+        }
+        //below is for keeping track of some numbers for graphic purposes; currently limited to 100 days
+        GameModel.recordData = function() {
+            if (this.moneyRecord.length > 20)
+                this.moneyRecord.shift();
+            if (this.adventurerRecord.length > 20)
+                this.adventurerRecord.shift();
+            this.moneyRecord.push(this.lastIncome);
+            this.adventurerRecord.push(this.adventurerList.length);
         }
         GameModel.getMaintenanceCost = function() {
             return 1;
