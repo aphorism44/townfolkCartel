@@ -13,7 +13,7 @@ Achievements.prototype = {
         
         this.stateGroup = this.game.add.group();
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
+        this.playerGoldText = this.add.text(50, 50, 'Gold: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -103,7 +103,7 @@ Achievements.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
     }
 };
 

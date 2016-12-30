@@ -9,7 +9,7 @@ TownShop.prototype = {
         game.add.sprite(0, 0, this.loc + '-bg');
         
         //gold
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
+        this.playerGoldText = this.add.text(50, 50, 'Gold: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -54,7 +54,7 @@ TownShop.prototype = {
     
     , updatePage: function(buttonMap) {
         this.shopGroup.removeAll();
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
         this.addHeaderTags(buttonMap);
         this.addButtons(buttonMap);
         this.addLists(buttonMap);
@@ -84,7 +84,7 @@ TownShop.prototype = {
             button.level = GameModel[key + "Level"];
             button.text = button.addChild(this.game.add.text(42, 6, button.name + " To Level " + Number( button.level + 1), { font: '16px TheMinion'}));
             button.cost = GameModel[key + 'Cost']();
-            button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
+            button.costText = button.addChild(this.game.add.text(42, 24, 'Cost: ' + GameModel.formatNumToText(button.cost), {font: '16px TheMinion'}));
             button.events.onInputDown.add(this.upgradeStore, this);
             if (!GameModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
@@ -118,7 +118,7 @@ TownShop.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
         this.buttonData = GameModel.getButtons(this.loc);
         this.updatePage(this.buttonData);
     }

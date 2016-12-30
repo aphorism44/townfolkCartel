@@ -15,12 +15,7 @@ Statistics.prototype = {
             fill: '#000000',
             strokeThickness: 0
         });
-        /*this.healthText = this.add.text(50, 300, this.healthInfo, {
-            font: '24px The Minion',
-            fill: '#000000',
-            strokeThickness: 0
-        });*/
-        this.game.plugin.createChart(GameModel.moneyRecord, 100, 300, "Past 20 Days, Income");
+        this.game.plugin.createChart(GameModel.moneyRecord, 100, 300, 400, 200, "Daily Net Income");
         
         
         
@@ -38,7 +33,6 @@ Statistics.prototype = {
         GameModel.goAdventuring();
         GameModel.visitTown();        
         this.infoText.text = GameModel.getOverview();
-        //this.healthText.text = GameModel.getHealth();
         this.game.plugin.updateChart(GameModel.moneyRecord);
     }
 };

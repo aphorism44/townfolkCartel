@@ -11,7 +11,7 @@ ResourceMap.prototype = {
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, 'map-bg');
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
+        this.playerGoldText = this.add.text(50, 50, 'Gold: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -52,7 +52,7 @@ ResourceMap.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
     }
 };
 

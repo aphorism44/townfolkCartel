@@ -23,18 +23,18 @@ Game.prototype = {
         //    this.game.state.start("GameOver");
         //});
         //scorekeepers
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
+        this.playerGoldText = this.add.text(25, 50, 'Gold: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
-        this.playerAdvText = this.add.text(300, 50, 'Adventurers: ' + GameModel.adventurerList.length + " / " + GameModel.maxAdventurers, {
+        this.playerAdvText = this.add.text(400, 50, 'Adventurers: ' + GameModel.adventurerList.length + " / " + GameModel.maxAdventurers, {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(50, 275, 'Daily Costs: ' + GameModel.getMaintenanceCost(), {
+        this.maintCostText = this.add.text(25, 275, 'Daily Costs: ' + GameModel.formatNumToText(GameModel.getMaintenanceCost()), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -56,7 +56,7 @@ Game.prototype = {
             button.text = button.addChild(state.game.add.text(42, 6, buttonData.name, { font: '16px TheMinion'}));
             button.multiplier = buttonData.multiplier;
             button.cost = GameModel.adventurerCost(buttonData.multiplier);
-            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + button.cost, {font: '16px TheMinion'}));
+            button.costText = button.addChild(state.game.add.text(42, 24, 'Cost: ' + GameModel.formatNumToText(button.cost), {font: '16px TheMinion'}));
             button.events.onInputDown.add(state.addAdventurers, state);
             if (!GameModel.hasAmount(button.cost) || GameModel.adventurerList.length + button.multiplier >= GameModel.maxAdventurers) {
                 button.inputEnabled = false;
@@ -102,14 +102,14 @@ Game.prototype = {
     , timerTrigger: function() {
         GameModel.goAdventuring();
         GameModel.visitTown();        
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
         this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
         this.updateButtons();
     }
     
     , addAdventurers: function(button, statePointer) {
         GameModel.addAdventurers(button.multiplier, button.cost);
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
         this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
         //update cost and availability for all
         this.updateButtons(statePointer);
@@ -123,7 +123,7 @@ Game.prototype = {
                 return button.cost;
             }
             button.cost = GameModel.adventurerCost(button.multiplier);
-            button.costText.text = 'Cost: ' + getAdjustedCost();
+            button.costText.text = 'Cost: ' + GameModel.formatNumToText(getAdjustedCost());
             if (!GameModel.hasAmount(button.cost) || GameModel.adventurerList.length + button.multiplier > GameModel.maxAdventurers) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;

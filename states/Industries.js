@@ -12,7 +12,7 @@ Industries.prototype = {
         this.stage.disableVisibilityChange = false;
         var bg = game.add.sprite(0, 0, this.locationName + '-bg');
         
-        this.playerGoldText = this.add.text(50, 50, 'Thalers: ' + GameModel.getMoneyPool(), {
+        this.playerGoldText = this.add.text(50, 50, 'Gold: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -43,7 +43,7 @@ Industries.prototype = {
         GameModel.goAdventuring();
         GameModel.visitTown();
         this.updateBuildings();
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
     }
     
     , updateBuildings: function() {
@@ -98,7 +98,7 @@ Industries.prototype = {
     , buyBuilding: function(bName) {
         GameModel.buyBuilding(bName);
         this.updateBuildings(this.locationName);
-        this.playerGoldText.text = 'Thalers: ' + GameModel.getMoneyPool();
+        this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
     }
     
 };
