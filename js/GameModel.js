@@ -10,11 +10,9 @@
             this.day = 0;
             this.adventurerList = [];
             this.deadAdventurerList = [];
-            this.brokeAdventurerList = [];
             this.expPool = createExpPool(this.expData);
             this.shopPool = createShopPool(this.shopData);
             this.shopButtonPool = createButtonPool(this.shopButtonData);
-            this.lastIncome = 0;
             this.monsterPool = createMonsterPool(this.monsterData);
             this.moneyPool = new BigNumber(9999999999);
             //keep records for charts
@@ -27,7 +25,7 @@
             this.hpLossPercentage = 0.4; //adjustable - what percentage of damage monsters do in a fight
             //inn stats
             this.innLevel = 0;
-            this.maxAdventurers = 20; //adjustable at inn
+            this.maxAdventurers = 10; //adjustable at inn
             //temple stats
             this.templeLevel = 0;
             this.idleDayNumber = 1; //adjustable at temple
@@ -44,6 +42,7 @@
             this.innMaintainCost = 1;
             this.templeMaintainCost = 1;
             this.shopMaintainCost = 1;
+            this.upgradeTownMultiplier = 1.1;
             //resource buildings (merged)
             this.buildingMap = createBldgMap(this.bldgData);
             this.itemMap = createItemMap(this.itemData);
@@ -52,8 +51,19 @@
                 groupSeparator: ','
                 , groupSize: 3
             };
+            //graphic note - this shows how many days of data are shown in graphs
+            this.graphDays = 90;
             BigNumber.config({ FORMAT: format, DECIMAL_PLACES: 2 });
         }
+        GameModel.saveGame = function() {
+            //saving the below items captures the entire game state
+            console.log("saving");
+        }
+        GameModel.loadGame = function(jsonIn) {
+            //parse and set the saved variables
+            console.log("loading");
+        }
+        
         //below functions used to format numbers expected to get really large
         GameModel.getMoneyPool = function() {
             return this.formatBigNumToText(this.moneyPool);
@@ -93,37 +103,37 @@
                 
         GameModel.upgradeInn = function() {
             this.innLevel++;
-            this.innMaintainCost *= 1.25;
+            this.innMaintainCost *= this.upgradeTownMultiplier;
             this.maxAdventurers += 10;
         }
         GameModel.upgradeTemple = function() {
             this.templeLevel++;
-            this.templeMaintainCost *= 1.25;
+            this.templeMaintainCost *= this.upgradeTownMultiplier;
             this.idleDayNumber++;
         }
         GameModel.upgradeTavern = function() {
             this.tavernLevel++;
-            this.tavernMaintainCost *= 1.25;
+            this.tavernMaintainCost *= this.upgradeTownMultiplier;
             this.expGainRoll++;
         }
         GameModel.upgradeShop = function() {
             this.shopLevel++;
-            this.shopMaintainCost *= 1.25;
+            this.shopMaintainCost *= this.upgradeTownMultiplier;
             this.goldGainRoll++;
         }
         GameModel.upgradeSword = function() {
             this.swordLevel++;
-            this.swordMaintainCost *= 1.25;
+            this.swordMaintainCost *= this.upgradeTownMultiplier;
             this.hpLossRoll++;
         }
         GameModel.upgradeArmor = function() {
             this.armorLevel++;
-            this.armorMaintainCost *= 1.25;
-            this.hpLossPercentage *= 0.95;
+            this.armorMaintainCost *= this.upgradeTownMultiplier;
+            this.hpLossPercentage *= 0.975;
         }
         GameModel.getShopStat = function(varName) {
             //this is needed since one of the variables is a decimal
-            if (varName === 'hpLossPercentage' )
+            if (varName === 'hpLossPercentage')
                 return this[varName].toFixed(3);
             else
                 return this[varName];
@@ -141,25 +151,25 @@
         }
         //Price=BaseCost×Multiplier^(#Owned)
         GameModel.newAdventurerCost = function(numOfAdv) {
-            return Math.floor(50 * Math.pow(1.07, numOfAdv));
+            return Math.floor(50 + 50 * Math.pow(numOfAdv, 2));
         }
         GameModel.innCost = function() {
-            return Math.floor(1000 * Math.pow(1.27, this.innLevel));
+            return Math.floor(1000 * Math.pow(this.innLevel + 1, 1.75));
         }
         GameModel.templeCost = function() {
-            return Math.floor(2000 * Math.pow(1.37, this.templeLevel));
+            return Math.floor(2000 * Math.pow(this.templeLevel + 1, 3));
         }
         GameModel.tavernCost = function() {
-            return Math.floor(2000 * Math.pow(1.3, this.tavernLevel));
+            return Math.floor(2000 * Math.pow(this.tavernLevel + 1, 2));
         }
         GameModel.shopCost = function() {
-            return Math.floor(3000 * Math.pow(1.5, this.shopLevel));
+            return Math.floor(3000 * Math.pow(this.shopLevel + 1, 2));
         }
         GameModel.swordCost = function() {
-            return Math.floor(2500 * Math.pow(1.07, this.swordLevel));
+            return Math.floor(2500 * Math.pow(this.swordLevel + 1, 2.5));
         }
         GameModel.armorCost = function() {
-            return Math.floor(2500 * Math.pow(1.07, this.armorLevel));
+            return Math.floor(2500 * Math.pow(this.armorLevel + 1, 2.5));
         }
         
         GameModel.getStoreData = function(loc) {
@@ -189,57 +199,68 @@
         }
         GameModel.visitTown = function() {
             var len = this.adventurerList.length;
-            this.lastIncome = 0;
+            var adventurerIncome = 0;
             for (var i = len - 1; i > -1; i--) {
                 //pay for as much healing as possible                
-                this.lastIncome += this.adventurerList[i].heal();
+                adventurerIncome += this.adventurerList[i].heal();
+                //next visit the shop, tavern, and inn; adventurer pays percentage of their money depending on the shop levels; was thinking of penalizing them if they don't have enough money but that might unbalance the game
+                adventurerIncome += this.adventurerList[i].visitTownBuilding(this.shopLevel);
+                adventurerIncome += this.adventurerList[i].visitTownBuilding(this.tavernLevel);
+                adventurerIncome += this.adventurerList[i].visitTownBuilding(this.innLevel);
             }
-            this.moneyPool = this.moneyPool.plus(new BigNumber(this.lastIncome));
-            this.moneyPool = this.moneyPool.minus(new BigNumber(this.getMaintenanceCost()));
-            this.moneyPool = this.moneyPool.plus(new BigNumber(this.getResourceIncome(this.lastIncome)));
-            this.recordData();
+            this.dailyIncomeUpdate(adventurerIncome);
+        }
+        GameModel.dailyIncomeUpdate = function(advIn) {
+            var totalIncome = advIn;
+            totalIncome -= this.getMaintenanceCost();
+            if (totalIncome > 0)
+                totalIncome += Math.round(Math.pow(advIn, this.getResourceExponent()));
+            this.moneyPool = this.moneyPool.plus(new BigNumber(totalIncome));
+            this.recordData(totalIncome);
             this.day++;
         }
-        //below is for keeping track of some numbers for graphic purposes; currently limited to 100 days
-        GameModel.recordData = function() {
-            if (this.moneyRecord.length > 90)
+        //below is for keeping track of some numbers for graphic purposes; currently limited to 90 days; see main variables
+        GameModel.recordData = function(income) {
+            if (this.moneyRecord.length > this.graphDays)
                 this.moneyRecord.shift();
-            if (this.adventurerRecord.length > 90)
+            if (this.adventurerRecord.length > this.graphDays)
                 this.adventurerRecord.shift();
-            this.moneyRecord.push(this.lastIncome - this.getMaintenanceCost() + this.getResourceIncome());
+            this.moneyRecord.push(income);
             this.adventurerRecord.push(this.adventurerList.length);
         }
         GameModel.getMaintenanceCost = function() {
-            //when you level up town buildings, the maintenance cost is a slow-growing exponential function of the level; start level 1 costs nothing
-            return Math.round(this.swordMaintainCost > 1? this.swordMaintainCost: 0
-                + this.armorMaintainCost > 1? this.armorMaintainCost: 0 
-                + this.tavernMaintainCost > 1? this.tavernMaintainCost: 0 
-                + this.innMaintainCost > 1? this.innMaintainCost: 0
-                + this.templeMaintainCost > 1? this.templeMaintainCost: 0 
-                + this.shopMaintainCost > 1? this.shopMaintainCost: 0);
+            //when you level up town buildings, the maintenance cost is a slow-growing linear function; level 1 should cost nothing            
+            var cost = 0;
+            cost += this.swordMaintainCost > 1 ? this.swordMaintainCost : 0;
+            cost += this.armorMaintainCost > 1 ? this.armorMaintainCost : 0;
+            cost += this.tavernMaintainCost > 1 ? this.tavernMaintainCost : 0; 
+            cost += this.innMaintainCost > 1 ? this.innMaintainCost : 0;
+            cost += this.templeMaintainCost > 1 ? this.templeMaintainCost : 0; 
+            cost += this.shopMaintainCost > 1 ? this.shopMaintainCost : 0;
+            return Math.round(cost);
         }
-        GameModel.getResourceIncome = function(income) {
-            //when you buy resource buildings, they provide a slow-growing exponential increase
-            //of your base income; this exponential growth is larger than that of maintenance to keep idle game moving, as well as reflecting limited number of available resource buildings
-            var buildingE;
+        GameModel.getResourceExponent= function() {
+            //when you buy resource buildings, they provide an exponential increase
+            //of your base income; since maintenance growth in linear, this will more than cancel it out
+            var baseExponent = 1;
+            //each building adds (.01 * building level) to the exponent, for a max of 1.3
+            for (var [key, value] of this.buildingMap)
+                if (value.purchased)
+                    baseExponent += value.level * .01;
             
-            
-            //also, ultimate items have a multiplier effect on income
-            
-            return 3;
+            return baseExponent;
         }
         //below are reporting methods
         GameModel.getOverview = function() {
             var maintainance = this.getMaintenanceCost();
             var strBuild = "Active Adventurers: " + this.adventurerList.length + "\n";
             strBuild += "Level 1-10: " + this.adventurerList.filter(function(a) { return a.level <= 10; }).length + "\t\t\t";
-            strBuild += "/   Level 11-20: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 20; }).length + "\n";
-            strBuild += "Level 21-30: " + this.adventurerList.filter(function(a) { return a.level > 20 && a.level <= 30; }).length + "\t\t\t";
-            strBuild += "/   Level 31-50: " + this.adventurerList.filter(function(a) { return a.level > 30 && a.level <= 50; }).length + "\n";
-            strBuild += "Level 50+: " + this.adventurerList.filter(function(a) { return a.level > 50; }).length + "\t\t\t";
+            strBuild += "/   Level 11-20: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 20; }).length + "\t\t\t";
+            strBuild += "/   Level 21-30: " + this.adventurerList.filter(function(a) { return a.level > 20 && a.level <= 30; }).length + "\n";
+            strBuild += "Level 31-50: " + this.adventurerList.filter(function(a) { return a.level > 30 && a.level <= 50; }).length + "\t\t\t";
+            strBuild += "/   Level 50+: " + this.adventurerList.filter(function(a) { return a.level > 50; }).length + "\t\t\t";
             strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
-            //strBuild += "Bankrupt adventurers: " + this.brokeAdventurerList.length + "\n";
-            strBuild += "Day: " + this.day + "\t\t\tDaily Maintenance: " + this.getMaintenanceCost() +  "\n";
+            strBuild += "Day: " + this.day + "  /   Daily Maintenance: " + GameModel.formatNumToText(maintainance) +  "\n";
             strBuild += "Current Gold: " + this.moneyPool.toFormat() + "\n\n";
             return strBuild;
         }
@@ -332,7 +353,7 @@
         Adventurer.prototype = Object.create(Being.prototype);
         Adventurer.prototype.constructor = Adventurer;
         Adventurer.prototype.lootMonster = function(deadMonsterLevel, extraExpRoll, extraGoldRoll) {
-            var goldDrop = 2 * Math.round(Math.pow(deadMonsterLevel, 1.5));
+            var goldDrop = 10 * Math.round(Math.pow(deadMonsterLevel, 2));
             var extraGold = dieRoll(extraGoldRoll);
             this.gold += goldDrop + extraGold;
             this.totalGoldEarned += goldDrop + extraGold;
@@ -365,7 +386,12 @@
             
             return healCost;
         }
-         
+        Adventurer.prototype.visitTownBuilding = function(level) {
+            var goldSpent = Math.round(this.gold * (level / 200));
+            this.gold -= goldSpent;
+            return goldSpent;
+        }
+        
         function dieRoll(size) {
             return Math.floor(Math.random() * size) + 1;
         }
@@ -449,6 +475,7 @@
             }
             return purchasedBuildings;
         }
+        
         GameModel.buyBuilding = function(name) {
             this.moneyPool = this.moneyPool.minus(new BigNumber(this.buildingMap.get(name).cost));
             this.buildingMap.get(name).purchased = true;

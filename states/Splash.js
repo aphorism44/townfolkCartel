@@ -9,17 +9,20 @@ Splash.prototype = {
             
             game.load.script('WebFont', 'vendor/webfontloader.js');
             game.load.script('mainmenu','states/MainMenu.js');
-            game.load.script('gameover','states/GameOver.js');
             game.load.script('credits', 'states/Credits.js');
             game.load.script('options', 'states/Options.js');
-
             game.load.script('game', 'states/Game.js');
             game.load.script('townshop', 'states/TownShop.js');
             game.load.script('statistics', 'states/Statistics.js');
             game.load.script('instructions', 'states/Instructions.js');
             game.load.script('resourcemap', 'states/ResourceMap.js');
+            game.load.script('ultimateitems', 'states/UltimateItems.js');
             game.load.script('achievements', 'states/Achievements.js');
+            game.load.script('helpscreen', 'states/HelpScreen.js');
             game.load.script('industries', 'states/Industries.js');
+            game.load.script('cutscreen', 'states/CutScreen.js');
+            game.load.script('gameoverlose', 'states/GameOverLose.js');
+            game.load.script('gameoverwin', 'states/GameOverWin.js');
             game.load.script('gameModel',  'js/GameModel.js');
             
             //my first Phaser.io plugin/API
@@ -181,10 +184,14 @@ Splash.prototype = {
         game.state.add("Instructions", Instructions);
         game.state.add("ResourceMap", ResourceMap);
         game.state.add("Industries", Industries);
+        game.state.add("UltimateItems", UltimateItems);
         game.state.add("Achievements", Achievements);
-        game.state.add("GameOver", GameOver);
+        game.state.add("HelpScreen", HelpScreen);
         game.state.add("Credits", Credits);
         game.state.add("Options", Options);
+        game.state.add("CutScreen", CutScreen);
+        game.state.add("GameOverLose", GameOverLose);
+        game.state.add("GameOverWin", GameOverWin);
     }
 
     , addGameMusic: function () {

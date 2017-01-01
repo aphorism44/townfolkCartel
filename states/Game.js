@@ -34,7 +34,7 @@ Game.prototype = {
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(25, 275, 'Daily Costs: ' + GameModel.formatNumToText(GameModel.getMaintenanceCost()), {
+        this.maintCostText = this.add.text(25, 225, 'Daily Costs: ' + GameModel.formatNumToText(GameModel.getMaintenanceCost()), {
             font: '24px Arial Black',
             fill: '#fff',
             strokeThickness: 4
@@ -80,12 +80,15 @@ Game.prototype = {
             , { name: "Item Shop", color: "Blue", nav: "TownShop", shop: "itemshop" }
             , { name: "Statistics", color: "Red", nav: "Statistics" }
             , { name: "Buy Resources", color: "Green", nav: "ResourceMap" }
-            , { name: "Achievements", color: "Yellow", nav: "Achievements" }
+            , { name: "Ultimate Items", color: "Yellow", nav: "UltimateItems" }
+            , { name: "Achievements", color: "LtBlue", nav: "Achievements" }
+            , { name: "Help!", color: "Orange", nav: "HelpScreen" }
+            
         ];
         
         navButtonsData.forEach(function(buttonData, index) {
             var x = 25 + 250 * (index % 2);
-            var y = 325 + 50 * Math.floor(index / 2);
+            var y = 275 + 50 * Math.floor(index / 2);
             var buttonImage = 'button' + buttonData.color;
             buttonImage.height = 48;
             button = this.game.add.button(x, y, buttonImage);
@@ -97,6 +100,18 @@ Game.prototype = {
             });
         });
         
+        var saveButton = this.add.button(535, 325, 'buttonBlack');
+        saveButton.text = saveButton.addChild(this.game.add.text(100, 25, "Save", {font: '18px TheMinion', fill: 'White'}));
+        saveButton.onInputDown.add(function() {
+            GameModel.saveGame();
+        });
+        var quitButton = this.add.button(535, 425, 'buttonPink');
+        quitButton.text = quitButton.addChild(this.game.add.text(100, 25, "Quit", {font: '18px TheMinion', fill: 'Black'}));
+        quitButton.onInputDown.add(function() {
+            game.state.start("MainMenu");
+        });
+        
+        
     }
     
     , timerTrigger: function() {
@@ -104,6 +119,7 @@ Game.prototype = {
         GameModel.visitTown();        
         this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
         this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
+        this.maintCostText.text = 'Daily Costs: ' + GameModel.formatNumToText(GameModel.getMaintenanceCost());
         this.updateButtons();
     }
     

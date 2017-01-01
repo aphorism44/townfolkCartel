@@ -1,6 +1,6 @@
-var GameOver = function(game) {};
+var GameOverLose = function(game) {};
 
-GameOver.prototype = {
+GameOverLose.prototype = {
 
     preload: function () {
         this.optionCount = 1;

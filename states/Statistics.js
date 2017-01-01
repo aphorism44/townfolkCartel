@@ -15,17 +15,14 @@ Statistics.prototype = {
             fill: '#000000',
             strokeThickness: 0
         });
-        this.game.plugin.createChart(GameModel.moneyRecord, 100, 300, 400, 200, "Daily Net Income");
-        
-        
-        
+        this.game.plugin.createChart(GameModel.moneyRecord, 200, 300, 400, 200, "Daily Net Income");
         
         //timer
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         
         this.addMenuOption('Return', function () {
             game.state.start("Game")
-        }, 400, 500);
+        }, 500, 500);
         
     }
     

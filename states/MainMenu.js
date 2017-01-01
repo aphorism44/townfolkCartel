@@ -29,13 +29,19 @@ MainMenu.prototype = {
             game.state.start("Game");
         }, 200, 260);
         
+        
+        this.addMenuOption('Load Game', function () {
+            GameModel.loadGame();
+            game.state.start("Game");
+        }, 200, 320);
+        
         this.addMenuOption('Options', function () {
             game.state.start("Options");
-        }, 200, 320);
+        }, 200, 380);
         
         this.addMenuOption('Credits', function () {
             game.state.start("Credits");
-        }, 200, 380);
+        }, 200, 440);
         
         game.add.sprite(525, 125, 'mizakDeform');
     }
