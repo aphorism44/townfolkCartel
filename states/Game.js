@@ -99,12 +99,13 @@ Game.prototype = {
                 game.state.start(buttonData.nav);
             });
         });
-        
-        var saveButton = this.add.button(535, 325, 'buttonBlack');
-        saveButton.text = saveButton.addChild(this.game.add.text(100, 25, "Save", {font: '18px TheMinion', fill: 'White'}));
-        saveButton.onInputDown.add(function() {
-            GameModel.saveGame();
-        });
+        if (GameModel.supportsLocalStorage()) {
+            var saveButton = this.add.button(535, 325, 'buttonBlack');
+            saveButton.text = saveButton.addChild(this.game.add.text(100, 25, "Save", {font: '18px TheMinion', fill: 'White'}));
+            saveButton.onInputDown.add(function() {
+                GameModel.saveGame();
+            });
+        }
         var quitButton = this.add.button(535, 425, 'buttonPink');
         quitButton.text = quitButton.addChild(this.game.add.text(100, 25, "Quit", {font: '18px TheMinion', fill: 'Black'}));
         quitButton.onInputDown.add(function() {

@@ -24,27 +24,33 @@ MainMenu.prototype = {
         game.stage.disableVisibilityChange = true;
         game.add.sprite(0, 0, 'mainmenu-bg');
         game.add.existing(this.titleText);
-
+        
         this.addMenuOption('Start', function () {
+            GameModel.init();
             game.state.start("Game");
         }, 200, 260);
         
-        
-        this.addMenuOption('Load Game', function () {
-            GameModel.loadGame();
-            game.state.start("Game");
-        }, 200, 320);
-        
         this.addMenuOption('Options', function () {
             game.state.start("Options");
-        }, 200, 380);
+        }, 200, 320);
         
         this.addMenuOption('Credits', function () {
             game.state.start("Credits");
-        }, 200, 440);
+        }, 200, 380);
+        
+        
+        if (GameModel.supportsLocalStorage() && GameModel.hasGameData()) {
+            this.addMenuOption('Load Game', function () {
+                if (GameModel.loadGame())
+                    game.state.start("Game");
+                else
+                    console.log("No game data!");
+            }, 200, 440);
+        }
         
         game.add.sprite(525, 125, 'mizakDeform');
     }
+    
 };
 
 Phaser.Utils.mixinPrototype(MainMenu.prototype, mixins);

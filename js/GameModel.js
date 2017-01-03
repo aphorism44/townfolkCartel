@@ -2,7 +2,7 @@
 (function(window){
     'use strict';
     
-    function define_town_model() {
+    function define_game_model() {
         
         var GameModel = {};
         
@@ -13,7 +13,6 @@
             this.expPool = createExpPool(this.expData);
             this.shopPool = createShopPool(this.shopData);
             this.shopButtonPool = createButtonPool(this.shopButtonData);
-            this.monsterPool = createMonsterPool(this.monsterData);
             this.moneyPool = new BigNumber(9999999999);
             //keep records for charts
             this.moneyRecord = [];
@@ -55,15 +54,105 @@
             this.graphDays = 90;
             BigNumber.config({ FORMAT: format, DECIMAL_PLACES: 2 });
         }
+        GameModel.supportsLocalStorage = function() {
+            var test = 'localStorageTester';
+            try {
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch(e) {
+                return false;
+            } 
+        }
+        GameModel.hasGameData = function() {
+            if (localStorage.getItem("townfolkCartelSaveData") === null) 
+                return false;
+            else
+                return true;
+        }
         GameModel.saveGame = function() {
-            //saving the below items captures the entire game state
-            console.log("saving");
+            //running init and then restoring the below items captures the entire game state
+            localStorage.removeItem("townfolkCartelSaveData");
+            var saveObject = {
+                 day : this.day
+                , adventurerList : this.adventurerList
+                , deadAdventurerList : this.deadAdventurerList
+                , moneyPool : this.moneyPool
+                , moneyRecord : this.moneyRecord
+                , adventurerRecord : this.adventurerRecord
+                , swordLevel : this.swordLevel
+                , hpLossRoll : this.hpLossRoll
+                , armorLevel : this.armorLevel
+                , hpLossPercentage : this.hpLossPercentage
+                , innLevel : this.innLevel
+                , maxAdventurers : this.maxAdventurers
+                , templeLevel : this.templeLevel
+                , idleDayNumber : this.idleDayNumber
+                , tavernLevel : this.tavernLevel
+                , expGainRoll : this.expGainRoll
+                , shopLevel : this.shopLevel
+                , goldGainRoll : this.goldGainRoll
+                , swordMaintainCost : this.swordMaintainCost
+                , armorMaintainCost : this.armorMaintainCost
+                , tavernMaintainCost : this.tavernMaintainCost
+                , innMaintainCost : this.innMaintainCost
+                , templeMaintainCost : this.templeMaintainCost
+                , shopMaintainCost : this.shopMaintainCost
+                , purchasedBuildingArray : this.getPurchasedBuildings()
+            };
+            saveObject.dateSaved = new Date();
+            localStorage.setItem("townfolkCartelSaveData", JSON.stringify(saveObject));
         }
-        GameModel.loadGame = function(jsonIn) {
+        GameModel.loadGame = function() {
             //parse and set the saved variables
-            console.log("loading");
+            this.init();
+            var loadObject = JSON.parse(localStorage.getItem("townfolkCartelSaveData"));
+            //set the simple objects
+            if (loadObject) {
+                this.day = loadObject.day;
+                this.moneyPool = new BigNumber(loadObject.moneyPool); //needs to be transformed
+                this.moneyRecord = loadObject.moneyRecord;
+                this.adventurerRecord = loadObject.adventurerRecord;
+                this.swordLevel = loadObject.swordLevel;
+                this.hpLossRoll = loadObject.hpLossRoll;
+                this.armorLevel = loadObject.armorLevel;
+                this.hpLossPercentage = loadObject.hpLossPercentage;
+                this.innLevel = loadObject.innLevel;
+                this.maxAdventurers = loadObject.maxAdventurers;
+                this.templeLevel = loadObject.templeLevel;
+                this.idleDayNumber = loadObject.idleDayNumber;
+                this.tavernLevel = loadObject.tavernLevel;
+                this.expGainRoll = loadObject.expGainRoll;
+                this.shopLevel = loadObject.shopLevel;
+                this.goldGainRoll = loadObject.goldGainRoll;
+                this.swordMaintainCost = loadObject.swordMaintainCost;
+                this.armorMaintainCost = loadObject.armorMaintainCost;
+                this.tavernMaintainCost = loadObject.tavernMaintainCost;
+                this.innMaintainCost = loadObject.innMaintainCost;
+                this.templeMaintainCost = loadObject.templeMaintainCost;
+                this.shopMaintainCost = loadObject.shopMaintainCost;
+                
+                //the json strings of adventurer objects need to be recreated as objects
+                this.addLoadedAdventurers(loadObject.adventurerList, this.adventurerList);
+                this.addLoadedAdventurers(loadObject.deadAdventurerList, this.deadAdventurerList);
+                //buildings just need to be marked as purchased
+                loadObject.purchasedBuildingArray.forEach(function(bData) {
+                    GameModel.buildingMap.get(bData).purchased = true;
+                });
+                return true;
+            } else {
+                console.log("no saved game!");
+                return false;
+            }
+            
         }
-        
+        GameModel.addLoadedAdventurers = function(advArray, targetArray) {
+            advArray.forEach(function(adv) {
+                var advObject = new Adventurer(1, [1,1,1]);
+                advObject.loadAdventurerData(adv.level, adv.hp, adv.fightStat, adv.hpMax, adv.gold, adv.totalGoldEarned, adv.totalGoldSpent, adv.exp, adv.expToNext);
+                targetArray.push(advObject);
+            });
+        }
         //below functions used to format numbers expected to get really large
         GameModel.getMoneyPool = function() {
             return this.formatBigNumToText(this.moneyPool);
@@ -291,13 +380,6 @@
             return strBuild;
         }
         
-        function createMonsterPool(monsterData) {
-            var pool = new Map();
-            monsterData.forEach(function(m) {
-                pool.set(m.level, m.name);
-            });
-            return pool;
-        }
          function createExpPool(expData) {
             var pool = new Map();
             expData.forEach(function(e) {
@@ -335,7 +417,6 @@
                 } 
              }
          }
-         
          var Adventurer = function(level, levelStats) {
              Being.call(this, level, levelStats);
              this.hpMax = levelStats[1];
@@ -344,14 +425,23 @@
              this.totalGoldSpent = 0;
              this.exp = 0;
              this.expToNext = levelStats[0];
-             this.broke = false;
-             this.weapon = null;
-             this.armor = null;
-             this.weaponModifier = 0;
-             this.armorModifier = 0;
+             this.weaponModifier = 0; //currently unused
+             this.armorModifier = 0; //currently unused
          }
         Adventurer.prototype = Object.create(Being.prototype);
         Adventurer.prototype.constructor = Adventurer;
+        //the below is needed when you load a game
+        Adventurer.prototype.loadAdventurerData = function(level, hp, fightStat, hpMax, gold, totalGoldEarned, totalGoldSpent, exp, expToNext) {
+            this.level = level;
+            this.hp = hp;
+            this.fightStat = fightStat;
+            this.hpMax = hpMax;
+            this.gold = gold;
+            this.totalGoldEarned = totalGoldEarned;
+            this.totalGoldSpent = totalGoldSpent;
+            this.exp = exp;
+            this.expToNext = expToNext;
+        }
         Adventurer.prototype.lootMonster = function(deadMonsterLevel, extraExpRoll, extraGoldRoll) {
             var goldDrop = 10 * Math.round(Math.pow(deadMonsterLevel, 2));
             var extraGold = dieRoll(extraGoldRoll);
@@ -395,30 +485,6 @@
         function dieRoll(size) {
             return Math.floor(Math.random() * size) + 1;
         }
-        
-        //level 21+ = "Boss Level " + level - 20
-        GameModel.monsterData = [
-            { 'level': 1 , 'name':  'Wolf' }
-            , { 'level': 2 , 'name':  'Boar' }
-            , { 'level': 3 , 'name':  'Eagle' }
-            , { 'level': 4 , 'name':  'Lion' }
-            , { 'level': 5 , 'name':  'Bear' }
-            , { 'level': 6 , 'name':  'Direwolf' }
-            , { 'level': 7 , 'name':  'Deathwolf' }
-            , { 'level': 8 , 'name':  'Werewolf' }
-            , { 'level': 9 , 'name':  'Hippopatamus' }
-            , { 'level': 10 , 'name':  'Dragon' }
-            , { 'level': 11 , 'name':  'Ghost' }
-            , { 'level': 12 , 'name':  'Ghoul' }
-            , { 'level': 13 , 'name':  'Doppleganger' }
-            , { 'level': 14 , 'name':  'Fire Fairy' }
-            , { 'level': 15 , 'name':  'Rogue Thief' }
-            , { 'level': 16 , 'name':  'Rogue Knight' }
-            , { 'level': 17 , 'name':  'Rogue Wizard' }
-            , { 'level': 18 , 'name':  'Archer Prince' }
-            , { 'level': 19 , 'name':  'Woodland Queen' }
-            , { 'level': 20 , 'name':  'Forest King' }
-        ];
         
         //[expNeeded, hpMax, fightStat]
         //follow this pattern after Level 5:
@@ -475,7 +541,6 @@
             }
             return purchasedBuildings;
         }
-        
         GameModel.buyBuilding = function(name) {
             this.moneyPool = this.moneyPool.minus(new BigNumber(this.buildingMap.get(name).cost));
             this.buildingMap.get(name).purchased = true;
@@ -538,7 +603,7 @@
         function createUltimaMap(ultimateItemData) {
             var pool = new Map();
             ultimateItemData.forEach(function(u) {
-                pool.set(u.location,  {'name': u.name, 'needArray': u.needList.split(",").map(function(e) { return e.trim(); }), 'location': u.location, 'needText': u.needtext, 'desc': u.desc, 'tab': u.tab, 'purchased': false });
+                pool.set(u.location,  {'name': u.name, 'needArray': u.needList.split(",").map(function(e) { return e.trim(); }), 'location': u.location, 'needText': u.needtext, 'desc': u.desc, 'tab': u.tab });
             });
             return pool;
         }
@@ -549,7 +614,7 @@
             , { 'name' : 'Pemmican', 'location': 'shop', 'needtext' : 'Smokehouse (jerky)\nWinepress (leftover fruit)\nSawmill (firewood)', 'desc' : 'Mizak\'s Notes:   The ultimate in adventuring rations! A mixture of ground jerky, dried fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Winepress, Sawmill', 'tab': 'Ultimate Item' }
             , { 'name' : 'Poultice', 'location': 'temple', 'needtext' : 'Hops Farm (herbs)\nLoom (cloth bangages)\nSaltern (sea minerals)', 'desc' : 'Mizak\'s Notes:   Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Hops Farm, Loom, Saltern', 'tab': 'Ultimate Medicine' }
             , { 'name' : 'Black Velvet', 'location': 'tavern', 'needtext' : 'Beer Brewery (stout)\nWinery (champagne)\nBakery (pretzels)', 'desc' : 'Mizak\'s Notes:   Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Beer Brewery, Winery, Bakery', 'tab': 'Ultimate Drink' }
-            , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees)', 'desc' : 'Mizak\'s Notes:   You can\t have a decent inn without a whorehouse! It\’s the world’s oldest profession, and we need to accommodate our brave adventurers! Well-stocked with beautiful girls and pretty boys, we offer companionship for a reasonable fee.', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
+            , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees)', 'desc' : 'Mizak\'s Notes:   You can\'t have a decent inn without a whorehouse! It\’s the world’s oldest profession, and we need to accommodate our brave adventurers! Well-stocked with beautiful girls and pretty boys, we offer companionship for a reasonable fee.', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
         ];
 
         GameModel.itemData = [
@@ -598,13 +663,12 @@
             , { 'level' : 3, 'name': 'Saltern', 'needs': 'Saltpans, Sawmill', 'cost': 10000000, 'graphic' : 'bldgIodiner' , 'location': 'sea', 'industry': 'salt', 'desc': 'Refines salt from seawater residue.' }
         ];
         
-        GameModel.init();
         return GameModel;
     }
     
     //define globally if it doesn't already exist
     if(typeof(GameModel) === 'undefined'){
-        window.GameModel = define_town_model();
+        window.GameModel = define_game_model();
     }
     else{
         console.log("GameModel already defined.");
