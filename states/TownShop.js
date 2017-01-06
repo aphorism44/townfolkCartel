@@ -63,8 +63,8 @@ TownShop.prototype = {
     , addHeaderTags: function(buttonMap) {
         var i = 0;
         for (var [key, value] of buttonMap) {
-            var tag = this.add.text(300 + (200 * i), 50, value.labelText + ": " + GameModel.getShopStat(value.variable) , {
-                font: '24px Arial Black',
+            var tag = this.add.text(400 + (200 * i), 50, value.labelText + ": " + GameModel.getShopStat(value.variable) , {
+                font: '20px Arial Black',
                 fill: '#fff',
                 strokeThickness: 4
             });
@@ -89,6 +89,10 @@ TownShop.prototype = {
             if (!GameModel.hasAmount(button.cost)) {
                 button.inputEnabled = false;
                 button.alpha = 0.1;
+            } else if (button.level >= GameModel.maxTownLevel) {
+                button.inputEnabled = false;
+                button.text.text = 'MAXED';
+                button.costText.text = 'OUT';
             } else {
                 button.inputEnabled = true;
                 button.alpha = 1;

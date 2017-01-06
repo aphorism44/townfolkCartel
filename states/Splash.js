@@ -51,11 +51,16 @@ Splash.prototype = {
         game.load.image('pasture-bg', 'assets/images/pastureBg.jpg');
         
         //character images (200x200)
-        game.load.image('mizak', 'assets/images/mizak.png');
-        game.load.image('lemel', 'assets/images/lemel.png');
-        game.load.image('lissette', 'assets/images/lissette.png');
+        game.load.image('mizakNormal', 'assets/images/mizakNormal.png');
+        game.load.image('mizakLaugh', 'assets/images/mizakLaugh.png');
+        game.load.image('lemelFrown', 'assets/images/lemelFrown.png');
+        game.load.image('lemelOut', 'assets/images/lemelOut.png');
+        game.load.image('lissetteAngry', 'assets/images/lissetteAngry.png');
+        game.load.image('lissetteFrown', 'assets/images/lissetteFrown.png');
+        game.load.image('clavoTalk', 'assets/images/clavoTalk.png');
+        game.load.image('clavoFrown', 'assets/images/clavoFrown.png');
+        
         game.load.image('jera', 'assets/images/jera.png');
-        game.load.image('widow', 'assets/images/widow.png');
         
         game.load.image('mizakFull', 'assets/images/mizakFull.png');
         game.load.image('lemelFull', 'assets/images/lemelFull.png');
@@ -136,6 +141,9 @@ Splash.prototype = {
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600
         game.load.image('checkmark', 'assets/images/checkmark.png'); //200x600
+        game.load.image('help1', 'assets/images/help1.png');
+        game.load.image('help2', 'assets/images/help2.png');
+        game.load.image('help3', 'assets/images/help3.png');
     }
 
     , loadFonts: function () {
