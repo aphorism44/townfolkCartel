@@ -3,7 +3,6 @@ var ResourceMap = function(game) {};
 ResourceMap.prototype = {
     preload: function() {
         this.info = GameModel.getOverview();
-        this.healthInfo = GameModel.getHealth();
         }
     
     , create: function() {

@@ -65,6 +65,7 @@ Credits.prototype = {
         this.addCredit('Miscellaneous Backgrounds', 'Alex Alten\nAction RPG Pack ');
         this.addCredit('Developer', 'Dominic Jesse/Aphorism44');
         this.addCredit('Phaser.io', 'Powered By');
+        this.addCredit('Phaser Boilerplaye', 'Matt McFarland');
         this.addCredit('for playing', 'Thank you');
         this.addMenuOption('<- Back', function (e) {
             game.state.start("MainMenu");

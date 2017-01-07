@@ -3,7 +3,6 @@ var Statistics = function(game) {};
 Statistics.prototype = {
     preload: function() {
         this.info = GameModel.getOverview();
-        this.healthInfo = GameModel.getHealth();
     }
     
     , create: function() {

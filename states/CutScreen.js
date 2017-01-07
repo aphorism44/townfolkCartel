@@ -11,40 +11,67 @@ CutScreen.prototype = {
             musicPlayer.stop();
         }
         
-        //textbox and graphic for dialogue
+        //textboxes and graphics for dialogue
         this.textBox = game.add.image(5, 50, 'textBox');
+        this.interestBox = game.add.text(100, 200, '', {
+            font: '24px The Minion',
+            fill: '#000000'
+        });
         
         this.dialogueArray = GameModel[game.cutscene + 'Dialogue'];
         this.dialogueLength = this.dialogueArray.length;
         this.index = 0;
         this.updateTextbox();
         
-        //only show interest during load
+        //only show interest during load; need to account for number crunching time
+         
         if (game.cutscene == 'load') {
-             this.textBox.addChild(this.game.add.text(50, 200, GameModel.formatBigNumToText(GameModel.idleMoneyMade), {
-            font: '24px The Minion',
-            fill: '#000000'
-            }));
+            this.interestBox.text = "Calculating..."
+            if (GameModel.loadGame()) {
+                this.automateLoadInfo();
+            } else {
+                 this.interestBox.text = "Nothing!"
+            }
         }
         //final graphic; alpha only changes if you win
         this.winGraphic = game.add.image(10, 75, 'mizakRun');
         this.winGraphic.alpha = 0.0;
         
         //unless automated, add buttons backwards and forwards
-        if (game.cutscene != 'win') {
+        if (game.cutscene == 'win') {
+            this.runAutomatedScene();
+        } else {
             this.previousButton = this.add.button(100, 500, 'buttonBlack', this.previousText, this);
             this.previousButton.text = this.previousButton.addChild(this.game.add.text(75, 25, "Previous", {font:    '18px TheMinion', fill: 'White'}));
 
             this.nextButton = this.add.button(450, 500, 'buttonBlack', this.nextText, this);
             this.nextButton.text = this.nextButton.addChild(this.game.add.text(100, 25, "Next", {font: '18px TheMinion', fill: 'White'}));
+            
+            if (game.cutscene == 'load') {
+                this.previousButton.inputEnabled = false;
+                this.nextButton.inputEnabled = false;
+                this.previousButton.alpha = 0;
+                this.nextButton.alpha = 0;
+            } else {
+                this.checkButtons();
+            }
+        }
+    }
+    
+    , checkButtons: function() {
+        if (this.index == 0) {
+            this.previousButton.inputEnabled = false;
+            this.previousButton.alpha = 0.1;
         } else {
-            this.runAutomatedScene();
+            this.previousButton.inputEnabled = true;
+            this.previousButton.alpha = 1;
         }
     }
     
     , previousText: function() {
         this.index == 0? 0: this.index--;
         this.updateTextbox();
+        this.checkButtons();
     }
     
     , nextText: function() {
@@ -58,6 +85,7 @@ CutScreen.prototype = {
         } else {
             this.updateTextbox();
         }
+        this.checkButtons();
     }
     
     , runAutomatedScene: function() {
@@ -91,6 +119,23 @@ CutScreen.prototype = {
         if (this.index < this.dialogueLength - 1) {
             this.index++;
             this.updateTextbox();
+        }
+    }
+    
+     , automateLoadInfo: function() {
+        game.time.events.add(250, this.startLoadLoop, this);
+    }
+    
+    , startLoadLoop: function() {
+        GameModel.simulateIdleTime();
+        game.time.events.loop(100, this.updateLoadText, this);
+    }
+    
+    , updateLoadText: function() {
+        if (GameModel.isIdleCalculated()) {
+            this.interestBox.text = GameModel.formatBigNumToText(GameModel.idleMoneyMade);
+            this.nextButton.inputEnabled = true;
+            this.nextButton.alpha = 1;
         }
     }
     

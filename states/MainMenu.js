@@ -42,12 +42,8 @@ MainMenu.prototype = {
         
         if (GameModel.supportsLocalStorage() && GameModel.hasGameData()) {
             this.addMenuOption('Load Game', function () {
-                if (GameModel.loadGame()) {
-                    game.cutscene = 'load';
-                    game.state.start("CutScreen");
-                } else {
-                    console.log("No game data!");
-                }
+                game.cutscene = 'load';
+                game.state.start("CutScreen");
             }, 200, 440);
         }
         

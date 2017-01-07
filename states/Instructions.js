@@ -3,7 +3,6 @@ var Instructions = function(game) {};
 Instructions.prototype = {
     preload: function() {
         this.info = GameModel.getOverview();
-        this.healthInfo = GameModel.getHealth();
     }
     
     , create: function() {
@@ -34,7 +33,6 @@ Instructions.prototype = {
         GameModel.goAdventuring();
         GameModel.visitTown();        
         this.infoText.text = GameModel.getOverview();
-        this.healthText.text = GameModel.getHealth();
     }
 };
 

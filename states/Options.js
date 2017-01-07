@@ -10,7 +10,7 @@ Options.prototype = {
 
 
     , init: function () {
-        this.titleText = game.make.text(game.world.centerX, 100, "The Townsfolk\nCartel", {
+        this.titleText = game.make.text(game.world.centerX, 150, "The Townsfolk\nCartel", {
             font: 'bold 60pt TheMinion',
             fill: '#fc962f',
             align: 'center'
@@ -32,10 +32,10 @@ Options.prototype = {
             musicPlayer.volume = gameOptions.playMusic ? 1 : 0;
         }, 200, 260);
         
-        this.addMenuOption(gameOptions.playSound ? 'Mute Sound' : 'Play Sound', function (target) {
+        /*this.addMenuOption(gameOptions.playSound ? 'Mute Sound' : 'Play Sound', function (target) {
             gameOptions.playSound = !gameOptions.playSound;
             target.text = gameOptions.playSound ? 'Mute Sound' : 'Play Sound';
-        }, 200, 320);
+        }, 200, 320);*/
         
         this.addMenuOption('<- Back', function () {
             game.state.start("MainMenu");

@@ -3,7 +3,6 @@ var Industries = function(game) {};
 Industries.prototype = {
     preload: function() {
         this.info = GameModel.getOverview();
-        this.healthInfo = GameModel.getHealth();
         this.locationName = game.currentIndustry;
         }
     

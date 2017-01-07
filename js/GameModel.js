@@ -13,13 +13,16 @@
             this.expPool = createExpPool(this.expData);
             this.shopPool = createShopPool(this.shopData);
             this.shopButtonPool = createButtonPool(this.shopButtonData);
-            this.moneyPool = new BigNumber(1000000000000);
+            this.moneyPool = new BigNumber(50);
             this.maxTownLevel = 70;
             this.itemsPerStore = 12;
-            //keep records for charts
+            //keep records for charts and update display
             this.moneyRecord = [];
             this.adventurerRecord = [];
             this.idleMoneyMade = new BigNumber(0);
+            this.gameDaysPassed = 0;
+            this.originalFunds = new BigNumber(0);
+            this.counter = 0;
             //blacksmith stats
             this.swordLevel = 0;
             this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
@@ -30,7 +33,7 @@
             this.maxAdventurers = 10; //adjustable at inn
             //temple stats
             this.templeLevel = 0;
-            this.idleHourInterest = 0.000; //adjustable at temple
+            this.idleHourDays = 1; //adjustable at temple
             //tavern stats
             this.tavernLevel = 0;
             this.expGainRoll = 4; //adjustable - die roll to add extra experience when an adventurer kills a monster
@@ -101,7 +104,7 @@
                 , innLevel : this.innLevel
                 , maxAdventurers : this.maxAdventurers
                 , templeLevel : this.templeLevel
-                , idleHourInterest : this.idleHourInterest
+                , idleHourDays : this.idleHourDays
                 , tavernLevel : this.tavernLevel
                 , expGainRoll : this.expGainRoll
                 , shopLevel : this.shopLevel
@@ -134,7 +137,7 @@
                 this.innLevel = loadObject.innLevel;
                 this.maxAdventurers = loadObject.maxAdventurers;
                 this.templeLevel = loadObject.templeLevel;
-                this.idleHourInterest = loadObject.idleHourInterest;
+                this.idleHourDays = loadObject.idleHourDays;
                 this.tavernLevel = loadObject.tavernLevel;
                 this.expGainRoll = loadObject.expGainRoll;
                 this.shopLevel = loadObject.shopLevel;
@@ -154,7 +157,7 @@
                     GameModel.buildingMap.get(bData).purchased = true;
                 });
                 //finally get the saved date and add that extra money
-                this.addIdleMoney(loadObject.dateSaved);
+                this.prepareIdleStats(loadObject.dateSaved);
                 return true;
             } else {
                 //if this runs there's a bug
@@ -163,23 +166,30 @@
             }
             
         }
-        GameModel.addIdleMoney = function(saveDate) {
-            //not working...
+        GameModel.prepareIdleStats = function(saveDate) {
+            this.counter = 0;
+            this.gameDaysPassed = 0;
+            this.originalFunds = new BigNumber(0);
+            this.idleMoneyMade = new BigNumber(0);
             var saveDate = new Date(saveDate);
             var today = new Date();
+            //limit hoursPassed to 7 days
             var hoursPassed = Math.floor(Math.abs(today - saveDate) / 3600000);
-            this.idleMoneyMade = new BigNumber(0);
-            var hoursPassed = 1000;
-            this.idleHourInterest = .07;
-            for (var i = 0; i < hoursPassed; i++) {
-                var interest = new BigNumber(Math.round(this.moneyPool.times(new BigNumber(this.idleHourInterest))));
-                this.idleMoneyMade = this.idleMoneyMade.plus(interest);
-                //cap this to quadrillion
-                if (this.moneyPool.lessThan(1000000000000000))
-                    this.moneyPool = this.moneyPool.plus(interest);
-                else
-                    this.idleMoneyMade.minus(interest);
+            if (hoursPassed > 168)
+                hoursPassed = 168;
+            hoursPassed = 168; //testing only
+            this.gameDaysPassed  = hoursPassed  * this.idleHourDays;
+            this.originalFunds = this.moneyPool;
+        }
+        GameModel.simulateIdleTime = function() {
+            for (this.counter = 0; this.counter < this.gameDaysPassed; this.counter++) {
+                this.goAdventuring();
+                this.visitTown();
             }
+            this.idleMoneyMade = this.moneyPool.minus(this.originalFunds);
+        }
+        GameModel.isIdleCalculated = function() {
+            return this.counter >= this.gameDaysPassed;
         }
         GameModel.addLoadedAdventurers = function(advArray, targetArray) {
             advArray.forEach(function(adv) {
@@ -236,7 +246,7 @@
         GameModel.upgradeTemple = function() {
             this.templeLevel++;
             this.templeMaintainCost *= this.upgradeTownMultiplier;
-            this.idleHourInterest = this.templeLevel / 1000;
+            this.idleHourDays++;
         }
         GameModel.upgradeTavern = function() {
             this.tavernLevel++;
@@ -260,7 +270,7 @@
         }
         GameModel.getShopStat = function(varName) {
             //this is needed since some of the variables are decimal
-            if (varName === 'hpLossPercentage' || varName === 'idleHourInterest')
+            if (varName === 'hpLossPercentage')
                 return this[varName].toFixed(3);
             else
                 return this[varName];
@@ -394,32 +404,6 @@
             strBuild += "Current Gold: " + this.moneyPool.toFormat() + "\n\n";
             return strBuild;
         }
-        //below currently not used
-        GameModel.getHealth = function() {
-            var full = 0, half = 0, low = 0, totalAdv = 0;
-            var totalLevel = new BigNumber(0);
-            var totalGold = new BigNumber(0);
-            
-            this.adventurerList.forEach(function(a) {
-                totalLevel = totalLevel.plus(new BigNumber(a.level));
-                totalGold = totalGold.plus(new BigNumber(a.gold));
-                totalAdv++;
-                if (a.hp === a.hpMax)
-                    full++;
-                else if (a.hp < a.hpMax / 2)
-                    low++;
-                else
-                    half++;
-            });
-            if (totalAdv === 0) totalAdv = 1;
-            var strBuild = "Adventurer health:\n";
-            strBuild += "Full HP: " + full + "\t\t\t";
-            strBuild += "/   Half to Full HP: " + half + "\n";
-            strBuild += "Less than Half HP: " + low + "\t\t\t";
-            strBuild += "/   Average Level: " + totalLevel.dividedBy(new BigNumber(totalAdv)) + "\n";
-            strBuild += "Total Adventurer Cash: " + totalGold.toFormat() + "\n";            
-            return strBuild;
-        }
         
          function createExpPool(expData) {
             var pool = new Map();
@@ -542,16 +526,16 @@
         GameModel.shopData = [
               { 'name': 'tavern', 'graphic': 'lissetteFull', 'text': 'Level up your tavern to give adventurers more experience when they fight.' }
             , { 'name': 'inn', 'graphic': 'clavoFull', 'text': 'Level up your inn to allow more adventurers to stay in town.' }
-            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the interest you make while you\'re not playing the game.' }
+            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the game speed when you\'re not playing. You can collect up to one week of idle play at a time.' }
             , { 'name': 'itemshop', 'graphic': 'mizakFull', 'text': 'Level up your item shop to give adventurers more money when they fight.' }
-            , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'Weapon levels increase the damage\' adventurers inflict on monsters. Armor levels decrease adventurers\' damage from monsters. Both decrease the amount of money made from healing.' }
+            , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'Weapon levels increase the damage adventurers inflict on monsters. Armor levels decrease adventurers\' damage from monsters.' }
         ];
         GameModel.shopButtonData = [
             { 'shopName': 'inn', 'goodsText': 'Amenities', 'tag': 'inn', 'labelText': 'Maximum Adventurers', variable: 'maxAdventurers', 'headGraphic': 'clavoFrown' }
             , { 'shopName': 'tavern', 'goodsText': 'Food and Drink', 'tag': 'tavern', 'labelText': 'Extra Experience Roll', variable: 'expGainRoll', 'headGraphic': 'lissetteFrown' }
             , { 'shopName': 'blacksmith', 'goodsText': 'Armor', 'tag': 'armor', 'labelText': 'HP Loss %', variable: 'hpLossPercentage', 'headGraphic': 'lemelFrown' }
             , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll', variable: 'goldGainRoll', 'headGraphic': 'mizakNormal' }
-            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Interest per Idle Hour', variable: 'idleHourInterest', 'headGraphic': 'jera' }
+            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Days Per Idle Hour', variable: 'idleHourDays', 'headGraphic': 'jera' }
             , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll', variable: 'hpLossRoll', 'headGraphic': 'lemelFrown' }
         ];
         
@@ -660,7 +644,7 @@
         GameModel.ultimateItemData = [
            { 'name' : 'Arquebus', 'location': 'sword', 'needtext' : 'Iron Roller (castings)\nChemist (potassium)\nCharcoal Kiln (forge charcoal)', 'desc' : 'Mizak\'s Notes:   The newest weapon on the market – makes a crossbow look tame! Just load it with this newfangled “gunpowder,” aim, and pull a small metal trigger.', 'needList': 'Iron Roller, Chemist, Charcoal Kiln', 'tab': 'Ultimate Weapon' }
             , { 'name' : 'Brigandine', 'location': 'armor', 'needtext' : 'Iron Roller (plate)\nLoom (padding)\nCharcoal Kiln (forge charcoal)', 'desc' : 'Mizak\'s Notes:   Looking for armor that is strong but also light? Try the brigandine, with its thick padding with strategically placed sheets of armor stitched throughout.', 'needList': 'Iron Roller, Loom, Charcoal Kiln', 'tab': 'Ultimate Armor' }
-            , { 'name' : 'Pemmican', 'location': 'shop', 'needtext' : 'Smokehouse (jerky)\nWinepress (leftover fruit)\nSawmill (firewood)', 'desc' : 'Mizak\'s Notes:   The ultimate in adventuring rations! A mixture of ground jerky, dried fruit, and fat, that will literally last decades!', 'needList': 'Smokehouse, Winepress, Sawmill', 'tab': 'Ultimate Item' }
+            , { 'name' : 'Pemmican', 'location': 'shop', 'needtext' : 'Smokehouse (jerky)\nWinepress (leftover fruit)\nSawmill (firewood)', 'desc' : 'Mizak\'s Notes:   The ultimate in adventuring rations! A mixture of ground jerky, dried fruit, and fat that will literally last decades!', 'needList': 'Smokehouse, Winepress, Sawmill', 'tab': 'Ultimate Item' }
             , { 'name' : 'Poultice', 'location': 'temple', 'needtext' : 'Hops Farm (herbs)\nLoom (cloth bangages)\nSaltern (sea minerals)', 'desc' : 'Mizak\'s Notes:   Suffering from a deep sword wound? We have the answer – our temple’s special mixture of medicine bandaged over the wound. The best choice until we invent penicillin….', 'needList': 'Hops Farm, Loom, Saltern', 'tab': 'Ultimate Medicine' }
             , { 'name' : 'Black Velvet', 'location': 'tavern', 'needtext' : 'Beer Brewery (stout)\nWinery (champagne)\nBakery (pretzels)', 'desc' : 'Mizak\'s Notes:   Fancy! A beer cocktail that uses the darkest stout and the bubbliest champagne. A great mixture of flavor that goes straight to your head.', 'needList': 'Beer Brewery, Winery, Bakery', 'tab': 'Ultimate Drink' }
             , { 'name' : 'Bordello', 'location': 'inn', 'needtext' : 'Shearing Shed (sheepskins)\nWinery (booze)\nDocks (employees)', 'desc' : 'Mizak\'s Notes:   You can\'t have a decent inn without a whorehouse! It\’s the world’s oldest profession, and we need to accommodate our brave adventurers! Well-stocked with beautiful girls and pretty boys, we offer companionship for a reasonable fee.', 'needList': 'Shearing Shed, Winery, Docks', 'tab': 'Ultimate Inn' }
@@ -715,7 +699,7 @@
         ];
         
         GameModel.openDialogue = [
-             { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Man, I\'m beat. How are you guys holding up?' }
+             { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Man, I\'m tired. How are you guys holding up?' }
             , { 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'I couldn\'t have gotten more than four hours of sleep this week, with all those adventurers visiting the tavern.' }
             , { 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'My aunt\'s inn is crammed to the rafters, and they still keep coming into town.' }
             , { 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'I can barely lift my arms, I\'ve forged so many swords.' }
@@ -729,19 +713,19 @@
             , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Okay, I made a mistake back then. But I have a foolproof plan now.' }
             , { 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'The last time you had a plan, you trapped us in the dungeon and nearly got us all killed.' }
             , { 'speaker': 'Mizak', 'graphic': 'mizakLaugh', 'text': 'Look. It\'s only a few gold coins. I just need to recruit some more adventurers, work with you guys to improve the shops a bit, and then start buying up the local industries. I\'m telling you, we could be rich!' }
-            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Here\'s the money. If I don\'t get it back, you\'re dead.' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Here\'s the money. If I don\'t get it back, I\'m going to beat your ass!' }
             , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'No worries. Just follow my lead...\n\n(Press next to start game)' }
         ];
         
         GameModel.winDialogue = [
             { 'speaker': 'Mizak', 'graphic': 'mizakLaugh', 'text': 'I did it! We have a monopoly on everything! We\'re rich!' }
-            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Then where\'s all your gold?!? I need that fifty I loaned you back!' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Then where\'s all the gold?!? I need that fifty I loaned you back!' }
             , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Umm...well you see, the money\'s tied up in the property. We\'ll start getting gold coins back again...maybe in a few months....' }
             , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'That\'s it!!!' }
         ];
         
         GameModel.loadDialogue = [
-            { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'While you were idle, you accumulated the following in interest:' }
+            { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'While you were idle, your adventurers brought in this much money:' }
         ];
         
         GameModel.loseDialogue = [

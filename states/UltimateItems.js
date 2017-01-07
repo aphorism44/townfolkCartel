@@ -3,7 +3,6 @@ var UltimateItems = function(game) {};
 UltimateItems.prototype = {
     preload: function() {
         this.info = GameModel.getOverview();
-        this.healthInfo = GameModel.getHealth();
         }
     
     , create: function() {

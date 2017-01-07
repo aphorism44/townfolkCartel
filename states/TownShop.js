@@ -26,7 +26,7 @@ TownShop.prototype = {
         //shop-level info text
         this.infoText = this.add.text(275, 215, this.shopData.text, {
             font: '24px The Minion',
-            fill: '#d41515',
+            fill: 'Black',
             strokeThickness: 0,
             wordWrap: true,
             wordWrapWidth: 500 
@@ -65,7 +65,7 @@ TownShop.prototype = {
         for (var [key, value] of buttonMap) {
             var tag = this.add.text(400 + (200 * i), 50, value.labelText + ": " + GameModel.getShopStat(value.variable) , {
                 font: '20px Arial Black',
-                fill: '#fff',
+                fill: 'White',
                 strokeThickness: 4
             });
             this.shopGroup.addChild(tag);
