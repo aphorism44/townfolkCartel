@@ -41,6 +41,13 @@ CutScreen.prototype = {
         if (game.cutscene == 'win') {
             this.runAutomatedScene();
         } else {
+            if (musicPlayer.name !== "daylightsOpening" && gameOptions.playMusic) {
+                musicPlayer.stop();
+                musicPlayer = game.add.audio('daylightsOpening');
+                musicPlayer.loop = true;
+                musicPlayer.play();
+            }
+            
             this.previousButton = this.add.button(100, 500, 'buttonBlack', this.previousText, this);
             this.previousButton.text = this.previousButton.addChild(this.game.add.text(75, 25, "Previous", {font:    '18px TheMinion', fill: 'White'}));
 
@@ -89,8 +96,11 @@ CutScreen.prototype = {
     }
     
     , runAutomatedScene: function() {
-        musicPlayer = game.add.audio('reasonEnding');
-        musicPlayer.play();
+        if (musicPlayer.name !== "reasonEnding" && gameOptions.playMusic) {
+            musicPlayer.stop();
+            musicPlayer = game.add.audio('reasonEnding');
+            musicPlayer.play();
+        }
         //automate the final cutscene; stop at last line 
         game.time.events.loop(7000, this.updateAuto, this);
         //show the final graphic slowly while enlarging and rotating

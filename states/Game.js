@@ -3,26 +3,26 @@ var Game = function(game) {};
 Game.prototype = {
 
     preload: function () {
-        this.stage.disableVisibilityChange = true;
-        if (gameOptions.playMusic) {
-            musicPlayer.stop();
-            //pick music later
-            //musicPlayer = game.add.audio('exit');
-            //musicPlayer.play();
-        }
-        
-        
+        this.stage.disableVisibilityChange = true;        
     }
     
     , create: function () {
         var state = this;
-        //console.log(GameModel.getOverview());
+        
+        if (musicPlayer.name !== "faceBehindGame" && gameOptions.playMusic) {
+            musicPlayer.stop();
+            musicPlayer = game.add.audio('faceBehindGame');
+            musicPlayer.loop = true;
+            musicPlayer.play();
+        }
+        
         this.stage.disableVisibilityChange = false;
         game.add.sprite(0, 0, 'townmenu-bg');
-        //this.addMenuOption('Quit ->', function (e) {
-        //    this.game.state.start("GameOver");
-        //});
-        //scorekeepers
+        
+        //last minute addition - players want to mute...Brian will be sad...
+        this.muteButton = this.add.button(30, 125, 'speakerIcon');
+        this.muteButton.onInputDown.add(this.toggleMusic, this);
+        
         this.playerGoldText = this.add.text(25, 50, 'Gold: ' + GameModel.getMoneyPool(), {
             font: '24px Arial Black',
             fill: '#fff',
@@ -121,6 +121,11 @@ Game.prototype = {
             game.cutscene = 'lose';
             game.state.start("CutScreen");
         }
+    }
+    
+    , toggleMusic: function() {
+        gameOptions.playMusic = !gameOptions.playMusic;
+        musicPlayer.volume = gameOptions.playMusic ? 1 : 0;
     }
     
     , addAdventurers: function(button, statePointer) {

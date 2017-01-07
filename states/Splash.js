@@ -30,6 +30,9 @@ Splash.prototype = {
     , loadBgm: function () {
         game.load.audio('menumusic', 'assets/bgm/circularPrelude.mp3');
         game.load.audio('reasonEnding', 'assets/bgm/reasonEnding.mp3');
+        game.load.audio('unpluggedCredits', 'assets/bgm/unpluggedCredits.mp3');
+        game.load.audio('daylightsOpening', 'assets/bgm/daylightsOpening.mp3');
+        game.load.audio('faceBehindGame', 'assets/bgm/faceBehindGame.mp3');
     }
     
     , loadImages: function () {
@@ -144,6 +147,7 @@ Splash.prototype = {
         game.load.image('help2', 'assets/images/help2.png');
         game.load.image('help3', 'assets/images/help3.png');
         game.load.image('textBox', 'assets/images/npc-info.png');
+        game.load.image('speakerIcon', 'assets/images/speakerIcon.png'); //50x50
     }
 
     , loadFonts: function () {

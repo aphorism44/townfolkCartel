@@ -177,7 +177,7 @@
             var hoursPassed = Math.floor(Math.abs(today - saveDate) / 3600000);
             if (hoursPassed > 168)
                 hoursPassed = 168;
-            hoursPassed = 168; //testing only
+            //hoursPassed = 168; //testing only
             this.gameDaysPassed  = hoursPassed  * this.idleHourDays;
             this.originalFunds = this.moneyPool;
         }
