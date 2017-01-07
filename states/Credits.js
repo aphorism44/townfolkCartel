@@ -56,15 +56,13 @@ Credits.prototype = {
             musicPlayer = game.add.audio('exit');
             musicPlayer.play();
         }
-
-        //http://www.pixelstalk.net/author/pixelstalk/ - the backgrounds  
-        //http://nicubunu.deviantart.com/gallery/25130237/gaming - the buildings
-        //http://wallpapercave.com/free-beach-background-images - the nature bgs
-
+        
         var bg = game.add.sprite(0, 0, 'parchment-bg');
         this.addCredit('Music', 'Exit Vehicles');
         this.addCredit('Character Design', 'AerinBoy');
-        this.addCredit('Backgrounds', 'Pixelstalk.net');
+        this.addCredit('Backgrounds', 'Pixelstalk.net and\nWallpapercave.com');
+        this.addCredit('Industrial Building Art', 'Nicubunu at Deviantart');
+        this.addCredit('Miscellaneous Backgrounds', 'Alex Alten\nAction RPG Pack ');
         this.addCredit('Developer', 'Dominic Jesse/Aphorism44');
         this.addCredit('Phaser.io', 'Powered By');
         this.addCredit('for playing', 'Thank you');

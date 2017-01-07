@@ -4,7 +4,7 @@ var MainMenu = function() {};
 MainMenu.prototype = {
     
     init: function () {
-        this.titleText = game.make.text(game.world.centerX, 100, "The Townsfolk\nCartel", {
+        this.titleText = game.make.text(game.world.centerX, 150, "The Townsfolk\nCartel", {
             font: 'bold 60pt TheMinion',
             fill: '#fc962f',
             align: 'center'
@@ -27,7 +27,8 @@ MainMenu.prototype = {
         
         this.addMenuOption('Start', function () {
             GameModel.init();
-            game.state.start("Game");
+            game.cutscene = 'open';
+            game.state.start("CutScreen");
         }, 200, 260);
         
         this.addMenuOption('Options', function () {
@@ -41,10 +42,12 @@ MainMenu.prototype = {
         
         if (GameModel.supportsLocalStorage() && GameModel.hasGameData()) {
             this.addMenuOption('Load Game', function () {
-                if (GameModel.loadGame())
-                    game.state.start("Game");
-                else
+                if (GameModel.loadGame()) {
+                    game.cutscene = 'load';
+                    game.state.start("CutScreen");
+                } else {
                     console.log("No game data!");
+                }
             }, 200, 440);
         }
         

@@ -34,12 +34,6 @@ Game.prototype = {
             strokeThickness: 4
         });
         
-        this.maintCostText = this.add.text(25, 225, 'Daily Costs: ' + GameModel.formatNumToText(GameModel.getMaintenanceCost()), {
-            font: '24px Arial Black',
-            fill: '#fff',
-            strokeThickness: 4
-        });
-        
         //adventurer control buttons
         var advButtonsData = [
             {icon: 'swordA', name: "Add 1 Adventurer", multiplier: 1 }
@@ -120,8 +114,13 @@ Game.prototype = {
         GameModel.visitTown();        
         this.playerGoldText.text = 'Gold: ' + GameModel.getMoneyPool();
         this.playerAdvText.text = 'Adventurers: ' + GameModel.adventurerList.length+ " / " + GameModel.maxAdventurers;
-        this.maintCostText.text = 'Daily Costs: ' + GameModel.formatNumToText(GameModel.getMaintenanceCost());
         this.updateButtons();
+        
+        //this is the only place it will check for bankruptcy which theoretically shouldn't happen
+        if (GameModel.isBankrupt()) {
+            game.cutscene = 'lose';
+            game.state.start("CutScreen");
+        }
     }
     
     , addAdventurers: function(button, statePointer) {

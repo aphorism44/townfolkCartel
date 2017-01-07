@@ -26,7 +26,7 @@ Achievements.prototype = {
             var head = this.add.sprite(40 + (i * 130), 150, value.headGraphic);
             head.width = 75;
             head.height = 75;
-            this.add.text(40 + (i * 130), 250
+            this.add.text(40 + (i * 130), 240
             , value.goodsText + "\n" + GameModel[key + 'Level'] + " / " + GameModel.maxTownLevel , {
                 font: '18px The Minion',
                 fill: 'Black'
@@ -49,11 +49,19 @@ Achievements.prototype = {
         }
           
         //button if you can win
-        if (1 == 1) {
+        if (GameModel.isComplete()) {
              var winButton = this.add.button(500, 325, 'buttonBlack'); winButton.addChild(this.game.add.text(25, 25, "Press to Win!", {font: '18px TheMinion', fill: 'White'}));
             winButton.onInputDown.add(function() {
-                console.log("you win!");
-                //game.state.start("GameOverWin");
+                game.cutscene = 'win';
+                game.state.start("CutScreen");
+            });
+        } else {
+            this.add.text(500, 325, 'Return here when you complete all the winning conditions.', {
+                font: '24px The Minion',
+                fill: '#000000',
+                strokeThickness: 0,
+                wordWrap: true,
+                wordWrapWidth: 290 
             });
         }
         

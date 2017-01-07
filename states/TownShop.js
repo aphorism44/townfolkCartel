@@ -107,7 +107,7 @@ TownShop.prototype = {
         var k = 0;
         for (var [key, value] of buttonMap) {
             var list = "Available " + value.goodsText + ": " + GameModel.getItemList(key, GameModel[key + 'Level']);
-            var itemText = this.add.text(275, 350 + (100 * k), list, {
+            var itemText = this.add.text(275, 350 + (125 * k), list, {
                 font: '24px The Minion',
                 fill: '#d41515',
                 wordWrap: true,

@@ -21,8 +21,6 @@ Splash.prototype = {
             game.load.script('helpscreen', 'states/HelpScreen.js');
             game.load.script('industries', 'states/Industries.js');
             game.load.script('cutscreen', 'states/CutScreen.js');
-            game.load.script('gameoverlose', 'states/GameOverLose.js');
-            game.load.script('gameoverwin', 'states/GameOverWin.js');
             game.load.script('gameModel',  'js/GameModel.js');
             
             //my first Phaser.io plugin/API
@@ -31,7 +29,7 @@ Splash.prototype = {
 
     , loadBgm: function () {
         game.load.audio('menumusic', 'assets/bgm/circularPrelude.mp3');
-        game.load.audio('exit', 'assets/bgm/Exit the Premises.mp3');
+        game.load.audio('reasonEnding', 'assets/bgm/reasonEnding.mp3');
     }
     
     , loadImages: function () {
@@ -140,10 +138,12 @@ Splash.prototype = {
         
         //other
         game.load.image('mizakDeform', 'assets/images/mizakCartoon.png'); //200x600
+        game.load.image('mizakRun', 'assets/images/mizakRun.png'); //790x428
         game.load.image('checkmark', 'assets/images/checkmark.png'); //200x600
         game.load.image('help1', 'assets/images/help1.png');
         game.load.image('help2', 'assets/images/help2.png');
         game.load.image('help3', 'assets/images/help3.png');
+        game.load.image('textBox', 'assets/images/npc-info.png');
     }
 
     , loadFonts: function () {
@@ -198,8 +198,6 @@ Splash.prototype = {
         game.state.add("Credits", Credits);
         game.state.add("Options", Options);
         game.state.add("CutScreen", CutScreen);
-        game.state.add("GameOverLose", GameOverLose);
-        game.state.add("GameOverWin", GameOverWin);
     }
 
     , addGameMusic: function () {

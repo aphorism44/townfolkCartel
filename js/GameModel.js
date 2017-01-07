@@ -13,12 +13,13 @@
             this.expPool = createExpPool(this.expData);
             this.shopPool = createShopPool(this.shopData);
             this.shopButtonPool = createButtonPool(this.shopButtonData);
-            this.moneyPool = new BigNumber(50);
+            this.moneyPool = new BigNumber(1000000000000);
             this.maxTownLevel = 70;
             this.itemsPerStore = 12;
             //keep records for charts
             this.moneyRecord = [];
             this.adventurerRecord = [];
+            this.idleMoneyMade = new BigNumber(0);
             //blacksmith stats
             this.swordLevel = 0;
             this.hpLossRoll = 4; //adjustable - die roll to add to damage adventurers lose in a fight
@@ -29,7 +30,7 @@
             this.maxAdventurers = 10; //adjustable at inn
             //temple stats
             this.templeLevel = 0;
-            this.idleDayNumber = 1; //adjustable at temple
+            this.idleHourInterest = 0.000; //adjustable at temple
             //tavern stats
             this.tavernLevel = 0;
             this.expGainRoll = 4; //adjustable - die roll to add extra experience when an adventurer kills a monster
@@ -55,6 +56,17 @@
             //graphic note - this shows how many days of data are shown in graphs
             this.graphDays = 90;
             BigNumber.config({ FORMAT: format, DECIMAL_PLACES: 2 });
+        }
+        GameModel.isBankrupt = function() {
+            return this.moneyPool.lessThan(0);
+        }
+        GameModel.isComplete = function() { 
+            var lCount = this.swordLevel + this.armorLevel + this.templeLevel + this.innLevel + this.shopLevel + this.tavernLevel; //420 max
+            var iCount = 0;
+            this.industryNames.forEach(function(n) {
+                iCount += GameModel.getBoughtIndustries(n);
+            });
+            return lCount >= 420 && iCount >= this.industryNames.length * 3;
         }
         GameModel.supportsLocalStorage = function() {
             var test = 'localStorageTester';
@@ -89,7 +101,7 @@
                 , innLevel : this.innLevel
                 , maxAdventurers : this.maxAdventurers
                 , templeLevel : this.templeLevel
-                , idleDayNumber : this.idleDayNumber
+                , idleHourInterest : this.idleHourInterest
                 , tavernLevel : this.tavernLevel
                 , expGainRoll : this.expGainRoll
                 , shopLevel : this.shopLevel
@@ -122,7 +134,7 @@
                 this.innLevel = loadObject.innLevel;
                 this.maxAdventurers = loadObject.maxAdventurers;
                 this.templeLevel = loadObject.templeLevel;
-                this.idleDayNumber = loadObject.idleDayNumber;
+                this.idleHourInterest = loadObject.idleHourInterest;
                 this.tavernLevel = loadObject.tavernLevel;
                 this.expGainRoll = loadObject.expGainRoll;
                 this.shopLevel = loadObject.shopLevel;
@@ -141,12 +153,33 @@
                 loadObject.purchasedBuildingArray.forEach(function(bData) {
                     GameModel.buildingMap.get(bData).purchased = true;
                 });
+                //finally get the saved date and add that extra money
+                this.addIdleMoney(loadObject.dateSaved);
                 return true;
             } else {
+                //if this runs there's a bug
                 console.log("no saved game!");
                 return false;
             }
             
+        }
+        GameModel.addIdleMoney = function(saveDate) {
+            //not working...
+            var saveDate = new Date(saveDate);
+            var today = new Date();
+            var hoursPassed = Math.floor(Math.abs(today - saveDate) / 3600000);
+            this.idleMoneyMade = new BigNumber(0);
+            var hoursPassed = 1000;
+            this.idleHourInterest = .07;
+            for (var i = 0; i < hoursPassed; i++) {
+                var interest = new BigNumber(Math.round(this.moneyPool.times(new BigNumber(this.idleHourInterest))));
+                this.idleMoneyMade = this.idleMoneyMade.plus(interest);
+                //cap this to quadrillion
+                if (this.moneyPool.lessThan(1000000000000000))
+                    this.moneyPool = this.moneyPool.plus(interest);
+                else
+                    this.idleMoneyMade.minus(interest);
+            }
         }
         GameModel.addLoadedAdventurers = function(advArray, targetArray) {
             advArray.forEach(function(adv) {
@@ -163,8 +196,11 @@
             var million = new BigNumber(1000000);
             var billion = new BigNumber(1000000000);
             var trillion = new BigNumber(1000000000000);
+            var quadrillion = new BigNumber(1000000000000000);
             
-            if (bigNum.greaterThanOrEqualTo(trillion)) {
+           if (bigNum.greaterThanOrEqualTo(quadrillion)) {
+                return bigNum.dividedBy(quadrillion) + " quadrillion";
+            } else if (bigNum.greaterThanOrEqualTo(trillion)) {
                 return bigNum.dividedBy(trillion) + " trillion";
             } else if (bigNum.greaterThanOrEqualTo(billion)) {
                 return bigNum.dividedBy(billion) + " billion";
@@ -200,7 +236,7 @@
         GameModel.upgradeTemple = function() {
             this.templeLevel++;
             this.templeMaintainCost *= this.upgradeTownMultiplier;
-            this.idleDayNumber++;
+            this.idleHourInterest = this.templeLevel / 1000;
         }
         GameModel.upgradeTavern = function() {
             this.tavernLevel++;
@@ -223,8 +259,8 @@
             this.hpLossPercentage *= 0.99;
         }
         GameModel.getShopStat = function(varName) {
-            //this is needed since one of the variables is a decimal
-            if (varName === 'hpLossPercentage')
+            //this is needed since some of the variables are decimal
+            if (varName === 'hpLossPercentage' || varName === 'idleHourInterest')
                 return this[varName].toFixed(3);
             else
                 return this[varName];
@@ -306,7 +342,7 @@
         }
         GameModel.dailyIncomeUpdate = function(advIn) {
             var totalIncome = advIn;
-            totalIncome -= this.getMaintenanceCost();
+            //totalIncome -= this.getMaintenanceCost();
             if (totalIncome > 0)
                 totalIncome += Math.round(Math.pow(advIn, this.getResourceExponent()));
             this.moneyPool = this.moneyPool.plus(new BigNumber(totalIncome));
@@ -354,7 +390,7 @@
             strBuild += "Level 31-50: " + this.adventurerList.filter(function(a) { return a.level > 30 && a.level <= 50; }).length + "\t\t\t";
             strBuild += "/   Level 50+: " + this.adventurerList.filter(function(a) { return a.level > 50; }).length + "\t\t\t";
             strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
-            strBuild += "Day: " + this.day + "  /   Daily Maintenance: " + GameModel.formatNumToText(maintainance) +  "\n";
+            strBuild += "Day: " + this.day +  "\n";
             strBuild += "Current Gold: " + this.moneyPool.toFormat() + "\n\n";
             return strBuild;
         }
@@ -506,17 +542,17 @@
         GameModel.shopData = [
               { 'name': 'tavern', 'graphic': 'lissetteFull', 'text': 'Level up your tavern to give adventurers more experience when they fight.' }
             , { 'name': 'inn', 'graphic': 'clavoFull', 'text': 'Level up your inn to allow more adventurers to stay in town.' }
-            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the game speed when you\'re not playing.' }
+            , { 'name': 'temple', 'graphic': 'jera', 'text': 'Level up your temple to increase the interest you make while you\'re not playing the game.' }
             , { 'name': 'itemshop', 'graphic': 'mizakFull', 'text': 'Level up your item shop to give adventurers more money when they fight.' }
             , { 'name': 'blacksmith', 'graphic': 'lemelFull', 'text': 'Weapon levels increase the damage\' adventurers inflict on monsters. Armor levels decrease adventurers\' damage from monsters. Both decrease the amount of money made from healing.' }
         ];
         GameModel.shopButtonData = [
             { 'shopName': 'inn', 'goodsText': 'Amenities', 'tag': 'inn', 'labelText': 'Maximum Adventurers', variable: 'maxAdventurers', 'headGraphic': 'clavoFrown' }
             , { 'shopName': 'tavern', 'goodsText': 'Food and Drink', 'tag': 'tavern', 'labelText': 'Extra Experience Roll', variable: 'expGainRoll', 'headGraphic': 'lissetteFrown' }
-            , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll', variable: 'goldGainRoll', 'headGraphic': 'mizakNormal' }
-            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Game Days per Idle Day', variable: 'idleDayNumber', 'headGraphic': 'jera' }
-            , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll', variable: 'hpLossRoll', 'headGraphic': 'lemelFrown' }
             , { 'shopName': 'blacksmith', 'goodsText': 'Armor', 'tag': 'armor', 'labelText': 'HP Loss %', variable: 'hpLossPercentage', 'headGraphic': 'lemelFrown' }
+            , { 'shopName': 'itemshop', 'goodsText': 'Items', 'tag': 'shop', 'labelText': 'Extra Money Roll', variable: 'goldGainRoll', 'headGraphic': 'mizakNormal' }
+            , { 'shopName': 'temple', 'goodsText': 'Medicine', 'tag': 'temple', 'labelText': 'Interest per Idle Hour', variable: 'idleHourInterest', 'headGraphic': 'jera' }
+            , { 'shopName': 'blacksmith', 'goodsText': 'Weapons', 'tag': 'sword', 'labelText': 'HP Loss Roll', variable: 'hpLossRoll', 'headGraphic': 'lemelFrown' }
         ];
         
         //resource building functions(merged)
@@ -679,29 +715,37 @@
         ];
         
         GameModel.openDialogue = [
-             'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Man, I\'m beat. How are you guys holding up?'
-            , 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'I couldn\'t have gotten more than four hours of sleep, with all these adventurers wanting dinner.'
-            , 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'My aunt\'s place is booked to the gills, and they still keep coming into town.'
-            , 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'I can barely life my arms, I\'ve forged so many swords this last week.'
-            , 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Hasn\'t anyone raised their prices since adventurers started hitting the dungeon? They\'re bringing in lots of treasure; they can afford it.'
-            , 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'Actually, that makes sense. Maybe if we raised our prices, we wouldn\'t be be so busy.'
-            , 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'But then we\'ll lose business!'
-            , 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Think, big guy! If we charge more, we won\'t need as many customers. And since we\'re the only village for days, they don\'t have a choice! I have a great plan! I just need to borrow-"
-            , 'speaker': 'Lemel', 'graphic': 'lemelOut', 'text': 'Here it comes....'
-            , 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': '-50 thalers. Lissette, you can spare that much, can\'t you?'
-            , 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'The last time I lent you money, you took a year to pay it back!'
-            , 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Okay, I made a mistake back then. But I have a foolproof plan now.'
-            , 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'The last time you had a plan, you trapped us in the dungeon and nearly got us all killed.'
-            , 'speaker': 'Mizak', 'graphic': 'mizakLaugh', 'text': 'Look. It\'s only a few gold coins. I just need to recruit some more adventurers, work with you guys to improve the shops a bit, and then start buying up the local industries. I\'m telling you, we could be rich!'
-            , 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Here\'s the money. If I don\'t get it back, you\'re dead.'
-            , 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'No worries. Just follow my lead...'
+             { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Man, I\'m beat. How are you guys holding up?' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'I couldn\'t have gotten more than four hours of sleep this week, with all those adventurers visiting the tavern.' }
+            , { 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'My aunt\'s inn is crammed to the rafters, and they still keep coming into town.' }
+            , { 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'I can barely lift my arms, I\'ve forged so many swords.' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Hasn\'t anyone raised their prices since adventurers started hitting the dungeon? They\'re bringing in lots of treasure; they can afford it.' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'Actually, that makes sense. Maybe if we raised our prices, we wouldn\'t be be so busy.' }
+            , { 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'But then we\'ll lose business!' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Think, big guy! If we charge more, we won\'t need as many customers. And since we\'re the only village in the area, they don\'t have a choice! I have a great plan! I just need to borrow-' }
+            , { 'speaker': 'Lemel', 'graphic': 'lemelOut', 'text': 'Here it comes....' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': '-50 thalers. Lissette, you can spare that much, can\'t you?' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'The last time I lent you money, you took eight months to pay it back!' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Okay, I made a mistake back then. But I have a foolproof plan now.' }
+            , { 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'The last time you had a plan, you trapped us in the dungeon and nearly got us all killed.' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakLaugh', 'text': 'Look. It\'s only a few gold coins. I just need to recruit some more adventurers, work with you guys to improve the shops a bit, and then start buying up the local industries. I\'m telling you, we could be rich!' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Here\'s the money. If I don\'t get it back, you\'re dead.' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'No worries. Just follow my lead...\n\n(Press next to start game)' }
         ];
         
         GameModel.winDialogue = [
-            'speaker': 'Mizak', 'graphic': 'mizakLaugh', 'text': 'I did it! We have a monopoly on everything! We\'re rich!'
-            , 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Then where\'s all your gold?!? I need that fifty I loaned you back!'
-            , 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Umm...well you see, the money\'s tied up in the property. We\'ll start getting gold coins back again...maybe in a few months....'
-            , 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'That\'s it!!!'
+            { 'speaker': 'Mizak', 'graphic': 'mizakLaugh', 'text': 'I did it! We have a monopoly on everything! We\'re rich!' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'Then where\'s all your gold?!? I need that fifty I loaned you back!' }
+            , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Umm...well you see, the money\'s tied up in the property. We\'ll start getting gold coins back again...maybe in a few months....' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteAngry', 'text': 'That\'s it!!!' }
+        ];
+        
+        GameModel.loadDialogue = [
+            { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'While you were idle, you accumulated the following in interest:' }
+        ];
+        
+        GameModel.loseDialogue = [
+            { 'speaker': 'N/A', 'graphic': '', 'text': 'Bankrupt! Game Over.' }
         ];
         
         return GameModel;
