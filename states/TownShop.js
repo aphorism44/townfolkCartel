@@ -2,7 +2,11 @@ var TownShop = function(game) {};
 
 TownShop.prototype = {
     
-    create: function() {
+    preload: function () {
+        this.stage.disableVisibilityChange = true;        
+    }
+    
+    , create: function() {
         var state = this;
         this.loc = game.currentShop;
         this.stage.disableVisibilityChange = false;
@@ -62,21 +66,20 @@ TownShop.prototype = {
     
     , addHeaderTags: function(buttonMap) {
         var i = 0;
-        for (var [key, value] of buttonMap) {
-            var tag = this.add.text(400 + (200 * i), 50, value.labelText + ": " + GameModel.getShopStat(value.variable) , {
+        for (var key in buttonMap) {
+            var tag = this.add.text(400 + (200 * i), 50, buttonMap[key].labelText + ": " + GameModel.getShopStat(buttonMap[key].variable), {
                 font: '20px Arial Black',
                 fill: 'White',
                 strokeThickness: 4
             });
             this.shopGroup.addChild(tag);
-            
             i++;
         }
     }
     
     , addButtons: function(buttonMap) {
         var j = 0;
-        for (var [key, value] of buttonMap) {
+        for (var key in buttonMap) {
             var button;
             button = this.add.button(300, 100 + 50 * j, this.game.cache.getBitmapData('button'));
             button.icon = button.addChild(this.game.add.image(6, 6, key + 'Icon'));
@@ -105,8 +108,8 @@ TownShop.prototype = {
     
     , addLists: function(buttonMap) {
         var k = 0;
-        for (var [key, value] of buttonMap) {
-            var list = "Available " + value.goodsText + ": " + GameModel.getItemList(key, GameModel[key + 'Level']);
+        for (var key in buttonMap) {
+            var list = "Available " + buttonMap[key].goodsText + ": " + GameModel.getItemList(key, GameModel[key + 'Level']);
             var itemText = this.add.text(275, 350 + (125 * k), list, {
                 font: '24px The Minion',
                 fill: '#d41515',

@@ -50,9 +50,9 @@ Industries.prototype = {
         var bldgData = GameModel.getLocationBldgs(this.locationName);
         var bldgTypes = GameModel.getIndustries(this.locationName);
         for (var i = 0; i < bldgTypes.length; i++) {
-            for (var [key, value] of bldgData) {
-                if (value.industry === bldgTypes[i]) {
-                    var b = this.addBuilding(key, value, i);
+            for (var key in bldgData) {
+                if (bldgData[key].industry === bldgTypes[i]) {
+                    var b = this.addBuilding(key, bldgData[key], i);
                     this.bldgGroup.addChild(b);
                 }
             }

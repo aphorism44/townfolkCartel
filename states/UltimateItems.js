@@ -50,19 +50,19 @@ UltimateItems.prototype = {
        
     , addTabs: function() {
         var i = 0;
-        for (var [key, value] of GameModel.ultimateItemMap) {
+        for (var key in GameModel.ultimateItemMap) {
             //why does the below work???
             var tab;
             tab = this.add.button(i * 125, 100, 'buttonTab');
             tab.width = 150;
             tab.height = 75;
             tab.name = key;
-            tab.desc = value.desc;
-            tab.needText = value.needText;
-            tab.needArray = value.needArray;
-            tab.itemName = value.name;
+            tab.desc = GameModel.ultimateItemMap[key].desc;
+            tab.needText = GameModel.ultimateItemMap[key].needText;
+            tab.needArray = GameModel.ultimateItemMap[key].needArray;
+            tab.itemName = GameModel.ultimateItemMap[key].name;
             tab.inputEnabled = true;
-            tab.tabText = tab.addChild(this.game.add.text(80, 20, value.tab.replace(' ', '\n'), {    
+            tab.tabText = tab.addChild(this.game.add.text(80, 20, GameModel.ultimateItemMap[key].tab.replace(' ', '\n'), {    
                 font: '20px TheMinion'
                 , wordWrap: true
                 , wordWrapWidth: 150

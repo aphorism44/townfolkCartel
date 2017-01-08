@@ -154,7 +154,7 @@
                 this.addLoadedAdventurers(loadObject.deadAdventurerList, this.deadAdventurerList);
                 //buildings just need to be marked as purchased
                 loadObject.purchasedBuildingArray.forEach(function(bData) {
-                    GameModel.buildingMap.get(bData).purchased = true;
+                    GameModel.buildingMap[bData].purchased = true;
                 });
                 //finally get the saved date and add that extra money
                 this.prepareIdleStats(loadObject.dateSaved);
@@ -230,7 +230,7 @@
         GameModel.addAdventurers = function(num) {
             this.moneyPool = this.moneyPool.minus(new BigNumber(this.adventurerCost(num)));
             for (var i = 0; i < num; i++)
-                this.adventurerList.push(new Adventurer(1, this.expPool.get(1)));
+                this.adventurerList.push(new Adventurer(1, this.expPool[1]));
         }
         GameModel.upgradeTown = function(tag, cost) {
             this.moneyPool = this.moneyPool.minus(new BigNumber(cost));
@@ -310,13 +310,13 @@
         }
         
         GameModel.getStoreData = function(loc) {
-            return this.shopPool.get(loc);
+            return this.shopPool[loc];
         }
         GameModel.getButtons = function(loc) {
-            var buttons = new Map();
-            for (var [key, value] of this.shopButtonPool)
-                if (value.shop === loc)
-                    buttons.set(key, value);
+            var buttons = {};
+            for (var key in this.shopButtonPool)
+                if (this.shopButtonPool[key].shop === loc)
+                    buttons[key] = this.shopButtonPool[key];
             return buttons;
         }
         
@@ -384,9 +384,9 @@
             //of your base income; since maintenance growth in linear, this will more than cancel it out
             var baseExponent = 1;
             //each building adds (.001 * building level) to the exponent, for a max of 1.03
-            for (var [key, value] of this.buildingMap)
-                if (value.purchased)
-                    baseExponent += value.level * .001;
+            for (var key in this.buildingMap)
+                if (this.buildingMap[key].purchased)
+                    baseExponent += this.buildingMap[key].level * .001;
             
             return baseExponent;
         }
@@ -406,23 +406,23 @@
         }
         
          function createExpPool(expData) {
-            var pool = new Map();
+            var pool = {};
             expData.forEach(function(e) {
-                pool.set(e.level, e.stats);
+                pool[e.level] = e.stats;
             });
             return pool;
         }
         function createShopPool(shopData) {
-            var pool = new Map();
+            var pool = {};
             shopData.forEach(function(u) {
-                pool.set(u.name, { 'graphic': u.graphic, 'text': u.text });
+                pool[u.name] = { 'graphic': u.graphic, 'text': u.text };
             });
             return pool;
         }
         function createButtonPool(buttonData) {
-            var pool = new Map();
+            var pool = {};
             buttonData.forEach(function(u) {
-                pool.set(u.tag, { 'shop': u.shopName, 'goodsText': u.goodsText, 'labelText': u.labelText, 'variable': u.variable, 'headGraphic': u.headGraphic });
+                pool[u.tag] = { 'shop': u.shopName, 'goodsText': u.goodsText, 'labelText': u.labelText, 'variable': u.variable, 'headGraphic': u.headGraphic };
             });
             return pool;
         }
@@ -482,9 +482,9 @@
                     this.hpMax += this.level;
                     this.fightStat += Math.ceil(this.level / 10);
                 } else {
-                    this.expToNext = expPool.get(this.level)[0];
-                    this.hpMax = expPool.get(this.level)[1];
-                    this.fightStat = expPool.get(this.level)[2];
+                    this.expToNext = expPool[this.level][0];
+                    this.hpMax = expPool[this.level][1];
+                    this.fightStat = expPool[this.level][2];
                 }
             }
         }
@@ -546,97 +546,105 @@
             if (level > this.maxTownLevel) level = this.maxTownLevel;
             level = Math.ceil(level / (this.maxTownLevel / this.itemsPerStore));
             for (var i = 0; i < level; i++)
-                itemArray.push(" " + this.itemMap.get(category)[i]);
+                itemArray.push(" " + this.itemMap[category][i]);
             if (itemArray.length < 1)
                 return "nothing"
             
             return itemArray.join(",");
         }
         GameModel.getUltimateItemData = function(name) {
-            return this.ultimateItemMap.get(name);
+            return this.ultimateItemMap[name];
         }
         GameModel.getBuildingData = function() {
             return this.buildingMap;
         }
         GameModel.getPurchasedBuildings = function() {
             var purchasedBuildings = [];
-            for (var [key, value] of this.buildingMap) {
-                if (value.purchased)
+            
+            for (var key in this.buildingMap)
+                if (this.buildingMap[key].purchased)
                     purchasedBuildings.push(key);
-            }
+            
             return purchasedBuildings;
         }
         GameModel.buyBuilding = function(name) {
-            this.moneyPool = this.moneyPool.minus(new BigNumber(this.buildingMap.get(name).cost));
-            this.buildingMap.get(name).purchased = true;
+            this.moneyPool = this.moneyPool.minus(new BigNumber(this.buildingMap[name].cost));
+            this.buildingMap[name].purchased = true;
         }
         GameModel.isBuildingPurchased = function(name) {
-            return this.buildingMap.get(name).purchased;
+            return this.buildingMap[name].purchased;
         }
         GameModel.isBuildingAvailable = function(name) {
-            var needed = this.buildingMap.get(name).needsArray;
+            var needed = this.buildingMap[name].needsArray;
             var bought = this.getPurchasedBuildings();
             
             if (needed.length < 0)
                 return true;
             
             for (var i = 0; i < needed.length; i++)
-                if (!bought.includes(needed[i]))
+                if (!GameModel.contains(bought, needed[i]))
                     return false;
             
             return true;
         }
         GameModel.getLocationBldgs = function(loc) {
-            var locBuildings = new Map();
-            for (var [key, value] of this.buildingMap) {
-                if (loc === null || value.location === loc)
-                    locBuildings.set(key, value);
-            }
+            var locBuildings = {};
+            
+            for (var key in this.buildingMap)
+                if (loc === null || this.buildingMap[key].location === loc)
+                    locBuildings[key] = this.buildingMap[key];
+            
             return locBuildings;
         }
         GameModel.isUltimateItemAvailable = function(name) {
-            var needed = this.ultimateItemMap.get(name).needArray;
+            var needed = this.ultimateItemMap[name].needArray;
             var bought = this.getPurchasedBuildings();
             
             for (var i = 0; i < needed.length; i++)
-                if (!bought.includes(needed[i]))
+                if (!GameModel.contains(bought, needed[i]))
                     return false;
             
             return true;
         }
         GameModel.getIndustries = function(loc) {
             var types = new Set();
-            for (var [key, value] of this.buildingMap)
-                if (value.location === loc)
-                    types.add(value.industry);
-            return Array.from(types);
+            
+            for (var key in this.buildingMap)
+                if (this.buildingMap[key].location === loc)
+                    types.add(this.buildingMap[key].industry);
+            var typesArray = [];
+            types.forEach(function(e) { typesArray.push(e); });
+            return typesArray;
+            
         }
         GameModel.getBoughtIndustries = function(indName) {
             var iName = indName.toLowerCase(), count = 0;
-            for (var [key, value] of this.buildingMap)
-                if (value.industry === iName && value.purchased)
+            
+            for (var key in this.buildingMap)
+                if (this.buildingMap[key].industry === iName && this.buildingMap[key].purchased)
                     count++;
+            
             return count;
         }
         
         function createBldgMap(bldgData) {
-            var pool = new Map();
+            var pool = {};
             bldgData.forEach(function(b) {
-                pool.set(b.name, {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'graphic': b.graphic, 'location': b.location, 'industry': b.industry, 'desc': b.desc, 'purchased': false });
+                pool[b.name] = {'level': b.level, 'needsArray': b.needs.length > 0 ? b.needs.split(",").map(function(e) { return e.trim(); }): [], 'cost': b.cost, 'graphic': b.graphic, 'location': b.location, 'industry': b.industry, 'desc': b.desc, 'purchased': false };
             });
             return pool;
         }
         function createItemMap(itemData) {
-            var pool = new Map();
+            var pool = {};
             itemData.forEach(function(i) {
-                pool.set(i.category, i.list.split(",").map(function(e) { return e.trim(); }));
+                pool[i.category] = i.list.split(",").map(function(e) { return e.trim(); });
             });
             return pool;
         }
         function createUltimaMap(ultimateItemData) {
-            var pool = new Map();
+            var pool = {};
             ultimateItemData.forEach(function(u) {
-                pool.set(u.location,  {'name': u.name, 'needArray': u.needList.split(",").map(function(e) { return e.trim(); }), 'location': u.location, 'needText': u.needtext, 'desc': u.desc, 'tab': u.tab });
+                pool[u.location] = {'name': u.name, 'needArray': u.needList.split(",").map(function(e) { return e.trim(); }), 'location': u.location, 'needText': u.needtext, 'desc': u.desc, 'tab': u.tab };
             });
             return pool;
         }
@@ -689,7 +697,6 @@
             , { 'level' : 3, 'name': 'Bakery', 'needs': 'Mill, Sawmill', 'cost': 1000000000000, 'graphic' : 'bldgBakery' , 'location': 'prairie', 'industry': 'grain', 'desc': 'Produces baked goods from flour.' }
             , { 'level' : 3, 'name': 'Beer Bottler', 'needs': 'Beer Brewery', 'cost': 1000000000000, 'graphic' : 'bldgBeerBottler' , 'location': 'prairie', 'industry': 'hops', 'desc': 'Prepares beer for trade.' }
             , { 'level' : 3, 'name': 'Winery', 'needs': 'Winepress, Charcoal Kiln', 'cost': 1000000000000, 'graphic' : 'bldgWinery' , 'location': 'prairie', 'industry': 'wine', 'desc': 'Ages and bottles wine.' }
-            
             , { 'level' : 1, 'name': 'Docks', 'needs': '', 'cost': 1000000, 'graphic' : 'bldgDock' , 'location': 'sea', 'industry': 'fish', 'desc': 'Allows catching of fish.' }
             , { 'level' : 1, 'name': 'Saltbeds', 'needs': '', 'cost': 1000000, 'graphic' : 'bldgSaltbeds' , 'location': 'sea', 'industry': 'salt', 'desc': 'Captures seawater.' }
             , { 'level' : 2, 'name': 'Fishery', 'needs': 'Docks', 'cost': 1000000000, 'graphic' : 'bldgFishery' , 'location': 'sea', 'industry': 'fish', 'desc': 'Guts and cleans fresh fish.' }
@@ -729,8 +736,19 @@
         ];
         
         GameModel.loseDialogue = [
-            { 'speaker': 'N/A', 'graphic': '', 'text': 'Bankrupt! Game Over.' }
+            { 'speaker': '', 'graphic': '', 'text': 'Bankrupt! Game Over.' }
         ];
+        
+        
+        //needed for IE....
+        GameModel.contains = function (a, obj) {
+            for (var i = 0; i < a.length; i++) {
+                if (a[i] === obj) {
+                    return true;
+                }
+            }
+            return false;
+        }
         
         return GameModel;
     }

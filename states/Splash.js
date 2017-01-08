@@ -8,20 +8,20 @@ Splash.prototype = {
             game.load.script('bignumber', 'vendor/bignumber.min.js');
             
             game.load.script('WebFont', 'vendor/webfontloader.js');
-            game.load.script('mainmenu','states/MainMenu.js');
-            game.load.script('credits', 'states/Credits.js');
-            game.load.script('options', 'states/Options.js');
-            game.load.script('game', 'states/Game.js');
-            game.load.script('townshop', 'states/TownShop.js');
-            game.load.script('statistics', 'states/Statistics.js');
-            game.load.script('instructions', 'states/Instructions.js');
-            game.load.script('resourcemap', 'states/ResourceMap.js');
-            game.load.script('ultimateitems', 'states/UltimateItems.js');
-            game.load.script('achievements', 'states/Achievements.js');
-            game.load.script('helpscreen', 'states/HelpScreen.js');
-            game.load.script('industries', 'states/Industries.js');
-            game.load.script('cutscreen', 'states/CutScreen.js');
-            game.load.script('gameModel',  'js/GameModel.js');
+            game.load.script('MainMenu','states/MainMenu.js');
+            game.load.script('Credits', 'states/Credits.js');
+            game.load.script('Options', 'states/Options.js');
+            game.load.script('Game', 'states/Game.js');
+            game.load.script('TownShop', 'states/TownShop.js');
+            game.load.script('Statistics', 'states/Statistics.js');
+            game.load.script('Instructions', 'states/Instructions.js');
+            game.load.script('ResourceMap', 'states/ResourceMap.js');
+            game.load.script('UltimateItems', 'states/UltimateItems.js');
+            game.load.script('Achievements', 'states/Achievements.js');
+            game.load.script('HelpScreen', 'states/HelpScreen.js');
+            game.load.script('Industries', 'states/Industries.js');
+            game.load.script('CutScreen', 'states/CutScreen.js');
+            game.load.script('GameModel',  'js/GameModel.js');
             
             //my first Phaser.io plugin/API
             game.plugin = game.plugins.add(Phaser.Plugin.BarchartPlugin);
@@ -189,12 +189,13 @@ Splash.prototype = {
     }
 
     , addGameStates: function () {
+        
         game.state.add("MainMenu", MainMenu);
         game.state.add("Game", Game);
-        game.state.add("TownShop", TownShop);
         game.state.add("Statistics", Statistics);
         game.state.add("Instructions", Instructions);
         game.state.add("ResourceMap", ResourceMap);
+        game.state.add("TownShop", TownShop);
         game.state.add("Industries", Industries);
         game.state.add("UltimateItems", UltimateItems);
         game.state.add("Achievements", Achievements);
@@ -202,6 +203,7 @@ Splash.prototype = {
         game.state.add("Credits", Credits);
         game.state.add("Options", Options);
         game.state.add("CutScreen", CutScreen);
+        
     }
 
     , addGameMusic: function () {

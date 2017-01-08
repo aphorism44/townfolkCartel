@@ -67,16 +67,16 @@ Game.prototype = {
         this.gameTimer = game.time.events.loop(1000, this.timerTrigger, this);
         //navigation buttons
         var navButtonsData = [
-            { name: "Tavern", color: "Orange", nav: "TownShop", shop: "tavern" }
-            , { name: "Inn", color: "LtBlue", nav: "TownShop", shop: "inn" }
-            , { name: "Temple", color: "Pink", nav: "TownShop", shop: "temple" }
-            , { name: "Blacksmith", color: "Brown", nav: "TownShop", shop: "blacksmith" }
-            , { name: "Item Shop", color: "Blue", nav: "TownShop", shop: "itemshop" }
-            , { name: "Statistics", color: "Red", nav: "Statistics" }
-            , { name: "Buy Resources", color: "Green", nav: "ResourceMap" }
-            , { name: "Ultimate Items", color: "Yellow", nav: "UltimateItems" }
-            , { name: "Achievements", color: "LtBlue", nav: "Achievements" }
-            , { name: "Help!", color: "Orange", nav: "HelpScreen" }
+            { 'name': "Tavern", color: "Orange", 'nav': "TownShop", 'shop': "tavern" }
+            , { 'name': "Inn", color: "LtBlue", 'nav': "TownShop", 'shop': "inn" }
+            , { 'name': "Temple", color: "Pink", 'nav': "TownShop", 'shop': "temple" }
+            , { 'name': "Blacksmith", color: "Brown", 'nav': "TownShop", 'shop': "blacksmith" }
+            , { 'name': "Item Shop", color: "Blue", 'nav': "TownShop", 'shop': "itemshop" }
+            , { 'name': "Statistics", color: "Red", 'nav': "Statistics" }
+            , { 'name': "Buy Industries", color: "Green", 'nav': "ResourceMap" }
+            , { 'name': "Ultimate Items", color: "Yellow", 'nav': "UltimateItems" }
+            , { 'name': "Achievements", color: "LtBlue", 'nav': "Achievements" }
+            , { 'name': "Help!", color: "Orange", 'nav': "HelpScreen" }
             
         ];
         

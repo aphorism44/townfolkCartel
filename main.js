@@ -8,8 +8,16 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game')
     , musicPlayer
     , gameTimer;
 
+//NG API (still in beta)
+var ngio = new Newgrounds.io.core("appId", "encCode");
 
-
+ngio.callComponent("Gateway.getDatetime", {}, function(result) {
+   if (result.success) {
+        console.log('The current date/time on the Newgrounds.io server is '+result.datetime);
+   } else {
+        console.log('ERROR!', result.error.message);
+   }
+});
 
 Main.prototype = {
 

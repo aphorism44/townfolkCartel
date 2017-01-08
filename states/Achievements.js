@@ -22,12 +22,12 @@ Achievements.prototype = {
         //the store levels
         this.shopData = GameModel.shopButtonPool;
         var i = 0;
-        for (var [key, value] of this.shopData) {
-            var head = this.add.sprite(40 + (i * 130), 150, value.headGraphic);
+        for (var key in this.shopData) {
+            var head = this.add.sprite(40 + (i * 130), 150, this.shopData[key].headGraphic);
             head.width = 75;
             head.height = 75;
             this.add.text(40 + (i * 130), 240
-            , value.goodsText + "\n" + GameModel[key + 'Level'] + " / " + GameModel.maxTownLevel , {
+            , this.shopData[key].goodsText + "\n" + GameModel[key + 'Level'] + " / " + GameModel.maxTownLevel , {
                 font: '18px The Minion',
                 fill: 'Black'
             });
