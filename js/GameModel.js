@@ -383,10 +383,10 @@
             //when you buy resource buildings, they provide an exponential increase
             //of your base income; since maintenance growth in linear, this will more than cancel it out
             var baseExponent = 1;
-            //each building adds (.001 * building level) to the exponent, for a max of 1.03
+            //each building adds to the exponent
             for (var key in this.buildingMap)
                 if (this.buildingMap[key].purchased)
-                    baseExponent += this.buildingMap[key].level * .001;
+                    baseExponent += this.buildingMap[key].level * .005;
             
             return baseExponent;
         }
@@ -394,12 +394,11 @@
         GameModel.getOverview = function() {
             var maintainance = this.getMaintenanceCost();
             var strBuild = "Active Adventurers: " + this.adventurerList.length + "\n";
-            strBuild += "Level 1-10: " + this.adventurerList.filter(function(a) { return a.level <= 10; }).length + "\t\t\t";
-            strBuild += "/   Level 11-20: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 20; }).length + "\t\t\t";
-            strBuild += "/   Level 21-30: " + this.adventurerList.filter(function(a) { return a.level > 20 && a.level <= 30; }).length + "\n";
-            strBuild += "Level 31-50: " + this.adventurerList.filter(function(a) { return a.level > 30 && a.level <= 50; }).length + "\t\t\t";
-            strBuild += "/   Level 50+: " + this.adventurerList.filter(function(a) { return a.level > 50; }).length + "\t\t\t";
-            strBuild += "/   Dead adventurers: " + this.deadAdventurerList.length + "\n\n";
+            strBuild += "Level 1-5: " + this.adventurerList.filter(function(a) { return a.level <= 5; }).length + "\t\t\t";
+            strBuild += "/   Level 6-10: " + this.adventurerList.filter(function(a) { return a.level > 5 && a.level <= 10; }).length + "\t\t\t";
+            strBuild += "/   Level 11-15: " + this.adventurerList.filter(function(a) { return a.level > 10 && a.level <= 15; }).length + "\n";
+            strBuild += "Level 16-20: " + this.adventurerList.filter(function(a) { return a.level > 15 && a.level <= 20; }).length + "\t\t\t";
+            strBuild += "/   Level 20+: " + this.adventurerList.filter(function(a) { return a.level > 20; }).length + "\n\n";
             strBuild += "Day: " + this.day +  "\n";
             strBuild += "Current Gold: " + this.moneyPool.toFormat() + "\n\n";
             return strBuild;
@@ -711,7 +710,7 @@
             , { 'speaker': 'Clavo', 'graphic': 'clavoFrown', 'text': 'My aunt\'s inn is crammed to the rafters, and they still keep coming into town.' }
             , { 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'I can barely lift my arms, I\'ve forged so many swords.' }
             , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Hasn\'t anyone raised their prices since adventurers started hitting the dungeon? They\'re bringing in lots of treasure; they can afford it.' }
-            , { 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'Actually, that makes sense. Maybe if we raised our prices, we wouldn\'t be be so busy.' }
+            , { 'speaker': 'Lissette', 'graphic': 'lissetteFrown', 'text': 'Actually, that makes sense. Maybe if we raised our prices, we wouldn\'t be so busy.' }
             , { 'speaker': 'Lemel', 'graphic': 'lemelFrown', 'text': 'But then we\'ll lose business!' }
             , { 'speaker': 'Mizak', 'graphic': 'mizakNormal', 'text': 'Think, big guy! If we charge more, we won\'t need as many customers. And since we\'re the only village in the area, they don\'t have a choice! I have a great plan! I just need to borrow-' }
             , { 'speaker': 'Lemel', 'graphic': 'lemelOut', 'text': 'Here it comes....' }

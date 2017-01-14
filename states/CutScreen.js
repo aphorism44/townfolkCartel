@@ -4,7 +4,7 @@ CutScreen.prototype = {
     
     create: function() {
         var state = this;
-        this.stage.disableVisibilityChange = false;
+        this.stage.disableVisibilityChange = true;
         var bg = game.add.sprite(0, 0, 'townmenu-bg');
         
         if (gameOptions.playMusic) {

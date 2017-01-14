@@ -7,7 +7,7 @@ ResourceMap.prototype = {
     
     , create: function() {
         var state = this;
-        this.stage.disableVisibilityChange = false;
+        this.stage.disableVisibilityChange = true;
         var bg = game.add.sprite(0, 0, 'map-bg');
         
         this.playerGoldText = this.add.text(50, 50, 'Gold: ' + GameModel.getMoneyPool(), {

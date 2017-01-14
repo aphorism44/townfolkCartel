@@ -51,9 +51,9 @@ Credits.prototype = {
     create: function () {
         this.stage.disableVisibilityChange = true;
 
-        if (musicPlayer.name !== "unpluggedCredits" && gameOptions.playMusic) {
+        if (musicPlayer.name !== "nightCredits" && gameOptions.playMusic) {
             musicPlayer.stop();
-            musicPlayer = game.add.audio('unpluggedCredits');
+            musicPlayer = game.add.audio('nightCredits');
             musicPlayer.loop = true;
             musicPlayer.play();
         }

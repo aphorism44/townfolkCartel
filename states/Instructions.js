@@ -7,7 +7,7 @@ Instructions.prototype = {
     
     , create: function() {
         var state = this;
-        this.stage.disableVisibilityChange = false;
+        this.stage.disableVisibilityChange = true;
         var bg = game.add.sprite(0, 0, 'parchment-bg');
         this.infoText = this.add.text(50, 50, this.info, {
             font: '24px The Minion',

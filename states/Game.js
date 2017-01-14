@@ -9,14 +9,14 @@ Game.prototype = {
     , create: function () {
         var state = this;
         
-        if (musicPlayer.name !== "faceBehindGame" && gameOptions.playMusic) {
+        if (musicPlayer.name !== "gameMusic" && gameOptions.playMusic) {
             musicPlayer.stop();
-            musicPlayer = game.add.audio('faceBehindGame');
+            musicPlayer = game.add.audio('gameMusic');
             musicPlayer.loop = true;
             musicPlayer.play();
         }
         
-        this.stage.disableVisibilityChange = false;
+        this.stage.disableVisibilityChange = true;
         game.add.sprite(0, 0, 'townmenu-bg');
         
         //last minute addition - players want to mute...Brian will be sad...

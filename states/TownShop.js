@@ -9,7 +9,7 @@ TownShop.prototype = {
     , create: function() {
         var state = this;
         this.loc = game.currentShop;
-        this.stage.disableVisibilityChange = false;
+        this.stage.disableVisibilityChange = true;
         game.add.sprite(0, 0, this.loc + '-bg');
         
         //gold

@@ -30,9 +30,9 @@ Splash.prototype = {
     , loadBgm: function () {
         game.load.audio('menumusic', 'assets/bgm/circularPrelude.mp3');
         game.load.audio('reasonEnding', 'assets/bgm/reasonEnding.mp3');
-        game.load.audio('unpluggedCredits', 'assets/bgm/unpluggedCredits.mp3');
+        game.load.audio('nightCredits', 'assets/bgm/nightCredits.mp3');
         game.load.audio('daylightsOpening', 'assets/bgm/daylightsOpening.mp3');
-        game.load.audio('faceBehindGame', 'assets/bgm/faceBehindGame.mp3');
+        game.load.audio('gameMusic', 'assets/bgm/gameMusic.mp3');
     }
     
     , loadImages: function () {

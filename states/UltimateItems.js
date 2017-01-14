@@ -7,7 +7,7 @@ UltimateItems.prototype = {
     
     , create: function() {
         var state = this;
-        this.stage.disableVisibilityChange = false;
+        this.stage.disableVisibilityChange = true;
         var bg = game.add.sprite(0, 0, 'parchment-bg');
         
         this.stateGroup = this.game.add.group();
