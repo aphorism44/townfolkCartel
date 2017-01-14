@@ -9,7 +9,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game')
     , gameTimer;
 
 //NG API (still in beta)
-var ngio = new Newgrounds.io.core(code, code);
+var ngio = new Newgrounds.io.core("45307:BJ129YXO", "WqLFkO2+tVviQB1Lz68dgg==");
 
 ngio.callComponent("Gateway.getDatetime", {}, function(result) {
    if (result.success) {
