@@ -1,7 +1,6 @@
 # The Townsfolk Cartel
 
 This is an idle game, and the first game I made using the Phaser.io engine. You can play it online here: http://www.newgrounds.com/portal/view/687176.
-https://cloud.githubusercontent.com/assets/6020859/21957852/c74651dc-da65-11e6-90d9-10cdd49dfa39.png
 
 ![Screenshot](https://cloud.githubusercontent.com/assets/6020859/21957852/c74651dc-da65-11e6-90d9-10cdd49dfa39.png)
 
